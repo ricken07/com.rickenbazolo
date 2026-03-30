@@ -1,0 +1,60 @@
+---
+title: "Kubernetes : Introduction à Kubernetes"
+slug: "kubernetes-introduction"
+language: "fr"
+publishedAt: "2022-09-08"
+tags: ["cloud", "container", "devops", "kubernetes", "virtualization"]
+readingTime: 2
+excerpt: "Dans ce premier article de la série Kubernetes, nous allons commencer par une introduction à Kubernetes. Ensuite, nous couvrirons plus de détails dans les prochains articles de la série Kubernetes. Commençons le premier épisode."
+status: "published"
+canonical: "https://autourducode.net/cloud/kubernetes-introduction/"
+---
+
+Dans ce premier article de la série Kubernetes, nous allons commencer par une introduction à Kubernetes. Ensuite, nous couvrirons plus de détails dans les prochains articles de la série Kubernetes. Commençons le premier épisode.
+
+## Qu’est-ce que Kubernetes ?
+
+**Définition de la documentation :** [Kubernetes](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/) est une plateforme portable, extensible et open-source pour la gestion des charges de travail et des services conteneurisés, qui facilite à la fois la configuration déclarative et l’automatisation. Il est abrégé en **k8s** car il y a **8 lettres entre le k et le s** dans le mot **Kubernetes**.
+
+Il s’agit essentiellement d’un outil d’orchestration de conteneurs conçu par Google. Étant donné que de nombreuses entreprises passent d’architectures **monolithiques** à des **microservices**, les technologies de conteneurisation (comme Docker) sont devenues populaires jour après jour. Kubernetes est utilisé pour gérer les applications conteneurisées. Il vous aide à :
+
+* Créez des applications hautement disponibles,
+* Faire évoluer vos applications,
+* Équilibrez facilement la charge,
+* Contrôler la consommation des ressources
+
+et bien d’autres choses comme la gestion des versions.
+
+## Composants de Kubernetes
+
+Un cluster Kubernetes se compose d’un plan de contrôle (**controlplane**) et de nœuds de travail (**worker nodes**).
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/components-of-kubernetes-1024x478.png)](https://autourducode.net/wp-content/uploads/2022/06/components-of-kubernetes.png)
+
+Image de référence : [kubernetes.io.](https://kubernetes.io/docs/concepts/overview/components/)
+
+### Composants du plan de contrôle
+
+Le **plan de contrôle** (Controlplane) est le décideur du cluster, ce qui signifie qu’il est responsable de l’orchestration de tous les processus nécessaires à l’exécution, à l’ordonnancement et à la maintenance des applications. Les composants de **Controlplane** peuvent être installés sur n’importe quel nœud mais, en tant que meilleure pratique, il n’est pas suggéré d’avoir des composants de **Controlplane** sur un nœud de travail. Nous parlerons de la construction d’un cluster Kubernetes dans les articles suivants.
+
+**kube-apiserver** : Le composant qui expose le serveur API.
+
+**etcd** : Il s’agit d’un magasin clé-valeur, distribué et fortement cohérent. Kubernetes l’utilise comme backing store pour toutes les données du cluster.
+
+**kube-scheduler** : Le composant qui surveille les pods nouvellement créés et leur attribue un nœud.
+
+**kube-controller-manager** : Le composant qui est responsable des processus de contrôle. Les processus de contrôle varient dans Kubernetes, comme le contrôleur de nœuds qui contrôle si les nœuds sont en panne ou le contrôleur de points de terminaison (**endpoints**) qui crée les objets de points de terminaison.
+
+**cloud-controller-manager** : Il s’agit d’un composant facultatif qui n’est requis que lorsqu’un cluster Kubernetes est créé sur le cloud. Ce composant relie votre cluster Kubernetes au fournisseur de cloud.
+
+### Composants des nœuds (Node)
+
+Ce sont les composants qui s’exécutent sur chaque nœud et qui sont utilisés pour exécuter et maintenir les pods.
+
+**kubelet** : Ce composant communique avec le plan de contrôle. D’une certaine manière, il s’assure que les conteneurs fonctionnent dans un Pod.
+
+**kube-proxy** : Le kube-proxy gère les communications réseau à l’intérieur ou à l’extérieur de votre cluster.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

@@ -1,0 +1,60 @@
+---
+title: "Kubernetes: Introduction to Kubernetes"
+slug: "kubernetes-introduction"
+language: "en"
+publishedAt: "2022-09-08"
+tags: ["cloud", "container", "devops", "kubernetes", "virtualization"]
+readingTime: 2
+excerpt: "In this first article of the Kubernetes series, we will start with an introduction to Kubernetes.Then we will cover more details in the next articles in the Kubernetes series.Let's start the first episode."
+status: "published"
+canonical: "https://autourducode.net/cloud/kubernetes-introduction/"
+---
+
+In this first article of the Kubernetes series, we will start with an introduction to Kubernetes.Then we will cover more details in the next articles in the Kubernetes series.Let's start the first episode.
+
+## What is Kubernetes?
+
+**Documentation Definition:** [Kubernetes](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/) is a portable, extensible, and open-source platform for managing containerized workloads and services that facilitates both declarative configuration and automation.It is abbreviated as **k8s** because there are **8 letters between the k and the s** in the word **Kubernetes**.
+
+It is essentially a container orchestration tool designed by Google.Since many companies are moving from **monolithic** architectures to **microservices**, containerization technologies (like Docker) have become popular day by day.Kubernetes is used to manage containerized applications.It helps you:
+
+* Create highly available applications,
+* Develop your applications,
+* Easily balance the load,
+* Control resource consumption
+
+and many other things like versioning.
+
+## Kubernetes Components
+
+A Kubernetes cluster consists of a control plane (**controlplane**) and worker nodes (**worker nodes**).
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/components-of-kubernetes-1024x478.png)](https://autourducode.net/wp-content/uploads/2022/06/components-of-kubernetes.png)
+
+Reference image: [kubernetes.io.](https://kubernetes.io/docs/concepts/overview/components/)
+
+### Control plane components
+
+The **Controlplane** is the decision maker of the cluster, meaning it is responsible for orchestrating all the processes necessary for running, scheduling, and maintaining applications.**Controlplane** components can be installed on any node but, as a best practice, it is not suggested to have **Controlplane** components on a worker node.We will talk about building a Kubernetes cluster in the following articles.
+
+**kube-apiserver**: The component that exposes the API server.
+
+**etcd**: This is a highly consistent, distributed, key-value store.Kubernetes uses it as a backing store for all data in the cluster.
+
+**kube-scheduler**: The component that monitors newly created pods and assigns them a node.
+
+**kube-controller-manager**: The component that is responsible for controlling processes.Control processes vary in Kubernetes, such as the node controller that monitors whether nodes are down or the endpoint controller that creates endpoint objects.
+
+**cloud-controller-manager**: This is an optional component that is only required when a Kubernetes cluster is created on the cloud.This component connects your Kubernetes cluster to the cloud provider.
+
+### Node components
+
+These are the components that run on each node and are used to run and maintain pods.
+
+**kubelet**: This component communicates with the control plane.In a way, it ensures that containers work in a Pod.
+
+**kube-proxy**: The kube-proxy manages network communications inside or outside your cluster.
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

@@ -1,0 +1,34 @@
+{
+  "hero": {
+    "title": "Building software, platforms, and AI",
+    "subtitle": "Building products and OSS tools.",
+    "description": "I share how I design AI-first workflows, ship resilient platforms, and the tools that speed up delivery.",
+    "primaryCta": "Read the blog",
+    "secondaryCta": "About me",
+    "role": "Software & AI engineer",
+    "profile": "Profile",
+    "focus": "Focus",
+    "focusValue": "AI-first products & platform tooling",
+    "availability": "Availability",
+    "availabilityValue": "Open to collaborations",
+    "stack": "Stack"
+  },
+  "sections": {
+    "featured": "Featured article",
+    "latest": "Latest writing",
+    "opensource": "Open source",
+    "speaking": "Speaking",
+    "tools": "Tools",
+    "toolbelt": "My toolbelt",
+    "toolLabel": "Tool",
+    "viewAll": "View all",
+    "readArticle": "Read the article",
+    "empty": "No articles yet."
+  },
+  "stats": {
+    "posts": "Articles",
+    "projects": "OSS projects",
+    "talks": "Talks",
+    "tools": "Tools"
+  }
+}

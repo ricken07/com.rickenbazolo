@@ -1,0 +1,179 @@
+---
+title: "Java Persistence – Conversion du mappage xml d’Hibernate en annotations JPA"
+slug: "java-persistence-api-conversion-mappage-xml-hibernate-annotations-jpa"
+language: "fr"
+publishedAt: "2022-09-08"
+tags: ["hibernate", "java", "jpa"]
+readingTime: 2
+excerpt: "Après l’introduction des annotations dans Java 5 , JPA et Hibernate proposaient des annotations pour définir les mappages d’entités."
+status: "published"
+canonical: "https://autourducode.net/java/java-persistence-api-conversion-mappage-xml-hibernate-annotations-jpa/"
+---
+
+[![](https://autourducode.net/wp-content/uploads/2022/05/JPA-Logo-1024x512-1.jpeg)](https://autourducode.net/wp-content/uploads/2022/05/JPA-Logo-1024x512-1.jpeg)
+
+Après l’introduction des annotations dans [Java 5](https://www.ibm.com/docs/en/rhapsody/9.0.1?topic=features-java-5-annotations), JPA et Hibernate proposaient des annotations pour définir les mappages d’entités.
+
+Les définitions de mappage sont devenues partie intégrante des entités. Cela met toutes les informations en un seul endroit et les rend plus faciles à comprendre. *Vous n’avez pas non plus besoin de synchroniser plusieurs fichiers (ce qui, à mon avis, est un avantage incroyable…)*.
+
+Définitions de mappage ; vous pouvez soit les définir via des annotations, soit dans un fichier XML.
+
+Nous allons faire correspondre les balises **XML** en annotions **[JPA](https://docs.oracle.com/javaee/6/tutorial/doc/bnbpz.html)**
+
+#### Mapping XML Hibernate (hbm.xml)
+
+#### Class Java (.java)
+
+```
+<class name="Produit">
+```
+
+```
+@Entity
+public class Produit
+// ou:
+@Entity(name="Produit")
+public class NomDeClassAutre
+// ou:
+```
+
+```
+<class name="Produit" table="PRODUIT">
+```
+
+```
+@Entity(name="Produit")
+@Table(name="PRODUIT")
+public class Produit
+```
+
+```
+<cache usage="read-write" region="directory" />
+```
+
+```
+@Entity(name="Produit")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "directory")
+```
+
+```
+<many-to-one name="stock" column="stock_id" class="Stock" />
+```
+
+```
+@ManyToOne
+@JoinColumn(name="stock_id")
+Stock stock;
+```
+
+```
+<property name="adresseValide" column="adresse_valide" />
+```
+
+```
+@Column(name="adresse_valide")
+Boolean adresseValide;
+```
+
+```
+<property name="adresse" />
+```
+
+```
+@Column(name="adresse")
+String adresse;
+```
+
+```
+<set name="demoGroupes" cascade="all-delete-orphan">
+	<cache usage="read-write" region="collection" />
+	<key column="groupe_id" />
+	<one-to-many class="Groupe" />
+</set>
+```
+
+```
+@OneToMany(orphanRemoval = true, cascade = {CascadeType.ALL}) 
+@JoinColumn(name = "produit_id")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "collection")
+private Collection<Groupe> demoGroupes = ...
+```
+
+```
+<set name="commandes" table="produit_commandes">
+	<cache usage="read-write" region="collection" />
+	<key column="produit_id" />
+	<many-to-many class="Commandes" column="commande_id" />
+</set>
+```
+
+```
+// Dans le fichier Produit.java:
+@ManyToMany
+@JoinTable(name = "produit_commandes",
+    joinColumns = { @JoinColumn(name = "produit_id") },
+    inverseJoinColumns = { @JoinColumn(name = "commande_id") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "collection")
+private Collection<Commande> commandes = ...
+
+// dans le fichier commande.hbm.xml la propriété "produits" est annoté avec inverse="true"
+// in Commande.java:
+@ManyToMany(mappedBy = "commandes", inverse = true)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "collection")
+private Collection<Produit> produits = ...
+```
+
+```
+<set name="valuesStrings" table="TestValue">
+	<cache usage="read-write" region="collection" />
+	<key column="id" />
+	<element type="String" column="value" />
+</set>
+```
+
+```
+@ElementCollection
+@CollectionTable(name = "TestValue", joinColumns = @JoinColumn(name = "id"))
+@Column(name = "value")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "collection")
+private Collection<String> valuesStrings = ...
+```
+
+```
+<joined-subclass name="Simple">
+</joined-subclass>
+```
+
+```
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Simple ...
+```
+
+```
+<set name="demoGroupes" ... inverse="true">
+...
+	<one-to-many class="Groupe" />
+</set>
+```
+
+```
+// dans le fichier Produit.java:
+
+@OneToMany(mappedBy="produit")
+private Collection<Groupe> demoGroupes = ...
+
+// dans le fichier Groupe.java :
+class Groupe {
+@ManyToOne
+@JoinColumn(name="produit_ref_id")
+Produit produit;
+... 
+}
+```
+
+### Vous pouvez utiliser les deux dans le même projet. Si vous faites cela, le mappage XML remplace les annotations.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

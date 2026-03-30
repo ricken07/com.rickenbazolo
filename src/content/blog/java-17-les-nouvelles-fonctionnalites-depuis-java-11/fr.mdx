@@ -1,0 +1,184 @@
+---
+title: "Java 17 – Les nouvelles fonctionnalités"
+slug: "java-17-les-nouvelles-fonctionnalites-depuis-java-11"
+language: "fr"
+publishedAt: "2022-07-25"
+tags: ["java", "java17"]
+readingTime: 5
+excerpt: "Avec la nouvelle cadence des versions de Java, nous voyons une nouvelle version de Java tous les 6 mois, mais nous devons faire attention aux versions LTS. Le 20 septembre 2021, la dernière version LTS de Java a été publiée, Java 17. Pour les applications matures ou prêtes à être mises en production"
+status: "published"
+canonical: "https://autourducode.net/java/java-17-les-nouvelles-fonctionnalites-depuis-java-11/"
+---
+
+Avec la nouvelle cadence des versions de Java, nous voyons une nouvelle version de Java tous les 6 mois, mais nous devons faire attention aux versions LTS. Le 20 septembre 2021, la dernière version LTS de Java a été publiée, Java 17. Pour les applications matures ou prêtes à être mises en production, il est toujours recommandé d’utiliser la dernière version stable LTS. Certaines personnes utilisent peut-être déjà Java 11 (version LTS précédente) et pourraient envisager de passer à Java 17 dans un avenir proche.
+
+C’est pourquoi il est très important de disposer d’un récapitulatif des fonctionnalités disponibles lors de la mise à niveau de Java 11 à Java 17, et cet article y sera consacré. La plupart de ces fonctionnalités ont été introduites dans les versions précédentes de Java (12, 13, 14, 15 ou 16) en tant que fonctionnalités d’incubation ou de prévisualisation.
+
+## Nouvelles fonctionnalités
+
+### Classes scellées (Sealed Classes)
+
+Le but des classes ou interfaces scellées est de fournir un moyen de permettre à une classe d’être largement accessible, mais pas largement extensible. Celles-ci ne peuvent être étendues ou implémentées que par les classes et interfaces qui sont explicitement autorisées.
+
+Une classe ou une interface est **scellée** en appliquant le modificateur **sealed** à sa définition, après tout extends ou implements la clause permits doit être ajoutée suivie des classes que nous autorisons à être étendues.
+
+```
+public abstract sealed class Forme
+    permits Cercle, Rectangle, Carre { ... }
+```
+
+Ensuite, dans les implémentations (classes autorisées), nous devons étendre la classe scellée.
+
+```
+public final class Cercle extends Forme { ... }
+public final class Rectangle extends Forme { ... }
+public final class Carre extends Shape { ... }
+```
+
+Les classes scellées peuvent être appliquées également aux interfaces et aux **records** et doivent suivre certaines règles lors de l’extension de la classe scellée.
+
+### Pattern Matching for Instance Of
+
+Un changement très simple, mais utile !!! Nous n’aurons plus besoin de **caster** l’objet après une déclaration **instanceof** afin de l’utiliser en toute sécurité.
+
+```
+//Java 11
+if (obj instanceof User) {
+  User user = (User) obj;
+  System.out.println(user.getName());
+}
+//Java 17
+if (obj instanceof User user) {
+  System.out.println(user.getName());
+}
+```
+
+### Switch Expression
+
+C’est le premier pas vers un style de programmation plus déclaratif et « **null-safe**« , permettant une meilleure façon d’exprimer et de modéliser les données, en reconnaissant la sémantique du modèle de données par le biais de patterns. Améliorer définitivement la lisibilité de notre code, en évitant les if/else if/else imbriqués dans de nombreuses circonstances et fournir des fonctionnalités que nous voyons dans d’autres langages de programmation.
+
+Prenons le code suivant comme référence, avec quelques **if/els****e if** et **instanceof**.
+
+```
+static String formatter(Object o) {
+    String formatted = "unknown";
+    if (o instanceof Integer i) {
+        formatted = String.format("int %d", i);
+    } else if (o instanceof Long l) {
+        formatted = String.format("long %d", l);
+    } else if (o instanceof Double d) {
+        formatted = String.format("double %f", d);
+    } else if (o instanceof String s) {
+        if(s.length > 3){
+          formatted = String.format("Short String %s", s);
+        }  else {
+          formatted = String.format("Large String %s", s);
+        }
+    }
+    return formatted;
+}
+```
+
+Le code précédent peut être converti avec une expression switch
+
+```
+static String formatterPatternSwitch(Object o) {
+    return switch (o) {
+        case Integer i -> String.format("int %d", i);
+        case Long l    -> String.format("long %d", l);
+        case Double d  -> String.format("double %f", d);
+        case String s && (s.length > 3) -> String.format("Short String %s", s);
+        case String s && (s.length > 10 -> String.format("Large String %s", s);
+        default        -> o.toString();
+    };
+}
+```
+
+### Blocs de texte (Text blocks)
+
+Il nous permet de créer facilement des chaînes de caractères multilignes. La chaîne multiligne doit être écrite à l’intérieur d’une paire de guillemets triples-doubles.
+
+```
+String sqlSentence = """
+					select * from Item i
+                    where i.price > 5000
+  					and i.saleDate = '07/07/2022'
+        			""";
+
+String textBlockJSON = """
+		{
+			"name":"Ricken",
+			"website":"autourducode.net"
+		}""";
+```
+
+### Records
+
+Elle réduit une grande partie de notre code, un **record** compacte la syntaxe pour déclarer une classe qui stocke des données pures et immuables (*qui reste identique, ne change pas*), et n’a pas de logique, une bonne option pour le fameux DTO (Data Transfer Object). C’est similaire à la classe Data en Kotlin ou à la classe Case en Scala. Les **records** évitent d’ajouter du code passe-partout, car le constructeur, les accesseurs (getters setters), les méthodes **equals**, **hashCode** et **toString** sont générés automatiquement.
+
+```
+public record Person (String name, String lastName, int age){}
+```
+
+Si nous voulons faire la même chose avec une classe Java ordinaire, nous devrons peut-être générer quelque chose comme le code suivant.
+
+```
+public class Person {
+  private String name;
+  private String lastName;
+  private int age;
+  
+  public String getName(){
+    return name;
+  }
+  public void setName(String name){
+    this.name = name;
+  }
+  
+  public String getLastName(){/*Code*/}
+  public void setLastName(String lastName){/*Code*/}
+  public int getAge(){/*Code*/}
+  public void setAge(int age){/*Code*/}
+  
+  public boolean equals(Object obj){/*Code*/}
+  public int hashCode(){/*Code*/}
+  public String toString(){/*Code*/}
+}
+```
+
+Certes, les POJO classiques (Plain Old Java Object) sont toujours valables, mais nous disposons désormais d’une autre structure à utiliser dans notre code en fonction de nos besoins. C’est pourquoi il est important de garder à l’esprit les caractéristiques suivantes d’un **record**.
+
+* Les champs déclarés sont privés et finaux.
+* Les accesseurs ou les méthodes autogénérées peuvent être redéfinis.
+* Il est possible de créer de nouvelles méthodes dans un **record**.
+* Les records ne permettent pas de créer des champs **d’instance** dans leur corps.
+* Les records permettent de créer des champs **statiques** dans leur corps.
+* Les records autorisent les **constructeurs multiples**.
+* Les records peuvent implémenter des interfaces.
+* Les records ne peuvent pas étendre d’autres classes.
+* Les records ne peuvent **pas être abstraits**.
+
+### Ajout de la méthode Stream.toList
+
+L’objectif est de réduire le texte passe-partout avec certains collecteurs Stream couramment utilisés, tels que ***Collectors.toList*** et ***Collectors.toSet***.
+
+```
+List<String> integersAsString = Arrays.asList("1", "2", "3");
+List<Integer> intsEquivalent = integersAsString.stream()
+  .map(Integer::parseInt)
+  .toList();
+```
+
+Au lieu du code précédent.
+
+```
+List<Integer> ints = integersAsString.stream()
+  .map(Integer::parseInt)
+  .collect(Collectors.toList());
+```
+
+*Comme nous pouvons le constater, Java, en tant que langage de programmation, évolue constamment en ajoutant de nouvelles fonctionnalités pour simplifier les tâches des développeurs, en réduisant le code standard, en ajoutant de nouveaux modèles et en adaptant le langage aux nouvelles tendances et fonctionnalités offertes par d’autres langages. Il est certain que la mise à niveau de Java 11 à Java 17 offrira des fonctionnalités intéressantes.*
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

@@ -1,0 +1,23 @@
+[
+  {
+    "slug": "spring-ai-paris",
+    "title": "Industrialiser Spring AI",
+    "event": "Spring I/O Paris",
+    "location": "Paris, France",
+    "date": "2024-10-12",
+    "language": "fr",
+    "tags": ["Spring", "AI"],
+    "slidesUrl": "https://speakerdeck.com/rickenbazolo/spring-ai",
+    "videoUrl": "https://youtube.com/watch?v=dummy"
+  },
+  {
+    "slug": "ai-governance-london",
+    "title": "AI Governance for Builders",
+    "event": "GraphQL Conf",
+    "location": "London, UK",
+    "date": "2024-06-18",
+    "language": "en",
+    "tags": ["AI", "Governance"],
+    "slidesUrl": "https://speakerdeck.com/rickenbazolo/ai-governance"
+  }
+]

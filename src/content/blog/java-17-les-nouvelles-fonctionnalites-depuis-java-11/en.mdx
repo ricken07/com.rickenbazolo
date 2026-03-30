@@ -1,0 +1,184 @@
+---
+title: "Java 17 – New features"
+slug: "java-17-les-nouvelles-fonctionnalites-depuis-java-11"
+language: "en"
+publishedAt: "2022-07-25"
+tags: ["java", "java17"]
+readingTime: 5
+excerpt: "With the new Java release cadence, we see a new Java release every 6 months, but we need to be careful about LTS releases.On September 20, 2021, the latest LTS version of Java was released, Java 17. For mature or production-ready applications"
+status: "published"
+canonical: "https://autourducode.net/java/java-17-les-nouvelles-fonctionnalites-depuis-java-11/"
+---
+
+With the new Java release cadence, we see a new Java release every 6 months, but we need to be careful about LTS releases.On September 20, 2021, the latest LTS version of Java was released, Java 17. For mature or production-ready applications, it is always recommended to use the latest stable LTS version.Some people may already be using Java 11 (previous LTS version) and might consider upgrading to Java 17 in the near future.
+
+This is why it is very important to have a summary of the features available when upgrading from Java 11 to Java 17, and this article will be dedicated to it.Most of these features were introduced in previous versions of Java (12, 13, 14, 15, or 16) as incubation or preview features.
+
+## New features
+
+### Sealed Classes
+
+The purpose of sealed classes or interfaces is to provide a way to allow a class to be widely accessible, but not widely extensible.These can only be extended or implemented by classes and interfaces that are explicitly allowed.
+
+A class or interface is **sealed** by applying the **sealed** modifier to its definition, after all extends or implements the permits clause must be added followed by the classes we allow to be extended.
+
+```
+public abstract sealed class Form
+permits Circle, Rectangle, Square { ... }
+```
+
+Then in the implementations (allowed classes) we need to extend the sealed class.
+
+```
+public final class Circle extends Shape { ... }
+public final class Rectangle extends Shape { ... }
+public final class Carre extends Shape { ... }
+```
+
+Sealed classes can be applied to interfaces and **records** as well and must follow certain rules when extending the sealed class.
+
+### Pattern Matching for Instance Of
+
+A very simple, but useful change!!!We will no longer need to **cast** the object after an **instanceof** declaration in order to use it safely.
+
+```
+//Java 11
+if (obj instance of User) {
+User user = (User) obj;
+System.out.println(user.getName());
+}
+//Java 17
+if (obj instanceof User user) {
+System.out.println(user.getName());
+}
+```
+
+### Switch Expression
+
+This is the first step towards a more declarative and null-safe style of programming, allowing a better way of expressing and modeling data, by recognizing the semantics of the data model through patterns.Definitely improving the readability of our code, avoiding nested if/else in many circumstances and providing features we see in other programming languages.
+
+Let's take the following code as a reference, with some **if/els****e if** and **instanceof**.
+
+```
+static String formatter(Object o) {
+String formatted = "unknown";
+if (o instanceof Integer i) {
+formatted = String.format("int %d", i);
+} else if (o instanceof Long l) {
+formatted = String.format("long %d", l);
+} else if (o instanceof Double d) {
+formatted = String.format("double %f", d);
+} else if (o instanceof String s) {
+if(s.length > 3){
+formatted = String.format("Short String %s", s);
+} else {
+formatted = String.format("Large String %s", s);
+}
+}
+return formatted;
+}
+```
+
+The previous code can be converted with a switch expression
+
+```
+static String formatterPatternSwitch(Object o) {
+return switch(o) {
+case Integer i -> String.format("int %d", i);
+case Long l -> String.format("long %d", l);
+case Double d -> String.format("double %f", d);
+case String s && (s.length > 3) -> String.format("Short String %s", s);
+case String s && (s.length > 10 -> String.format("Large String %s", s);
+default -> o.toString();
+};
+}
+```
+
+### Text blocks
+
+It allows us to easily create multiline character strings.The multiline string must be written inside a pair of triple-double quotes.
+
+```
+String sqlSentence = """
+select * from Item i
+where i.price > 5000
+and i.saleDate = '07/07/2022'
+""";
+
+String textBlockJSON = """
+{
+"name":"Ricken",
+"website":"autourducode.net"
+}""";
+```
+
+### Records
+
+It reduces a large part of our code, a **record** compacts the syntax to declare a class which stores pure and immutable data (*which remains the same, does not change*), and has no logic, a good option for the famous DTO (Data Transfer Object).It is similar to the Data class in Kotlin or the Case class in Scala.**Records** avoid adding boilerplate code because the constructor, getters setters, **equals**, **hashCode** and **toString** methods are automatically generated.
+
+```
+public record Person (String name, String lastName, int age){}
+```
+
+If we want to do the same thing with a regular Java class, we may need to generate something like the following code.
+
+```
+public class Person {
+private String name;
+private String lastName;
+private int age;
+
+public String getName(){
+return name;
+}
+public void setName(String name){
+this.name = name;
+}
+
+public String getLastName(){/*Code*/}
+public void setLastName(String lastName){/*Code*/}
+public int getAge(){/*Code*/}
+public void setAge(int age){/*Code*/}
+
+public boolean equals(Object obj){/*Code*/}
+public int hashCode(){/*Code*/}
+public String toString(){/*Code*/}
+}
+```
+
+Certainly, classic POJOs (Plain Old Java Object) are still valid, but we now have another structure to use in our code according to our needs.This is why it is important to keep in mind the following characteristics of a **record**.
+
+* Declared fields are private and final.
+* Accessors or autogenerated methods can be redefined.
+* It is possible to create new methods in a **record**.
+* Records do not allow the creation of **instance** fields in their body.
+* Records allow you to create **static** fields in their body.
+*Records allow **multiple manufacturers**.
+* Records can implement interfaces.
+*Records cannot extend other classes.
+* Records cannot **not be abstract**.
+
+### Added Stream.toList method
+
+The goal is to reduce boilerplate text with some commonly used Stream collectors, such as ***Collectors.toList*** and ***Collectors.toSet***.
+
+```
+List<String> integersAsString = Arrays.asList("1", "2", "3");
+List<Integer> intsEquivalent = integersAsString.stream()
+.map(Integer::parseInt)
+.toList();
+```
+
+Instead of the previous code.
+
+```
+List<Integer> ints = integersAsString.stream()
+.map(Integer::parseInt)
+.collect(Collectors.toList());
+```
+
+*As we can see, Java, as a programming language, is constantly evolving by adding new features to simplify developers' tasks, reducing boilerplate code, adding new patterns, and adapting the language to new trends and features offered by other languages.Upgrading from Java 11 to Java 17 is sure to bring some exciting features.*
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

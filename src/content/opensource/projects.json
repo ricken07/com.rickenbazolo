@@ -1,0 +1,23 @@
+[
+  {
+    "slug": "toon4j",
+    "name": "toon4j",
+    "description": {
+      "fr": "Moteur Java pour créer des expériences 3D stylisées.",
+      "en": "Java engine for stylized 3D experiences."
+    },
+    "tags": ["Java", "3D"],
+    "repoUrl": "https://github.com/rickenbazolo/toon4j",
+    "latestVersion": "0.3.0"
+  },
+  {
+    "slug": "momo4j",
+    "name": "momo4j",
+    "description": {
+      "fr": "Toolkit de microservices pour l'écosystème africain.",
+      "en": "Microservice toolkit tuned for the African ecosystem."
+    },
+    "tags": ["Microservices", "Cloud"],
+    "repoUrl": "https://github.com/rickenbazolo/momo4j"
+  }
+]

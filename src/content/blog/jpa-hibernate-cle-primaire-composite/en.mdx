@@ -1,0 +1,218 @@
+---
+title: "JPA/Hibernate – Embedding a Composite Primary Key (@Embeddable, @EmbeddedId)"
+slug: "jpa-hibernate-cle-primaire-composite"
+language: "en"
+publishedAt: "2022-07-25"
+tags: ["hibernate", "java", "jpa", "spring-boot"]
+readingTime: 3
+excerpt: "In this example, we will learn how to embed a composite primary key, we will declare the IDs (primary key fields) as a separate class annotated with the @Embeddable annotation.A student is identified by its StudentCompositeId, which is defined by eleveId and class."
+status: "published"
+canonical: "https://autourducode.net/java/jpa-hibernate-cle-primaire-composite/"
+---
+
+In this example, we will learn how to embed a ***composite primary key***, we will declare the IDs (primary key fields) as a separate class annotated with the annotation ***@Embeddable***.A student is identified by their **StudentCompositeId**, which is defined by **eleveId** and **class**.
+
+To know what a composite key is, we need to know what a primary key is, a primary key is a column that has a **unique** and **non-zero** value in a SQL table.
+
+Now, a **composite key** is also a **primary key**, but the difference is *that it is made by combining several columns to identify the particular row in the table*.
+
+Let’s get into the code…
+
+### Create a simple Spring Boot project “TutoHibernatePK”
+
+### Folder structure:
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-09-à-01.26.16-822x1024.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-09-à-01.26.16.png)
+
+### The POM.xml file
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
+<parent>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-parent</artifactId>
+<version>2.6.7</version>
+<relativePath/> <!-- lookup parent from repository -->
+</parent>
+<groupId>com.autourducode</groupId>
+<artifactId>TutoHibernatePK</artifactId>
+<version>0.0.1-SNAPSHOT</version>
+<name>TutoHibernatePK</name>
+<description>TutoHibernatePK</description>
+<properties>
+<java.version>11</java.version>
+</properties>
+<dependencies>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<dependency>
+<groupId>mysql</groupId>
+<artifactId>mysql-connector-java</artifactId>
+<scope>runtime</scope>
+</dependency>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-test</artifactId>
+<scope>test</scope>
+</dependency>
+</dependencies>
+
+<build>
+<plugins>
+<plugin>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-maven-plugin</artifactId>
+</plugin>
+</plugins>
+</build>
+
+</project>
+```
+
+### Create Java classes:
+
+###EleveCompositeId.java
+
+```
+package com.aroundcode;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import java.io.Serializable;
+import java.util.Objects;
+
+/**
+* @author aroundducode
+*/
+@Embeddable
+public class EleveCompositeId implements Serializable {
+@Column(name = "HIGH_ID")
+private int highId;
+@Column(name = "CLASS", length = 50)
+private String class;
+
+public StudentCompositeId() {
+}
+
+public int getEleveId() {
+return highId;
+}
+
+public void setEleveId(int eleveId) {
+this.eleveId = eleveId;
+}
+
+public String getClass() {
+return class;
+}
+
+public void setClass(String class) {
+this.class = class;
+}
+
+@Override
+public boolean equals(Object o) {
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+EleveCompositeId that = (EleveCompositeId) o;
+return eleveId == that.eleveId && class.equals(that.class);
+}
+
+@Override
+public int hashCode() {
+return Objects.hash(eleveId, class);
+}
+}
+```
+
+In order to implement a composite key in Hibernate, we need to override the **equals()** and **hashCode()** methods and also implement the **Serializable** interface.Our **EleveCompositeId** class acts as an identifier class and we have marked it with the **@Embeddable** annotation so that this class is eligible to be **an embeddable class**.
+
+### Student.java
+
+```
+package com.aroundcode;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.Objects;
+
+@Entity
+@Table(name = "HIGH")
+public class Student {
+@EmbeddedId
+private EleveCompositeId eleveCompositeID;
+
+@Column(name = "SUPPORT_NAME", length = 80)
+private String studentName;
+
+public Student() {
+}
+
+public EleveCompositeId getEleveCompositeID() {
+return highCompositeID;
+}
+
+public void setEleveCompositeID(EleveCompositeId eleveCompositeID) {
+this.eleveCompositeID = eleveCompositeID;
+}
+
+public String getStudentName() {
+return studentName;
+}
+
+public void setStudentName(String studentName) {
+this.StudentName = StudentName;
+}
+
+@Override
+public boolean equals(Object o) {
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+High high = (High) o;
+return eleveCompositeID.equals(eleve.eleveCompositeID) && studentName.equals(eleve.studentName);
+}
+
+@Override
+public int hashCode() {
+return Objects.hash(studentCompositeID, studentName);
+}
+}
+```
+
+Our primary key fields **(eleveId and class)** are defined in our embeddable class **(EleveCompositeId)**.The **Eleve** entity class contains a single primary key field **(eleveCompositeID)** that is annotated with **@EmbeddedId** and contains an instance of this embeddable class.
+
+### The application.properties file
+
+```
+spring.datasource.url=jdbc:mysql://localhost:3306/tutodb?serverTimezone=UTC
+spring.datasource.username=aroundcode
+spring.datasource.password=aroundcode
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+spring.jpa.show-sql=true
+```
+
+### Creating the database schema
+
+After starting our application, hibernate updates the database schema
+
+```
+Hibernate: create table eleve (class varchar(50) not null, eleve_id integer not null, eleve_name varchar(80), primary key (class, eleve_id)) engine=MyISAM
+```
+
+The combination of the **class** and **eleve_id** column constitutes a composite key, it will be used to uniquely identify each row in the table.
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-10-à-00.51.32.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-10-à-00.51.32.png)
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

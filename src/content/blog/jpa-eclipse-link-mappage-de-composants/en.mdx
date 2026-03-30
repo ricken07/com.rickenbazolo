@@ -1,0 +1,199 @@
+---
+title: "JPA/EclipseLink - Component Mapping Using Annotations |@Embeddable & @Embedded"
+slug: "jpa-eclipse-link-mappage-de-composants"
+language: "en"
+publishedAt: "2022-09-08"
+tags: ["eclipselink", "hibernate", "java", "jpa", "persistence"]
+readingTime: 3
+excerpt: "In this example, we will learn Component Mapping using JPA annotations.Component Mapping represents the has-a relationship, composition is a stronger association where the contained object has no existence of its own.For example, a student has an address, an address cannot exist"
+status: "published"
+canonical: "https://autourducode.net/java/jpa-eclipse-link-mappage-de-composants/"
+---
+
+In this example, we will learn ***Component Mapping*** using **JPA** annotations.***Component Mapping*** represents the ***has-a*** relationship, composition is a stronger association where the contained object has no existence of its own.For example, a student has an address, an address cannot exist separately without a student.As the **Student** and **Address** entities are strongly related, it is best to store them in a **single table**.
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-10-à-01.43.11-1024x348.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-10-à-01.43.11.png)
+
+### **Create a Java project “JpaComponentMapping”**
+
+### **Folder structure:**
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-21.46.57.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-21.46.57.png)
+
+### Bookstores
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-21.00.54.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-21.00.54.png)
+
+### Create Java classes:
+
+### StudentAddress.java
+
+```
+package aroundcode;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+/**
+*
+* @author aroundducode
+*/
+@Embeddable
+public class HighAddress {
+@Column(name = "POSTAL_CODE")
+private int Postcode;
+@Column(name = "STREET")
+private String street;
+
+public StudentAddress() {
+}
+
+public int getPostalCode() {
+return PostCode;
+}
+
+public void setPostalCode(intPostalCode) {
+this.PostalCode = PostalCode;
+}
+
+public String getStreet() {
+return street;
+}
+
+public void setStreet(String street) {
+this.street = street;
+}
+}
+```
+
+We have marked our **EleveAddress** class with the @Embeddable annotation so that this class is eligible to be an **embeddable class**.The **@Embeddable** annotation is used to specify that the **EleveAddress** class will be used as a component.**EleveAddress** cannot have its own primary key and it will use the primary key of the **Eleve** class.
+
+### Student.java
+
+```
+package aroundcode;
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/**
+*
+* @author aroundducode
+*/
+@Entity
+@Table(name = "student")
+public class Eleve implements Serializable {
+
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "ID")
+private Long id;
+@Column(name = "NAME", length = 20)
+private String name;
+@Embedded
+private StudentAddress address;
+
+public Student() {
+}
+
+public Long getId() {
+return id;
+}
+
+public void setId(Long id) {
+this.id = id;
+}
+
+public String getName() {
+return name;
+}
+
+public void setName(String name) {
+this.name = name;
+}
+
+public StudentAddress getAddress() {
+return address;
+}
+
+public void setAddress(HighAddressaddress) {
+this.address = address;
+}
+}
+```
+
+We used the following JPA annotations in our Student class
+
+1. **@Entity** – This annotation will mark our **Eleve** class as an Entity Bean.
+2. **@Table** – The **@Table** annotation will map our class to the corresponding database table.You can also specify other attributes such as **indexes**, **catalog**, **schema**, **uniqueConstraints**.The **@Table** annotation is an optional annotation;if this annotation is not provided, the class name will be used as the table name.
+3. **@Id** – The **@Id** annotation marks the particular field as the **primary key** of the **entity**.
+4. **@GeneratedValue** – This annotation is used to specify how the **primary key** should be generated.
+5. **@Column** – This annotation associates the corresponding fields with their respective columns in the database table.
+6. **@Embedded –** The **@Embedded** annotation is used to specify that the **EleveAddress** entity should be stored in the “eleve” table as a component.
+
+### **persistence.xml**
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistencehttp://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+<persistence-unit name="JpaComponentMappingPU" transaction-type="RESOURCE_LOCAL">
+<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+<class>autourducode.Eleve</class>
+<properties>
+<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/component_mapping?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
+<property name="javax.persistence.jdbc.user" value="autourducode"/>
+<property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+<property name="javax.persistence.jdbc.password" value="autourducode"/>
+<property name="javax.persistence.schema-generation.database.action" value="create"/>
+</properties>
+</persistence-unit>
+</persistence>
+```
+
+#### The first and most important property is used to specify the JDBC driver class, in my case Driver.
+
+```
+<property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+```
+
+#### Give the **Connection URL** of the database and provide the **Username** and **Password** for the database connection above.
+
+```
+<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/component_mapping?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
+<property name="javax.persistence.jdbc.user" value="autourducode"/>
+<property name="javax.persistence.jdbc.password" value="autourducode"/>
+```
+
+#### If the property “**javax.persistence.schema-generation.database.action**” is set to “**create**“, the database schema will be dropped and recreated on each run.
+
+```
+<property name="javax.persistence.schema-generation.database.action" value="create"/>
+```
+
+#### you can also use this property
+
+```
+<property name="eclipselink.ddl-generation" value="create-tables"/>
+```
+
+### Creating the database schema
+
+After starting our application, **eclipseLink** creates the database schema
+
+```
+Thread(Thread[main,5,main])--CREATE TABLE high (ID BIGINT AUTO_INCREMENT NOT NULL, NAME VARCHAR(20), ZIPCODE INTEGER, STREET VARCHAR(255), PRIMARY KEY (ID))
+```
+
+The **POSTAL_CODE** and **STREET** columns of the **EleveAdresse** class used as a **component** have been integrated into the “**eleve**” table.
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-22.20.27.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-22.20.27.png)
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

@@ -1,0 +1,59 @@
+---
+title: "Spring vs. Spring Boot vs. Spring MVC"
+slug: "spring-vs-springboot-vs-springmvc"
+language: "fr"
+publishedAt: "2022-09-08"
+tags: ["java", "spring", "spring-boot"]
+readingTime: 3
+excerpt: "Dans cet article nous allons faire une comparaison entre Spring , Spring Boot et Spring MVC"
+status: "published"
+canonical: "https://autourducode.net/java/spring-vs-springboot-vs-springmvc/"
+---
+
+Dans cet article nous allons faire une comparaison entre **Spring**, **Spring Boot** et **Spring MVC**
+
+### Spring vs. Spring Boot
+
+**[Spring](https://fr.wikipedia.org/wiki/Spring_(framework)):**  Spring Framework est le cadre de développement d’applications le plus populaire de [Java](https://dev.java/). La principale caractéristique de Spring Framework est l’injection de dépendances ou l’inversion de contrôle (IoC). Avec l’aide de Spring Framework, nous pouvons développer une application faiblement couplée. ***Il est préférable de l’utiliser si le type ou les caractéristiques de l’application sont purement définis.***
+
+**[Spring Boot](https://spring.io/projects/spring-boot) :** Spring Boot est un module de Spring Framework. Il nous permet de construire une application autonome avec des configurations minimales ou nulles. ***Il est préférable de l’utiliser si nous voulons développer une application simple basée sur Spring ou des services RESTful.***
+
+#### Comparaisons entre Spring et Spring Boot :
+
+| Spring | Spring Boot |
+| --- | --- |
+| **Spring Framework** est un cadre Java EE largement utilisé pour la création d’applications. | Le framework **Spring Boot** est largement utilisé pour développer des API REST. |
+| Il vise à simplifier le développement de Java EE afin de rendre les développeurs plus productifs. | Il vise à réduire la complexité du code et à fournir le moyen le plus simple de développer des applications Web. |
+| La principale caractéristique de Spring Framework est l’**injection de dépendances**. | La principale caractéristique de Spring Boot est l’**Auto-configuration**. Il configure automatiquement les classes en fonction des besoins. |
+| Il contribue à simplifier les choses en nous permettant de développer des applications **faiblement couplées**. | Il permet de créer une application **autonome** avec moins de configuration. |
+| Le développeur écrit beaucoup de code (**code passe-partout**) pour effectuer une tâche minimale. | Il réduit le **code passe-partout**. |
+| Pour tester le projet Spring, nous devons configurer le serveur de manière explicite. | Spring Boot offre un serveur intégré tel que **Jetty** et **Tomcat**, etc. |
+| Il ne prend pas en charge une base de données en mémoire. | Il propose plusieurs plugins permettant de travailler avec une **base de données intégrée** telle que **H2**. |
+| Les développeurs définissent manuellement les dépendances du projet Spring dans le fichier **pom.xml**. | Spring Boot est livré avec le concept de **starter** dans le fichier pom.xml qui se charge en interne de télécharger les **JARs** de dépendances en fonction des exigences de Spring Boot. |
+
+Tableau comparatif
+
+### Spring Boot vs. Spring MVC
+
+**Spring Boot :** Spring Boot permet d’amorcer rapidement et de commencer à développer une application basée sur Spring. Il évite un grand nombre de codes passe-partout. Il dissimule une grande partie de la complexité derrière la scène afin que le développeur puisse rapidement se lancer et développer facilement des applications basées sur Spring.
+
+**[Spring MVC](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/mvc.html) :** Spring MVC est un Framework Web MVC pour la construction d’applications Web. Il contient un grand nombre de fichiers de configuration pour diverses capacités. Il s’agit d’un cadre de développement d’applications Web orienté HTTP.
+
+*Spring Boot et Spring MVC ont des objectifs différents.*
+
+**Comparaisons entre Spring Boot et Spring MVC :**
+
+| Spring Boot | Spring MVC |
+| --- | --- |
+| **Spring Boot** est un module de Spring permettant d’empaqueter les applications basées sur Spring avec des valeurs par défaut raisonnables. | **Spring MVC** est un framework web basé sur Modèle-Vue-Contrôleur, sous le framework Spring. |
+| Il fournit des **configurations par défaut** pour construire un framework alimenté par Spring. | Il fournit des **fonctionnalités prêtes à l’emploi** pour construire une application web. |
+| Il n’est pas nécessaire de faire une configuration manuelle. | Il nécessite une configuration manuelle. |
+| Il n’est pas nécessaire d’avoir un descripteur de déploiement. | Un descripteur de déploiement est requis. |
+| Il évite le code passe-partout et regroupe les dépendances en une seule unité. | Il spécifie chaque dépendance séparément. |
+| Il réduit le temps de développement et augmente la productivité. | Il faut plus de temps pour arriver au même résultat. |
+
+Tableau comparatif
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

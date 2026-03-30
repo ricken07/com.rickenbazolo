@@ -1,0 +1,61 @@
+---
+title: "Mots Clés – JDK, JRE Et JVM, Qu’est-ce que c’est ?"
+slug: "la-difference-entre-jdk-jre-et-jvm"
+language: "fr"
+publishedAt: "2022-07-25"
+tags: ["java"]
+readingTime: 3
+excerpt: "JDK, JRE et JVM sont les trois mots-clés les plus importants que l’on entend souvent dans le langage de programmation Java et même de nombreux développeurs Java ne parviennent pas à faire la différence entre eux ou pensent qu’ils sont identiques. À la fin de cet article, nous connaîtrons les réponse"
+status: "published"
+canonical: "https://autourducode.net/java/la-difference-entre-jdk-jre-et-jvm/"
+---
+
+JDK, JRE et JVM sont les trois mots-clés les plus importants que l’on entend souvent dans le langage de programmation Java et même de nombreux développeurs Java ne parviennent pas à faire la différence entre eux ou pensent qu’ils sont identiques. À la fin de cet article, nous connaîtrons les réponses aux questions ci-dessous.
+
+1. Qu’est-ce que la **JVM** en Java ?
+2. Qu’est-ce que le compilateur **JIT** en Java ?
+3. Qu’est-ce que le **JRE** en Java ?
+4. Qu’est-ce que le **JDK** en Java ?
+
+Une fois que vous avez compris la différence entre le **JDK**, **JRE** et la **JVM**, il vous sera beaucoup plus facile de mieux visualiser les choses.
+
+## 1. Qu’est-ce que la JVM en Java ?
+
+La **JVM** est une machine abstraite qui fournit une spécification pour l’environnement d’exécution où le bytecode sera exécuté. Le code Java compilé (fichier .class) sert d’entrée à la JVM car elle ne peut comprendre que le bytecode Java. La JVM elle-même est en fait dépendante de la **plate-forme**. Elle interprète le bytecode en langage de niveau machine qui peut ensuite être exécuté par n’importe quelle implémentation de la JVM.
+
+La JVM comprend les trois principaux composants suivants.
+
+1. **Class Loader Subsystem** – *Loading* (chargement des fichiers class/jar requis), *Linking* (affectation des références et vérification) et *Initialization* (initialisation des variables statiques et exécution du bloc statique).
+2. **Runtime Data Area** – Fournit de la mémoire pour toutes les variables, opérateurs, etc.
+3. **Execution Engine** – Effectue l’interprétation et l’exécution
+
+```
+JVM = Class Loader Subsystem + Runtime Data Area + Execution Engine
+```
+
+## 2. Qu’est-ce que le compilateur JIT en Java ?
+
+Avant de connaître le **compilateur JIT**, nous devons avoir quelques connaissances de base sur le fonctionnement d’un **interpréteur** en Java. L’interpréteur lit le bytecode, l’interprète et l’exécute un par un. L’interpréteur interprète le bytecode Java plus rapidement, mais l’exécute lentement. L’inconvénient d’un interpréteur est que lorsqu’une méthode est appelée plusieurs fois, une interprétation est nécessaire à chaque fois.
+
+Le **compilateur JIT** nous aide à surmonter l’inconvénient de **l’interpréteur** (la méthode unique est interprétée plusieurs fois pour des appels multiples). Le **moteur d’exécution** utilise l’interpréteur pour lire et interpréter le bytecode mais lorsqu’il rencontre un code répété, il utilise le compilateur JIT qui compile le bytecode Java entier une fois et le transforme en code natif. Ce code natif sera utilisé directement à partir de la prochaine fois pour les appels de méthode répétés.
+
+## 3. Qu’est-ce que le JRE dans Java ?
+
+**L’environnement d’exécution Java** est généralement la mise en œuvre d’une **JVM**. Il se compose de la JVM, **des bibliothèques de classes (rt.jar)** et d’autres **fichiers de support (java, javaw, etc.)** nécessaires à l’exécution. En fait, la JVM exécute le programme, elle utilise les bibliothèques fournies dans le JRE. Elle ne contient pas d’outils de développement tels que **le compilateur (javac)**, **le désassembleur (javap)**, **le débogueur (jdb)**, etc. En termes simples, nous pouvons dire que le **JRE** est égal à la **JVM** et aux bibliothèques.
+
+```
+JRE = JVM + Librairies
+```
+
+## 4. Qu’est-ce que le JDK dans Java ?
+
+**Le kit du développeur Java** contient les outils dont un développeur Java a besoin pour développer les programmes Java et le **JRE** pour exécuter le programme. Supposons que vous vouliez écrire votre propre code, le compiler et l’exécuter, alors seul JDK est nécessaire. Pour exécuter le code déjà compilé, le JRE est suffisant.  
+En termes simples, nous pouvons dire que le **JDK** est égal à **JRE** et aux **outils de développement**. Ces outils comprennent le compilateur Java (**javac**), le désassembleur Java (**Javap**), le débogueur Java (**jdb**), le générateur de fichiers d’en-tête Java (**javah**), la documentation (**javadoc**) et bien d’autres.
+
+```
+JDK = JRE + Outils de développement
+```
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

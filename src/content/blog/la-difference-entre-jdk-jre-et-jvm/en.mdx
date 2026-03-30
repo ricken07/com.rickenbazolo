@@ -1,0 +1,61 @@
+---
+title: "Keywords – JDK, JRE And JVM, What is it?"
+slug: "la-difference-entre-jdk-jre-et-jvm"
+language: "en"
+publishedAt: "2022-07-25"
+tags: ["java"]
+readingTime: 3
+excerpt: "JDK, JRE and JVM are the three most important keywords that are often heard in Java programming language and even many Java developers fail to differentiate between them or think that they are the same.At the end of this article, we will know the answers"
+status: "published"
+canonical: "https://autourducode.net/java/la-difference-entre-jdk-jre-et-jvm/"
+---
+
+JDK, JRE and JVM are the three most important keywords that are often heard in Java programming language and even many Java developers fail to differentiate between them or think that they are the same.At the end of this article, we will know the answers to the questions below.
+
+1. What is **JVM** in Java?
+2. What is **JIT** compiler in Java?
+3. What is **JRE** in Java?
+4. What is **JDK** in Java?
+
+Once you understand the difference between **JDK**, **JRE** and **JVM**, it will be much easier for you to visualize things better.
+
+## 1. What is JVM in Java?
+
+The **JVM** is an abstract machine that provides a specification for the execution environment where the bytecode will be executed.The compiled Java code (.class file) serves as input to the JVM because it can only understand Java bytecode.The JVM itself is actually **platform** dependent.It interprets bytecode into machine-level language which can then be executed by any implementation of the JVM.
+
+The JVM consists of the following three main components.
+
+1. **Class Loader Subsystem** – *Loading* (loading the required class/jar files), *Linking* (assigning references and checking) and *Initialization* (initializing static variables and executing the static block).
+2. **Runtime Data Area** – Provides memory for all variables, operators, etc.
+3. **Execution Engine** – Performs interpretation and execution
+
+```
+JVM = Class Loader Subsystem + Runtime Data Area + Execution Engine
+```
+
+## 2. What is JIT compiler in Java?
+
+Before knowing about **JIT compiler**, we need to have some basic knowledge about how an **interpreter** works in Java.The interpreter reads the bytecode, interprets it and executes it one by one.The interpreter interprets Java bytecode faster, but executes it slowly.The disadvantage of an interpreter is that when a method is called multiple times, interpretation is required each time.
+
+The **JIT compiler** helps us overcome the disadvantage of **interpreter** (single method is interpreted multiple times for multiple calls).The **execution engine** uses the interpreter to read and interpret the bytecode but when it encounters repeated code, it uses the JIT compiler which compiles the entire Java bytecode once and transforms it into native code.This native code will be used directly from next time for repeated method calls.
+
+## 3. What is JRE in Java?
+
+**The Java runtime environment** is generally the implementation of a **JVM**.It consists of the JVM, **class libraries (rt.jar)** and other **support files (java, javaw, etc.)** required for execution.Actually the JVM runs the program, it uses the libraries provided in the JRE.It does not contain development tools such as **compiler (javac)**, **disassembler (javap)**, **debugger (jdb)**, etc.In simple terms, we can say that the **JRE** is equal to the **JVM** and libraries.
+
+```
+JRE = JVM + Libraries
+```
+
+## 4. What is JDK in Java?
+
+**The Java Developer Kit** contains the tools a Java developer needs to develop Java programs and the **JRE** to run the program.Suppose you want to write your own code, compile it and run it, then only JDK is needed.To run already compiled code, the JRE is sufficient.
+In simple terms, we can say that **JDK** is equal to **JRE** and **Development Tools**.These tools include Java Compiler (**javac**), Java Disassembler (**Javap**), Java Debugger (**jdb**), Java Header File Generator (**javah**), Documentation (**javadoc**) and many others.
+
+```
+JDK = JRE + Development Tools
+```
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

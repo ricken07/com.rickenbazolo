@@ -1,0 +1,165 @@
+---
+title: "Java – How to convert an Enumeration into a Stream?"
+slug: "java-comment-convertir-une-enumeration-en-stream"
+language: "en"
+publishedAt: "2022-07-25"
+tags: ["java"]
+readingTime: 3
+excerpt: "Enumeration is an interface that was introduced in an older version of Java and is used to store a sequence of elements.An object that implements this interface generates a series of elements, one by one.Calling the nextElement method returns a successive element in the series."
+status: "published"
+canonical: "https://autourducode.net/java/java-comment-convertir-une-enumeration-en-stream/"
+---
+
+**Enumeration** is an interface that was introduced in an older version of Java and is used to store a sequence of elements.An object that implements this interface generates *a series of elements, one by one*.Calling the **nextElement** method returns a successive element in the series.*In the latest version of the JDK, there are better ways to maintain a sequence of elements*, which is why it is often necessary to convert the old **Enumeration** to something that developers are more familiar with, such as a **Stream**.
+
+### **The [Enumeration](https://docs.oracle.com/javase/8/docs/api/java/util/Enumeration.html) interface**
+
+The **Enumeration** interface is simple, it contains two methods:
+
+* **hasMoreElements()** – checks if this enum contains more elements;
+* **nextElement()** – returns the next element of this enumeration if this enumeration object has at least one additional element to provide.
+
+To print all elements of an enumeration, we can use the **for** statement as in the following example:
+
+```
+for (Enumeration<E> e = v.elements(); e.hasMoreElements();) {
+System.out.println(e.nextElement());
+}
+```
+
+### **1 – **Convert **an **Enumeration** to a Stream**** using the *Spliterators* and *Iterator* interfaces.**
+
+Since **Spliterators** use the brand new **Iterator** interface which is very similar to Enumeration, it seems like a good idea to use it for conversion.
+
+In the following example, we created a helper method ***enumerationAsStream*** that converts **Enumeration** to Stream using this approach:
+
+```
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+public class EnumerationToStreamUsingSpliterator {
+
+public static void main(String[] args) {
+Enumeration<String> enumeration = Collections.enumeration(Arrays.asList("one", "two", "three"));
+
+Stream<String> stream = enumerationAsStream(enumeration);// convert an Enumeration into a Stream
+
+stream.forEach(System.out::println);// print the elements of the Stream
+}
+
+public static <T> Stream<T> enumerationAsStream(Enumeration<T> e) {
+return StreamSupport.stream(Spliterators.splitatorUnknownSize(new Iterator<T>() {
+@Override
+public Tnext() {
+return e.nextElement();
+}
+
+@Override
+public boolean hasNext() {
+return e.hasMoreElements();
+}
+
+public void forEachRemaining(Consumer<? super T> action) {
+while (e.hasMoreElements())
+action.accept(e.nextElement());
+}
+}, Spliterator.ORDERED), false);
+}
+}
+```
+
+We created an anonymous class that overrides three **Iterator** methods: **next()**, **hasNext()** and **forEachRemaining()**.
+
+***In this approach, we do not need to know the exact number of elements contained in the Enumeration object.***
+
+### **2 – Convert **Enumeration** to Stream** **using** Guava**
+
+We could use external libraries such as **[Guava](https://github.com/google/guava/wiki)** to convert an **Enumeration** into an **Iterator** and use it in the **Spliterators**.This is the same approach as in *point 1*, but here we could get rid of many lines of code:
+
+```
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import com.google.common.collect.Iterators;
+
+public class EnumerationToStreamUsingIterators {
+
+public static void main(String[] args) {
+Enumeration<String> enumeration = Collections.enumeration(Arrays.asList("one", "two", "three"));
+
+Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(Iterators.forEnumeration(enumeration), Spliterator.ORDERED);
+
+Stream<String> stream = StreamSupport.stream(splitator, false);
+
+stream.forEach(System.out::println);// print the elements of the Stream
+}
+}
+```
+
+In this example, we use the **Iterators.forEnumeration(…)** utility method from ***Guava***.
+
+### **3 – **Convert **an **Enumeration** to Stream**** using the Apache Common library**
+
+We could also use the ***Apache Common*** library to convert an **Enumeration** into an **Iterator** and then use it to create a **Stream**
+
+```
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import org.apache.commons.collections4.IteratorUtils;
+
+public class EnumerationToStreamUsingIteratorUtils {
+
+public static void main(String[] args) {
+Enumeration<String> enumeration = Collections.enumeration(Arrays.asList("one", "two", "three"));
+
+Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(IteratorUtils.asIterator(enumeration), Spliterator.ORDERED);
+
+Stream<String> stream = StreamSupport.stream(splitator, false);
+
+stream.forEach(System.out::println);// print the elements of the Stream
+}
+}
+```
+
+In this approach, we use the Apache Commons **IteratorUtils.asIterator(…)** helper method.
+
+> Since Java 9, it is possible to convert an **Enumeration** to **Stream** using a one-line solution:
+
+```
+Enumeration<String> enumeration = Collections.enumeration(Arrays.asList("one", "two", "three"));
+
+Stream<String> stream = StreamSupport.stream(
+Spliterators.spliteratorUnknownSize(enumeration.asIterator(), Spliterator.ORDERED),
+false
+);
+```
+
+A new method has been *introduced in the **Enumeration*** interface with **Java 9**:
+
+* **default Iterator asIterator()** – this method returns an **Iterator** that iterates through the remaining elements covered by this enumeration.
+
+There is also a way to convert an Enumeration to a Stream object by first converting the Iterator to a Collection, but in this approach we will have to copy all the elements, which could be very resource intensive.
+
+**In this article, we presented how to convert an Enumeration into a Stream object.**
+
+I hope it was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

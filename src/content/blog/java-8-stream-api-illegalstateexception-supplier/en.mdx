@@ -1,0 +1,95 @@
+---
+title: "Java 8 Stream API – Exception I"
+slug: "java-8-stream-api-illegalstateexception-supplier"
+language: "en"
+publishedAt: "2022-07-25"
+tags: ["java"]
+readingTime: 2
+excerpt: "In this part we will discuss a common exception that we may encounter when working with Streams in Java 8"
+status: "published"
+canonical: "https://autourducode.net/java/java-8-stream-api-illegalstateexception-supplier/"
+---
+
+In this part we will discuss a common exception that we may encounter when working with [Stream](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html) in Java 8
+
+```
+IllegalStateException: stream has already been operated upon or closed.
+```
+
+In Java 8, each Stream represents a single-purpose data sequence and supports multiple input/output operations.
+
+#### *A Stream must only be operated (by invoking an intermediate or terminal stream operation) once.An implementation of **Stream** may throw the **IllegalStateException** if it detects that the **Stream** is being reused.*
+
+Each time a terminal operation is called on a **Stream** object, the instance is consumed and closed.
+
+Therefore, we are only allowed to perform a single operation that consumes a **Stream**, otherwise we will get an exception indicating that the **Stream** has already been exploited or closed.
+
+#### Example
+
+```
+import java.util.stream.Stream;
+
+/**
+* @author aroundducode
+*/
+public class Main {
+public static void main(String[] args) {
+Stream<String> fruit
+= Stream.of("Apple", "Mango", "Strawberry", "Banana", "Avocado", "Raspberry");
+fruits.filter(f -> f.contains("m")).map(String::toUpperCase).forEach(System.out::println);
+boolean anyMatch = fruits.anyMatch(f -> f.length() > 6);
+System.out.println("Any Match "+anyMatch);
+}
+}
+```
+
+After invoking the #**forEach**() method, the **Stream** is closed, therefore any further operation on the **Stream** will throw IllegalStateException, and this is what happened after invoking the #**anyMatch**() method.
+
+```
+Exception in thread "main" java.lang.IllegalStateException: stream has already been operated upon or closed
+at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:229)
+at java.util.stream.ReferencePipeline.anyMatch(ReferencePipeline.java:516)
+at Main.main(Main.java:11)
+```
+
+#### Solution approach
+
+Simply put, the solution is to create a new feed every time we need one.
+
+We can, of course, do this manually
+
+```
+Stream<String> fruit
+= Stream.of("Apple", "Mango", "Strawberry", "Banana", "Avocado", "Raspberry");
+fruits.filter(f -> f.contains("m")).map(String::toUpperCase).forEach(System.out::println);
+fruit
+= Stream.of("Apple", "Mango", "Strawberry", "Banana", "Avocado", "Raspberry");
+boolean anyMatch = fruits.anyMatch(f -> f.length() > 6);
+System.out.println("Any Match "+anyMatch);
+```
+
+### but this is where the functional interface *[Supplier](https://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html)*  comes really handy
+
+```
+Supplier<Stream<String>> fruit
+= () -> Stream.of("Apple", "Mango", "Strawberry", "Banana", "Avocado", "Raspberry");
+fruits.get().filter(f -> f.contains("m")).map(String::toUpperCase).forEach(System.out::println);
+boolean anyMatch = fruits.get().anyMatch(f -> f.length() > 6);
+System.out.println("Any Match "+anyMatch);
+```
+
+We defined the stream **Supplier** object with type **`Stream<String>`**, which is exactly the same type that the #get() method returns.The Supplier is based on a lambda expression that takes no input and returns a new Stream.
+
+Calling the get() functional method on the Supplier returns a freshly created Stream object, on which we can safely perform another Stream operation.
+
+```
+APPLE
+RASPBERRY
+Any Match true
+```
+
+We have seen how to perform terminal operations on a **Stream** several times, while avoiding the famous IllegalStateException which is thrown when the Stream is already closed or operated.
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

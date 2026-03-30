@@ -1,0 +1,64 @@
+---
+title: "Différence entre equals() et =="
+slug: "difference-entre-equals-et-operateur-egalite"
+language: "fr"
+publishedAt: "2022-07-31"
+tags: ["java"]
+readingTime: 2
+excerpt: "La méthode equals() et l’opérateur ‘ == ‘ sont toutes deux utilisées pour vérifier l’égalité des objets, mais il existe une différence significative entre equals() et ‘ == ‘. La méthode equals est présente dans la classe java.lang.Object et est utilisée pour vérifier l’équivalence de l’objet, pour v"
+status: "published"
+canonical: "https://autourducode.net/java/difference-entre-equals-et-operateur-egalite/"
+---
+
+La méthode **equals()** et l’opérateur ‘**==**‘ sont toutes deux utilisées pour vérifier l’égalité des objets, mais il existe une différence significative entre **equals()** et ‘**==**‘. ***La méthode equals est présente dans la classe java.lang.Object et est utilisée pour vérifier l’équivalence de l’objet, pour vérifier si le contenu est égal*** alors que ‘***==***‘ ***est utilisé pour vérifier si les instances réelles de l’objet sont identiques ou non***.
+
+### **Opérateur ‘==’**
+
+L’opérateur ‘**==**‘ est utilisé pour vérifier si les deux objets font référence au même endroit dans la mémoire. Voyons cela dans l’exemple ci-dessous
+
+```
+String str1 = new String("autourducode");
+String str2 = new String("autourducode");
+if(str1 == str2) {
+	System.out.println("Les deux objets sont égaux");
+}
+else {
+	System.out.println("Les deux objets ne sont pas égaux");
+}
+```
+
+Si vous avez deviné que ‘les deux objets sont égaux‘, alors vous avez tort, ***car ‘==’ vérifie la mémoire***, ici **str1** et **str2** sont présents dans des adresses mémoire différentes, disons que **str1** est à l’adresse **0x34567** et **str2** à l’adresse **0x15698**, c’est la raison pour laquelle nous obtenons ‘les deux objets ne sont pas égaux‘ bien que les contenus soient identiques.
+
+```
+String str1 = new String("autourducode");
+String str2 = str1;
+if(str1 == str2) {
+	System.out.println("Les deux objets sont égaux");
+}
+else {
+	System.out.println("Les deux objets ne sont pas égaux");
+}
+```
+
+alors que le code ci-dessus vous donnera le résultat attendu ‘**Les deux objets sont égaux**‘ ***car les deux objets font référence au même endroit dans la mémoire***.
+
+### **Méthode equals ()**
+
+La méthode **equals** vérifie le contenu des deux objets str, nous obtiendrons ‘**Les deux objets sont égaux**‘ même si nous comparons le premier exemple avec **equals()** lui-même.
+
+```
+String str1 = new String("autourducode");
+String str2 = new String("autourducode");
+if(str1.equals(str2)) {
+	System.out.println("Les deux objets sont égaux");
+}
+else {
+	System.out.println("Les deux objets ne sont pas égaux");
+}
+```
+
+La classe String surcharge la méthode equals pour comparer si le caractère dans la chaîne est égal. Ainsi, nous obtenons la réponse vraie car les deux contiennent la même chaîne ‘**autourducode**‘.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : **\1**

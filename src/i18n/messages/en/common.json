@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "blog": "Blog",
+    "speaking": "Speaking",
+    "opensource": "Open Source",
+    "tools": "Tools",
+    "about": "About"
+  },
+  "footer": {
+    "rights": "All rights reserved"
+  }
+}

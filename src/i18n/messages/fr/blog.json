@@ -1,0 +1,11 @@
+{
+  "title": "Articles",
+  "description": "Mes notes sur Java, l'architecture, le cloud et l'IA. Filtrez par mois ou par tags pour retrouver rapidement un sujet.",
+  "searchPlaceholder": "Rechercher un article",
+  "empty": "Aucun article publié pour le moment",
+  "prev": "Précédent",
+  "next": "Suivant",
+  "pageOf": "Page {current} / {total}",
+  "tags": "Tags",
+  "clearFilters": "Réinitialiser"
+}

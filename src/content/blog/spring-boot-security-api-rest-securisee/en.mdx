@@ -1,0 +1,205 @@
+---
+title: "Spring Boot Security – Secure REST API"
+slug: "spring-boot-security-api-rest-securisee"
+language: "en"
+publishedAt: "2022-07-26"
+tags: ["api", "java", "spring-boot"]
+readingTime: 3
+excerpt: "In this article, we will learn how to secure the REST API using Spring Boot Security's Basic Authentication.With security in place, our application will provide the data to the user who is authenticated by basic authentication."
+status: "published"
+canonical: "https://autourducode.net/java/spring-boot-security-api-rest-securisee/"
+---
+
+In this article, we will learn how to secure the **REST API** ***using Spring Boot Security** Basic Authentication***.With security in place, our application will provide the data to the user who is authenticated by basic authentication.
+
+In order to access a secure resource, the user must make the request to our API with header information containing the username and password to access the resource.
+
+### **Create a Spring Boot project “SecurityBasicAuth”**
+
+#### Project structure
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-14.53.08.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-14.53.08.png)
+
+Create your project using the official website: https://start.spring.io/
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-14.59.07-1024x536.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-14.59.07.png)
+
+### **The pom.xml file**
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
+<parent>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-parent</artifactId>
+<version>2.7.2</version>
+<relativePath/> <!-- lookup parent from repository -->
+</parent>
+<groupId>net.autourducode</groupId>
+<artifactId>SecurityBasicAuth</artifactId>
+<version>0.0.1-SNAPSHOT</version>
+<name>SecurityBasicAuth</name>
+<description>SecurityBasicAuth</description>
+<properties>
+<java.version>11</java.version>
+</properties>
+<dependencies>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-test</artifactId>
+<scope>test</scope>
+</dependency>
+<dependency>
+<groupId>org.springframework.security</groupId>
+<artifactId>spring-security-test</artifactId>
+<scope>test</scope>
+</dependency>
+</dependencies>
+
+<build>
+<plugins>
+<plugin>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-maven-plugin</artifactId>
+</plugin>
+</plugins>
+</build>
+
+</project>
+```
+
+The **spring-boot-starter-parent** is a special starter, it provides useful Maven defaults.Since we are developing a web application, we also need to add the **spring-boot-starter-web** dependency, which will add the dependencies such as **Tomcat**, **Jackson**, **Spring boot**, etc.which are necessary for our application.The **spring-boot-starter-security** dependency adds all security-related dependencies.
+
+### **The dependency diagram**
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/SecurityBasicAuth-Diagram-Dependences-1024x894.png)](https://autourducode.net/wp-content/uploads/2022/07/SecurityBasicAuth-Diagram-Dependences.png)
+
+Project dependency diagram
+
+### **Configuring Spring Boot Security**
+
+### **SecurityConfig.java**
+
+```
+package net.aroundcode.securitybasicauth;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+
+/**
+* @author aroundducode
+*/
+@Configuration
+public class SecurityConfig {
+
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+http.httpBasic().and().authorizeRequests()
+.antMatchers("/user").hasRole("USER")
+.antMatchers("/admin").hasRole("ADMIN")
+.and()
+.csrf().disable();
+return http.build();
+}
+
+@Bean
+public InMemoryUserDetailsManager userDetailsService() {
+UserDetails user = User.builder()
+.username("user")
+.password(passwordEncoder().encode("password"))
+.roles("USER")
+.build();
+
+UserDetails admin = User.builder()
+.username("admin")
+.password(passwordEncoder().encode("password"))
+.roles("USER", "ADMIN")
+.build();
+return new InMemoryUserDetailsManager(admin, user);
+}
+
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+return (web) -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
+}
+
+@Bean
+public PasswordEncoder passwordEncoder() {
+return new BCryptPasswordEncoder();
+}
+}
+```
+
+To encourage users to move towards a **component-based security** configuration, ***you now need to declare two beans of type SecurityFilterChain and WebSecurityCustomizer***.More information in this article [Spring Security – WebSecurityConfigurerAdapter deprecated!](https://bit.ly/3z9nARC)
+
+### **The controller**
+
+### **SecureController.java**
+
+```
+package net.aroundcode.securitybasicauth;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+* @author aroundducode
+*/
+@RestController
+public class SecureController {
+
+@GetMapping("/user")
+public String loginUser()
+{
+return "The user has successfully logged in!!!";
+
+}
+
+@GetMapping("/admin")
+public String loginAdmin()
+{
+return "Administrator logged in successfully!!!";
+}
+}
+```
+
+* We annotated our "SecureController" class with **@RestController**.The **@RestController** annotation was introduced in Spring 4 and is a combination of @Controller + **@ResponseBody**.*So when using **@RestController** you do not need to use **@ResponseBody** which is now optional*.
+* We have two methods
++ loginUser() → This method will be called when the request with the **GET** method is /user
++ loginAdmin() → This method will be called when the request with the **GET** method is /admin
+
+In POSTMAN, select the **GET** method and give the url as “**http://localhost:8080/user**“.In the Authorization tab, select the type “**Basic Auth**” and enter the invalid username/password.You will get the error **401 Unauthorized**
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.02.33-1024x968.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.02.33.png)
+
+**Now pass valid username and password [user/password (or) admin/password].**
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.06.12-1024x814.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.06.12.png)
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.17.09-1024x821.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.17.09.png)
+
+### [**Download source code**](https://github.com/autourducode/SecurityBasicAuth)
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: **\1**

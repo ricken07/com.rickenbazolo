@@ -1,0 +1,497 @@
+---
+title: "Java Streams – Terminal Operations with Examples"
+slug: "java-streams-operations-terminales-avec-exemples"
+language: "en"
+publishedAt: "2022-07-25"
+tags: ["api", "java"]
+readingTime: 11
+excerpt: "In this article, we will learn terminal operations of Java Streams such as AnyMatch, Collectors, Count, FindAny, FindFirst, Min, Max, NoneMatch and AllMatch."
+status: "published"
+canonical: "https://autourducode.net/java/java-streams-operations-terminales-avec-exemples/"
+---
+
+In this article, we will learn terminal operations of Java Streams such as **AnyMatch**, **Collectors**, **Count**, **FindAny**, **FindFirst**, **Min**, **Max**, **NoneMatch** and **AllMatch**.
+
+Java streams must be terminated with a terminal operation and we will have many options to use depending on our needs.Let’s learn these terminal operations with the help of examples.
+
+### Java Streams Terminal Operations with Examples
+
+#### ***anyMatch()*** Terminal operation
+
+The ***anyMatch()*** method returns elements of the stream matching the provided predicate.It may not evaluate the predicate on all elements if this is not necessary to determine the outcome.If the stream is empty, **false** is returned and the predicate is not evaluated.
+This is a terminal **short-circuiting** operation, which means that it can allow calculations on infinite streams to complete in finite time.Let's make an example and see how it happens.
+
+```
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JavaStreamAnyMatchTest {
+List<String> country = new ArrayList<>();
+
+@BeforeEach
+public void setup() {
+country.add("Republic of Congo");
+country.add("Democratic Republic of Congo");
+country.add("Morocco");
+country.add("Algeria");
+country.add("Ivory Coast");
+}
+@Test
+public void anyMatchExample() {
+boolean result = country.stream()
+.filter(country -> !country.isEmpty())
+.map(String::toUpperCase)
+.anyMatch(country -> country.contains("CONGO"));
+System.out.println(result);
+}
+}
+```
+
+##### Console output
+
+In this test, we have a list of countries which includes several elements, and in our test method, first, **(line 20)** we filter the non-empty country elements, **(line 21)** then we transform the filtered elements to uppercase, and finally, **(line 22)** we check if there are elements which contain "**CONGO**".If yes, the ***anyMatch()*** method returns **true**, otherwise it returns **false**.In our test, the country list contains elements that contain "**CONGO**" and the ***anyMatch()*** method returns **true** for this test.
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-20-à-17.36.06.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-20-à-17.36.06.png)
+
+#### *****collect()***** Terminal operation
+
+We can collect the stream elements like **List**, **Map** and **Set** with ***collect()*** method.For a more advanced explanation, I also share some important parts of its official description below.
+
+> Official description below.
+>
+> The collect() method performs a mutable reduction operation on the elements of the stream using a collector.A collector encapsulates the functions used as collect arguments (Supplier, BiConsumer, …), which makes it possible to reuse collection strategies and compose collection operations such as grouping or multi-level partitioning.
+
+I want to show some basic uses of the *collect()* terminal operation in the examples below.
+
+```
+import org.junit.jupiter.api.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class JavaStreamCollectorsTest {
+List<Integer> numbers = new ArrayList<>();
+List<String> texts = new ArrayList<>();
+
+@BeforeEach
+public void setup(TestInfo info) {
+System.out.println("Test name: " + info.getDisplayName());
+Collections.addAll(numbers, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+texts.add("Java");
+texts.add("Python");
+texts.add("JS");
+texts.add("C#");
+}
+
+@AfterEach
+public void reinit() {
+numbers.clear();
+texts.clear();
+System.out.println("");
+}
+
+@Test
+@Order(1)
+public void streamCollectorsToListTest() {
+List<Integer> numberList = numbers.stream() // returns a Stream on the elements of the collection
+.filter(number -> number < 8) // Filter numbers less than 8.
+.filter(number -> number % 2 == 0) // Filter even numbers.
+.skip(1) // Skip the first filtered number.
+.map(number -> number * number) // Transform number into number*number
+.collect(Collectors.toList());
+System.out.println("List of numbers: " + numberList);
+}
+
+/**
+* Join elements with or without delimiters.
+*/
+@Test
+@Order(2)
+public void streamCollectorsJoiningTest() {
+System.out.println("List of texts: " + texts);
+String textJoint = texts.stream() // returns a Stream on the elements of the collection
+.filter(text -> text.length() < 12) // Filter texts with fewer than 8 characters.
+.collect(Collectors.joining(" - "));// Join elements with delimiter ' - '
+System.out.println("attached text: " + attachedtext);
+}
+
+/**
+* Grouping of elements according to defined rules.
+*/
+@Test
+@Order(3)
+public void streamCollectToGroupingByLengthTest() {
+texts.add("Helidon");
+texts.add("Panda");
+texts.add("Micronaut");
+System.out.println("Text List: " + texts);
+// Group by length
+Map<Integer, List<String>> groupByLength = texts.stream()
+.collect(Collectors.groupingBy(String::length));
+// Grouped by elements that contain "r"
+Map<Boolean, List<String>> groupByContainsCharR = texts.stream()
+.map(String::toLowerCase)
+.collect(Collectors.groupingBy(text -> text.contains("r")));
+//Group by last character
+Map<Character, List<String>> groupByLastCharacter = texts.stream()
+.collect(Collectors.groupingBy(text -> text.charAt(text.length() - 1)));
+System.out.println("Grouped by length: " + groupByLength);
+System.out.println("Grouped by elements that contain r: " + groupByContainsCharR);
+System.out.println("Grouped by last character: " + groupByLastCharacter);
+}
+}
+```
+
+##### Console output
+
+As seen, the test results below;
+
+* In the first example, we collect the feed as a list.
+* In the second example, we use the ***joining()*** method and joined the stream elements with the "-" delimiter.
+* In the third example, we group the elements in the stream based on specific rules such as string length, elements that contain "r" and grouping by their last character respectively.
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-21-à-21.03.04-1024x307.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-21-à-21.03.04.png)
+
+#### *******count()******* Terminal operation
+
+The ***count()*** method returns the number of elements in a stream.The working example of the terminal operation ***count()*** is as follows.
+
+```
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class JavaStreamCountTest {
+List<Integer> numbers = new ArrayList<>();
+
+@BeforeEach
+public void setup() {
+Collections.addAll(numbers, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+}
+
+@Test
+public void streamCountTest() {
+long count = numbers.stream()
+.filter(number -> number < 8) // Filter numbers that are smaller than 8.
+.filter(number -> number % 2 == 0) // Filter even numbers.
+.skip(1) // Skip the first filtered number.
+.count();// Count the rest of the numbers.
+System.out.println("Count: " + count);
+}
+}
+```
+
+##### Console output
+
+As seen in the test result below, the number stream has two filters that filter even numbers less than 8, then skip the first one and with the ***count()*** method we count them.So the numbers that pass through the filter are 2, 4, 6 and the code skips the number 2, and the final elements of the stream are 4 and 6 and the count is 2.
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-13.51.46-1024x183.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-13.51.46.png)
+
+#### ***findAny()* Terminal operation**
+
+The ***findAny()*** method returns an **Optional** describing an element of the stream or an empty **Optional** if the stream is empty.The behavior of this operation is explicitly non-deterministic;she is free to select any element in the flow.This is to allow maximum performance in parallel operations;the cost is that multiple invocations on the same source may not return the same result.If we need a stable result, then we should use the **findFirst()** method instead.I will show some examples for both methods ***findAny()*** and **findFirst()** below.
+
+```
+package com.aroundcode;
+
+import org.junit.jupiter.api.*;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class JavaStreamFindAnyTest {
+List<String> texts = new ArrayList<>();
+
+@BeforeEach
+public void setup(TestInfo testInfo) {
+System.out.println("Test name: " + testInfo.getDisplayName());
+texts.add("Ronaldo");
+texts.add("Messi");
+texts.add("Zlatan");
+texts.add("Pele");
+texts.add("Iniesta");
+texts.add("Zidane");
+texts.add("Ozil");
+}
+
+@AfterEach
+public void tearDown() {
+texts.clear();
+System.out.println("");
+}
+
+/**
+* Finds any item that satisfies the condition.
+* Returns just one element from the stream.It performs parallel processing.
+*/
+@Test
+@Order(1)
+public void findAnyTest() {
+Instant start = Instant.now();
+Optional<String> elementContainsCharZ = texts.stream()
+.map(String::toLowerCase)
+.filter(text -> text.contains("z"))
+.findAny();
+elementContainsCharZ.ifPresent(System.out::println);
+Instant end = Instant.now();
+System.out.println("FindAny elapsed time: " + Duration.between(start, end).toNanos());
+}
+
+// Returns the first element.It performs synchronous processing.
+@Test
+@Order(2)
+public void findFirstTest() {
+Instant start = Instant.now();
+Optional<String> elementContainsCharZ = texts.stream()
+.map(String::toLowerCase)
+.filter(text -> text.contains("z"))
+.findFirst();
+elementContainsCharZ.ifPresent(System.out::println);
+Instant end = Instant.now();
+System.out.println("FindFirst elapsed time: " + Duration.between(start, end).toNanos());
+}
+
+/**
+* FindFirst in parallel.
+*Here we have poor performance.
+* Try to do parallel operations when there are IO operations or long running operations.
+* Parallel does not always guarantee the best performance.
+*/
+@Test
+@Order(3)
+public void findFirstWithParallelTest() {
+Instant start = Instant.now();
+Optional<String> elementContainsCharZ = texts.stream()
+.parallel()
+.map(String::toLowerCase)
+.filter(text -> text.contains("z"))
+.findFirst();
+elementContainsCharZ.ifPresent(System.out::println);
+Instant end = Instant.now();
+System.out.println("Elapsed time of findFirst in parallel: " + Duration.between(start, end).toNanos());
+}
+}
+```
+
+##### Console output
+
+We have a list of footballers and in the **first example**, the code first transforms all elements in the string to lowercase, then it filters out the footballers that contain "z" in their name.In the first example, the code finds any element that satisfies this condition and each time it finds the condition satisfactory, it shorts and completes the operation.The ***findAny()*** method is a [terminal short-circuiting operation.](https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html)
+
+**The second and third examples are functionally the same**.In these examples, the codes find the first footballer whose name contains "z" and it is Zlatan.**In the second example, the flow runs synchronously** and in the third example, **the flow runs in parallel.**
+
+Parallel execution does not always guarantee the best performance and in the third example we have poor performance.We should use parallel stream executions, for example when we have I/O operations or similar conditions.For example, if we are testing broken links of a website, parallel execution improves performance a lot because we attack the links in parallel, get the results and process them.In this case, parallelism is much more efficient.However, in these kinds of simple examples, parallel execution is slower than synchronous execution, as you can see below.
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.09.15-1024x432.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.09.15.png)
+
+#### ***findFirst()* **Terminal operation****
+
+The ***findFirst()*** method returns an Optional describing the first element of this stream, or an empty Optional if the stream is empty.If the stream has no encounter order, then any element can be returned.This method is also a terminal short-circuiting operation like **findAny()**.Now it's time to do some examples.
+
+```
+import org.junit.jupiter.api.*;
+
+import java.util.*;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class JavaStreamFindFirstTest {
+List<Integer> numbers = new ArrayList<>();
+
+@BeforeEach
+public void setup(TestInfo testInfo) {
+System.out.println("Test name: " + testInfo.getDisplayName());
+Collections.addAll(numbers, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+}
+
+@AfterEach
+public void tearDown() {
+numbers.clear();
+System.out.println("");
+}
+
+@Test
+@Order(1)
+public void streamCountTest() {
+Optional<Integer> firstFoundNumber = numbers.stream()
+.filter(number -> number < 8) // Filter numbers less than 8.
+.filter(number -> number % 2 == 0) // Filter even numbers.
+.skip(1) // Skip the first filtered number.
+.findFirst();
+
+// Traditional style
+if(firstFoundNumber.isPresent()) {
+System.out.println(firstFoundNumber.get());
+}
+// Functional style
+firstFoundNumber.ifPresent(System.out::println);
+}
+@Test
+@Order(2)
+public void streamCountTestWithException() {
+Optional<Integer> firstFoundNumber = Optional.of(numbers.stream()
+.filter(number -> number < 8) // Filter numbers less than 8.
+.filter(number -> number % 2 == 0) // Filter even numbers.
+.skip(4) // Skip the first 4 filtered numbers.
+.findFirst()
+.orElseThrow(NoSuchElementException::new));
+
+// Functional style
+firstFoundNumber.ifPresent(System.out::println);
+}
+}
+```
+
+**Console output**
+
+**In the first example**, the code finds the first even number that is smaller than 8, it should normally be 2 but because of the skip() method the code skips the 2 and the first number that satisfies the condition is 4. We printed the result with the functional and non-functional styles.
+
+**In the second example**, the code cannot find an element that satisfies the conditions of the flow and, for this reason, it throws a “**NoSuchElementException**“.
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.34.48-1024x323.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.34.48.png)
+
+#### ***min()* and *max()* ****Terminal operation******
+
+The ***min()*** method returns the minimum element of the stream based on the Comparator provided.The ***max()*** method returns the maximum element of the stream based on the comparator provided.Now for the examples.
+
+```
+import org.junit.jupiter.api.*;
+
+import java.util.*;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class JavaStreamMinMaxTest {
+List<Integer> numbers = new ArrayList<>();
+
+@BeforeEach
+public void setup(TestInfo testInfo) {
+System.out.println("Test name: " + testInfo.getDisplayName());
+Collections.addAll(numbers, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+}
+
+@AfterEach
+public void tearDown() {
+numbers.clear();
+System.out.println("");
+}
+
+/**
+* ReverseOrder is a DESCRIBING order.
+*NaturalOrder is an ASCENDING order.
+*/
+@Test
+@Order(1)
+public void minTest() {
+Optional<Integer> min = numbers.stream()
+.min(Comparator.naturalOrder());
+min.ifPresent(System.out::println);
+}
+
+@Test
+@Order(2)
+public void minReverseWayTest() {
+Optional<Integer> min = numbers.stream()
+.min(Comparator.reverseOrder());
+min.ifPresent(System.out::println);
+}
+@Test
+@Order(3)
+public void maxTest() {
+Optional<Integer> max = numbers.stream()
+.max(Comparator.naturalOrder());
+max.ifPresent(System.out::println);
+}
+@Test
+@Order(4)
+public void maxReverseWayTest() {
+Optional<Integer> max = numbers.stream()
+.max(Comparator.reverseOrder());
+max.ifPresent(System.out::println);
+}
+}
+```
+
+##### **Console output**
+
+**In the first example**, the code finds the minimum number in ascending order and the minimum number is 1 (Min operation with naturalOrder).
+
+**In the second example**, the code finds the minimum number in reverse order, which is the inverse of the minimum operation, that's why it prints 10. (Reverse of Min because of reverseOrder).
+
+**In the third example**, the code finds the maximum number with a natural order (ascending) and which is 10. (Operation Max with naturalOrder).
+
+**In the fourth example**, max with reverse order is a sort of inverse of finding a maximum number that we did in the third example, and the code prints 1. (Reverse of Max because of reverseOrder).
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.51.40-1024x499.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.51.40.png)
+
+#### ***noneMatch()* and *allMatch()* ****Terminal operation******
+
+The ***noneMatch()*** method returns **true** if no element in this stream matches the provided predicate.It may not evaluate the predicate on all elements if this is not necessary to determine the outcome.If the stream is empty, true is returned and the predicate is not evaluated.
+
+The ***allMatch()*** method returns **true** if all elements in this stream match the provided predicate.May not evaluate the predicate on all elements if it is not necessary to determine the outcome.If the stream is empty, true is returned and the predicate is not evaluated.
+
+```
+package com.aroundcode;
+
+import org.junit.jupiter.api.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class JavaStreamNoneAndAllMatchTest {
+List<String> texts = new ArrayList<>();
+
+@BeforeEach
+public void setup(TestInfo testInfo) {
+System.out.println("Test name: " + testInfo.getDisplayName());
+
+texts.add("Application");
+texts.add("Development");
+texts.add("DevOps");
+texts.add("Docker");
+texts.add("Kubernetes");
+}
+
+@Test
+@Order(1)
+public void noneMatchExample() {
+boolean result = texts.stream()
+.filter(text -> !text.isEmpty())
+.map(String::toLowerCase)
+.noneMatch(text -> text.contains("DEV"));
+System.out.println(result);
+}
+
+@Test
+@Order(2)
+public void allMatchExample() {
+boolean result = texts.stream()
+.filter(text -> !text.isEmpty())
+.map(String::toLowerCase)
+.allMatch(text -> text.contains("DEV"));
+System.out.println(result);
+}
+}
+```
+
+##### **Console output**
+
+**In the first example**, the code filters out non-empty string elements, then changes them to lowercase and then tries to match "**DEV**" to the elements in the stream, and no elements in this stream match this condition, so it returns true.
+
+**In the second example**, the code filters out non-empty string elements, then changes them to lowercase and then tries to match "**DEV**" to the elements in the stream, and not all elements in that stream match this condition, so it returns false.
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-20.57.12-1024x281.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-20.57.12.png)
+
+In this article, I have explained the most important terminal operations of Java Streams with examples.I hope you enjoyed reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

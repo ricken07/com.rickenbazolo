@@ -1,0 +1,265 @@
+---
+title: "Jakarta EE 10 – How to create a REST API"
+slug: "jakarta-ee-10-comment-creer-une-api-rest"
+language: "en"
+publishedAt: "2022-11-12"
+tags: ["api", "jakarta", "jakarta-ee", "java"]
+readingTime: 10
+excerpt: "In this article, we walk you through some basic scenarios using the REST specification.Although most people use the term REST or RESTful API only to indicate that they are transferring data over HTTP, and ignore the \"Hypermedia as a state engine\" part."
+status: "published"
+canonical: "https://autourducode.net/java/jakarta-ee-10-comment-creer-une-api-rest/"
+---
+
+[![](https://autourducode.net/wp-content/uploads/2022/11/jakarta-1024x778.png)](https://autourducode.net/wp-content/uploads/2022/11/jakarta.png)
+
+In this article, we walk you through some basic scenarios using the **REST** specification.Although most people use the term **REST** or **RESTful** API only to indicate that they are transferring data over HTTP, and ignore the "*Hypermedia as an Application State Engine* (**HATEOS**)" part of REST.This technique is widely used recently to connect the front-end to the back-end.
+
+### **Configuring our REST API**
+
+Just like the other **Jakarta** specifications, you just need to add the Web API dependency to your project.This gives you access to all the classes, interfaces and annotations that you need to use in your application to write a Jakarta EE application.The **Eclipse GlassFish 7.0.0-M8** server *certified Jakarta EE 10 compliant* in this case has all the code and implementations so you can have a *lightweight WAR file that contains only your application code.*
+
+When using Maven as a build tool, you must have the following dependency in the **pom.xml** file for your WAR application
+
+```
+<dependency>
+<groupId>jakarta.platform</groupId>
+<artifactId>jakarta.jakartaee-web-api</artifactId>
+<version>10.0.0</version>
+<scope>provided</scope>
+</dependency>
+```
+
+and when you use Gradle as a build tool, you need to add the following line in the **build.gradle** file:
+
+```
+providedCompile 'jakarta.platform:jakarta.jakartaee-web-api:10.0.0'
+```
+
+There are several possible configuration options for setting up the Jakarta REST framework, but most of the time you just need to define the part of the URL that will trigger the REST engine to process it.This can be done by defining the following Java class in your project:
+
+```
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
+
+@ApplicationPath("/api")
+public class HelloApplication extends Application {
+
+}
+```
+
+Let's look at the elements that make up this configuration class
+
+* **jakarta.ws.rs.core.Application**: The class extends *jakarta.ws.rs.core.Application* which is the base class for configuration
+* **jakarta.ws.rs.ApplicationPath**: Identifies the application path that serves as the base URI for all resource URIs
+
+> In the first example, it will be clear where the **/api** part of the URL is in the final endpoint URL.
+
+### **Hello World EndPoint**
+
+Now that we have the Jakarta REST application and configuration in place, let's create the simplest endpoint possible.
+
+A Java class like this is enough to create a **REST resource**:
+
+```
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("/hello")
+public class HelloResource {
+@GET
+public String helloWorld() {
+return "Hello, World!";
+}
+}
+```
+
+Let's look at the elements that make up our REST resource
+
+* **@Path**: The ***jakarta.ws.rs.Path*** annotation defines the link between the URL entered by the user and the Java class responsible for processing this request
+* **@GET**: The ***jakarta.ws.rs.GET*** annotation indicates that we should call our endpoint using the HTTP method **Get**
+
+> The return of the **helloWorld()** method, the string “Hello, World!”, will be the content of the response to the customer.
+
+When an application consisting of these two classes is compiled, packaged, and deployed to ***Eclipse GlassFish**, **Payara Server**, or **Payara Micro***, the following call to the endpoint produces this result:
+
+```
+1 >curl -v http://localhost:8080/jakarta/api/hello
+2 * Trying 127.0.0.1:8080...
+3 * Connected to localhost (127.0.0.1) port 8080 (#0)
+4 > GET /jakarta/api/hello HTTP/1.1
+5 > Host: localhost:8080
+6 > User-Agent: curl/7.79.1
+7 > Accept: */*
+8 >
+9 * Mark bundle as not supporting multiuse
+10 < HTTP/1.1 200 OK
+11 < Server: Eclipse GlassFish 7.0.0
+12 < X-Powered-By: Servlet/6.0 JSP/3.1(Eclipse GlassFish 7.0.0
+13 Java/Oracle Corporation/17)
+14 < Content-Type: text/plain
+15 < Content-Length: 13
+16 <
+17 * Connection #0 to host localhost left intact
+18 Hello, World!
+```
+
+First, let's look at the URL structure
+
+`http://<host-name>:<port>/<context-root>/<REST-config>/<resource-config>`
+
+- `<host-name>`: *The host name of the machine running the **Eclipse GlassFish** application server installation.*
+- `<port>`: *The **Eclipse GlassFish** port listens for incoming HTTP requests. This is port 8080 by default but can be configured.*
+- `<context-root>`: The context root assigned to the deployed application. This is the file name (without the extension) of the deployed WAR file by default, but can be specified during deployment.
+- `<REST-config>`: *The value we set for the **@ApplicationPath** annotation in our project.*
+- `<resource-config>`: *The value we defined in the **@Path** annotation on the Java class.*
+
+If we look at the output of the curl command, including the headers, we see the following aspects
+
+* **Line 10**: We received a response with status **200 (OK)** indicating successful execution of the query.At the end of this article, we show you how you can control the HTTP status that is returned to the caller.
+* **Line 13**: The response body is plain text.We haven't explicitly specified this but it follows from the fact that our **helloWorld()** method returns a string.In general, the format is based on the supported options that the client indicates it can handle and the returned value itself.Most applications explicitly define the supported format because they only want to implement support for JSON or XML throughout their code base.You can indicate the format of the response using the annotation ***jakarta.ws.rs.Produces***.
+
+```
+@Produces(MediaType.TEXT_PLAIN)
+```
+
+### **Reading URL information**
+
+It's important that you can determine parts of the specified URL sent by the client when you write API EndPoints because they contain important information related to the request.We'll cover two methods in this example, reading part of the URL and reading query parameters.
+
+To demonstrate them, we can add the following lines to the HelloResource Java class.
+
+```
+@GET
+@Produces(MediaType.TEXT_PLAIN)
+@Path("/{name}")
+public String greeting(@PathParam("name") String value, @QueryParam("language") String language) {
+return "Hello " + value + " with language " + language;
+}
+```
+
+You can see that we also specify a **@Path** annotation and that it has braces.The curly brackets indicate that this is a placeholder and that the actual value specified in the URL is passed to the 'name' variable.The variable name is also specified in the **jakarta.ws.rs.PathParam** annotation.So the Jakarta REST engine knows that the matching URL part should be used as the value for the **value** method parameter.The second method parameter has another annotation, **jakarta.ws.rs.QueryParam**, and as you might guess, it will pass the value of the **language** query parameter to this parameter.
+
+> Once deployed, we can make a call to the URL ***/api/hello/AUTOURDUCODE?langue=en*** which will result in calling the Java method with the following parameters **greeting(“***AUTOURDUCODE***“, “en”)**.
+
+### **JSON –** **Supported**
+
+In the previous examples, we always used the content type ***text/plain*** as the return type for a response.In a production application, most communications are done using the **JSON** data format.In the following example, we show you how easy it is to return this type of data.
+
+Suppose we have a Java class containing information about a user:
+
+```
+public class User {
+private String name;
+private String profile;
+private int reader;
+
+// Jakarta JSON requires a no-argument constructor.
+// Setters and Setters omitted
+}
+```
+
+And we can define the following Java resource class which returns such a value.
+
+```
+@Path("/user")
+public class UserResource {
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public User getUser() {
+return // a way to return a User instance
+}
+}
+```
+
+How you retrieve the **User** instance that needs to be returned doesn't matter here.In one of the next articles on Jakarta EE 10, we will tell you how to inject a service and retrieve it from a database for example.
+
+For this example, only the **@Produces** value is important because we explicitly indicate that the response must contain a JSON payload.This is enough for the Jakarta REST system to know to convert the **User** instance to JSON *using the built-in support defined in Jakarta*.Calling this endpoint will result in the following response:
+
+```
+> curl -v http://localhost:8080/jakarta/api/user
+* Trying 127.0.0.1:8080...
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> GET /jakarta/api/user HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.79.1
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Server: Eclipse GlassFish 7.0.0
+< X-Powered-By: Servlet/6.0 JSP/3.1(Eclipse GlassFish 7.0.0 Java/Oracle Corporation/17)
+< Content-Type: application/json
+< Content-Length: 58
+<
+* Connection #0 to host localhost left intact
+{"reader":800,"name":"autourducode","profile":"Editor"}
+```
+
+You can see that we don't need to configure the **User** class for **JSON** serialization.By default, each property is inspected and added to the output.*It also uses the type of the property to determine the optimal encoding*, so the entire value is written without quotes in this example.
+
+In addition to JSON support, you can also indicate via the Media Type value that you need **XML** output.
+
+> Of course, several configuration options are possible and will be covered in a future article in this series that discusses JSON support.
+
+### **Sending data**
+
+Now that we've explored the possibilities of retrieving data from the server, we want to send information to be processed.In the Java class **UserResource**, we can create the following method:
+
+```
+@POST
+@Produces(MediaType.TEXT_PLAIN)
+@Consumes(MediaType.APPLICATION_JSON)
+public String userRequest(User user) {
+return user.toString();
+}
+```
+
+We need to indicate the *HTTP method* that we are using and here we have specified the **jakarta.ws.rs.POST** annotation.When the Jakarta REST system receives a request matching this HTTP method on the URL specified by the **@Path**, it will transfer control to this method.
+
+You can also see that we specified the **jakarta.ws.rs.Consumes** annotation with a **JSON** value.This information is also used to match the correct Java method that should be executed for a certain request.*If we send a POST request to the URL but it has another content type (like XML), this method is no longer considered*.
+
+The media type information is also used to convert the request body into a method parameter.There can only be one method parameter that does not have Jakarta REST annotations since you can only convert the body to a single parameter.Additional parameters having **@PathParam** and **@QueryParam** are allowed and the reading information section of the URL that we discussed earlier can be used when sending information.
+
+### **Take control of HTTP response status**
+
+In this final section, we explore the option to take control of the HTTP status value returned in the response.Until now, we always returned **200 (OK status)** because the call was successful and contained a payload in the result.
+
+If we return null in one of the previous examples (instead of an actual **String** or **User** instance), the returned status is **204 (No Content)**.But there are many cases where you would like to have control over the returned status.
+
+The following example describes how you can do this.
+
+```
+@Path("/response")
+public class ResponseResource {
+@GET
+@Produces(MediaType.TEXT_PLAIN)
+@Path("/{value}")
+public Response testValue(@PathParam("value") Integer v) {
+if (v % 2 == 0) {
+return Response.ok("The value is a correct even number").build();
+} else {
+return Response.notAcceptable(Collections.emptyList()).build();
+}
+}
+}
+```
+
+The example describes a Java resource that defines an endpoint that checks whether the provided number is an even value.otherwise, it returns a status to indicate that the value is not correct.
+
+Most of the code looks familiar because we've discussed annotations before.What's new is the **jakarta.ws.rs.core.Response** return type of the method.The response encapsulates all parts of the response, the status and the payload, and can be created using the **ResponseBuilder**.
+
+In the case of a correct request, you can use the Response.ok() method.The ok method parameter sets the **Payload**.In the example this is a string, but when you specify a Java instance and have the appropriate MediaType, ***a JSON response is possible.***
+
+If the value is not correct, Response.notAcceptable returns the desired state to the client.
+
+## **Conclusion**
+
+**Jakarta REST** can be used with minimal configuration and is primarily focused on Java methods that perform or delegate the actual work without having to worry about the query infrastructure parts.
+
+The configuration and infrastructure parts are specified using annotations.The ***@ApplicationPath*** annotation defines the URL that triggers ***REST support***, the ***@Path*** annotation links the URL to the Java class that handles the response, the ***@GET***, ***@POST*** and other annotations define the HTTP method that is supported by the code, the ***@PathParam*** and ***@QueryParam*** annotations get the information from the URL and pass it as parameters to the Java method and the annotations***@Consumes*** and ***@Produces*** indicate the type of payload in the request and response.
+
+And in the last example, we showed how you can have full control over the response, ***HTTP status*** and payload data, using the ***ResponseBuilder***.
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel:**\1**

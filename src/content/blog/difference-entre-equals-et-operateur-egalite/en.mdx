@@ -1,0 +1,64 @@
+---
+title: "Difference between equals() and =="
+slug: "difference-entre-equals-et-operateur-egalite"
+language: "en"
+publishedAt: "2022-07-31"
+tags: ["java"]
+readingTime: 2
+excerpt: "Both equals() method and '==' operator are used to check the equality of objects, but there is a significant difference between equals() and '=='.The equals method is present in the java.lang.Object class and is used to check the equivalence of the object, for v"
+status: "published"
+canonical: "https://autourducode.net/java/difference-entre-equals-et-operateur-egalite/"
+---
+
+Both the **equals()** method and the ‘**==**‘ operator are used to check the equality of objects, but there is a significant difference between **equals()** and ‘**==**‘.***The equals method is present in the java.lang.Object class and is used to check the equivalence of the object, to check whether the contents are equal*** whereas ‘***==***‘ ***is used to check whether the actual instances of the object are the same or not***.
+
+### **Operator ‘==’**
+
+The ‘**==**‘ operator is used to check if both objects refer to the same location in memory.Let's see this in the example below
+
+```
+String str1 = new String("aroundcode");
+String str2 = new String("aroundcode");
+if(str1 == str2) {
+System.out.println("The two objects are equal");
+}
+else {
+System.out.println("The two objects are not equal");
+}
+```
+
+If you guessed that 'both objects are equal', then you are wrong, ***because '==' checks memory***, here **str1** and **str2** are present in different memory addresses, let's say **str1** is at address **0x34567** and **str2** is at address **0x15698**, that's the reason we get 'both objects are not equal' although the contents are the same.
+
+```
+String str1 = new String("aroundcode");
+String str2 = str1;
+if(str1 == str2) {
+System.out.println("The two objects are equal");
+}
+else {
+System.out.println("The two objects are not equal");
+}
+```
+
+while the above code will give you the expected result ‘**Both objects are equal**‘ ***because both objects refer to the same location in memory***.
+
+### **equals() method**
+
+**equals** method checks the contents of both str objects, we will get '**Both objects are equal**' even if we compare the first example with **equals()** itself.
+
+```
+String str1 = new String("aroundcode");
+String str2 = new String("aroundcode");
+if(str1.equals(str2)) {
+System.out.println("The two objects are equal");
+}
+else {
+System.out.println("The two objects are not equal");
+}
+```
+
+The String class overrides the equals method to compare whether the character in the string is equal.So, we get the true answer because both contain the same string ‘**aroundcode**’.
+
+I hope this article was useful to you.Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: **\1**

@@ -1,26 +1,150 @@
 @import "tailwindcss";
 
+/* Palette selon charte graphique autourducode.net */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Light Mode - Plus professionnel avec touches de bleu */
+  --color-background: #ffffff;      /* fond blanc pur */
+  --color-foreground: #1a1d2e;      /* texte principal très sombre */
+  --color-muted: #4a5568;           /* texte secondaire gris-bleu */
+  --color-muted-foreground: #718096;
+  --color-border: #e2e8f0;          /* bordures légères gris-bleu */
+  --color-card: #f8fafc;            /* léger gris-bleu très clair */
+  --color-card-hover: #f1f5f9;      /* hover state cards */
+  --color-accent: #0693e3;          /* bleu cyan vif (CTAs) */
+  --color-accent-hover: #0576c2;    /* hover plus foncé */
+  --color-accent-foreground: #ffffff;
+  --color-secondary: #273171;       /* bleu navy profond */
+  --color-secondary-light: #3d4a8f; /* navy plus clair */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Mode dark : Palette autourducode.net (navy/teal profonds) */
+[data-theme="dark"] {
+  --color-background: #0f1419;      /* fond très sombre */
+  --color-foreground: #f7fafc;      /* texte principal clair */
+  --color-muted: #cbd5e0;           /* texte secondaire */
+  --color-muted-foreground: #a0aec0;
+  --color-border: #2d3748;          /* bordures discrètes */
+  --color-card: #163963;            /* cards teal sombre (charte) */
+  --color-card-hover: #1f425d;      /* hover slate */
+  --color-accent: #0693e3;          /* cyan vif */
+  --color-accent-hover: #38b2f5;    /* hover plus clair */
+  --color-accent-foreground: #ffffff;
+  --color-secondary: #273171;       /* navy profond */
+  --color-secondary-light: #3d4a8f;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Application globale */
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* Accessibilité - Focus States améliorés */
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip to content link pour accessibilité clavier */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 1rem 1.5rem;
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.skip-to-content:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+/* Indicateur de navigation clavier visible */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Amélioration des focus pour les boutons et liens */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Animations & Visual Effects */
+@keyframes float-slow {
+  0% { transform: translateY(0px) translateX(0px); opacity: 0.75; }
+  50% { transform: translateY(-12px) translateX(8px); opacity: 1; }
+  100% { transform: translateY(0px) translateX(0px); opacity: 0.75; }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.blob {
+  filter: blur(40px);
+  opacity: 0.6;
+  animation: float-slow 12s ease-in-out infinite;
+}
+
+.blob-delayed {
+  animation-delay: 3s;
+}
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Utility classes pour la charte */
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-secondary-light {
+  background-color: var(--color-secondary-light);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.border-accent {
+  border-color: var(--color-accent);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -10px rgba(6, 147, 227, 0.3);
 }

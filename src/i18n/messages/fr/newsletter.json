@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "title": "Newsletter - Ricken Bazolo",
+    "description": "Abonnez-vous à ma newsletter pour des insights sur l'architecture logicielle, l'ingénierie IA et l'open source."
+  },
+  "hero": {
+    "tag": "Newsletter",
+    "title": "Restez informé",
+    "description": "Rejoignez des centaines de développeurs qui reçoivent des insights sur l'architecture logicielle, l'ingénierie IA, l'écosystème Spring et l'open source. Aucun spam, désabonnement à tout moment."
+  },
+  "form": {
+    "emailLabel": "Adresse email",
+    "emailPlaceholder": "vous@exemple.fr",
+    "nameLabel": "Prénom (optionnel)",
+    "namePlaceholder": "Jean",
+    "submitButton": "S'abonner",
+    "submitting": "Inscription...",
+    "errors": {
+      "invalidEmail": "Veuillez entrer une adresse email valide",
+      "required": "L'email est requis",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
+    },
+    "success": {
+      "title": "Vous êtes abonné !",
+      "description": "Consultez votre boîte mail pour confirmer votre inscription."
+    }
+  },
+  "features": {
+    "title": "Ce que vous recevrez",
+    "items": [
+      {
+        "title": "Insights architecture",
+        "description": "Analyses approfondies sur les patterns de conception, microservices et ingénierie de plateforme."
+      },
+      {
+        "title": "Ingénierie IA",
+        "description": "Guides pratiques pour construire des applications alimentées par IA avec Spring AI et LangChain4j."
+      },
+      {
+        "title": "Actualités open source",
+        "description": "Nouvelles sur mes projets et contributions à l'écosystème Java."
+      }
+    ]
+  },
+  "frequency": "Chaque jeudi",
+  "privacy": "Votre email est en sécurité. Aucun spam, jamais."
+}

@@ -1,0 +1,199 @@
+---
+title: "JPA/EclipseLink – Mappage de composants à l’aide d’annotations | @Embeddable & @Embedded"
+slug: "jpa-eclipse-link-mappage-de-composants"
+language: "fr"
+publishedAt: "2022-09-08"
+tags: ["eclipselink", "hibernate", "java", "jpa", "persistence"]
+readingTime: 4
+excerpt: "Dans cet exemple, nous allons apprendre le Component Mapping en utilisant les annotations JPA . Component Mapping représente la relation has-a , la composition est une association plus forte où l’objet contenu n’a pas d’existence propre. Par exemple, un élève a une adresse, une adresse ne peut exist"
+status: "published"
+canonical: "https://autourducode.net/java/jpa-eclipse-link-mappage-de-composants/"
+---
+
+Dans cet exemple, nous allons apprendre le ***Component Mapping*** en utilisant les annotations **JPA**. ***Component Mapping*** représente la relation ***has-a***, la composition est une association plus forte où l’objet contenu n’a pas d’existence propre. Par exemple, un élève a une adresse, une adresse ne peut exister séparément sans élève. Comme les entités **Eleve** et **Adresse** sont fortement liées, il est préférable de les stocker dans une **seule table**.
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-10-à-01.43.11-1024x348.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-10-à-01.43.11.png)
+
+### **Créez un projet Java « JpaComponentMapping »**
+
+### **Structure des dossiers :**
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-21.46.57.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-21.46.57.png)
+
+### Librairies
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-21.00.54.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-21.00.54.png)
+
+### Créer les classes Java :
+
+### EleveAdresse.java
+
+```
+package autourducode;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+/**
+ *
+ * @author autourducode
+ */
+@Embeddable
+public class EleveAdresse {
+    @Column(name = "CODE_POSTAL")
+    private int codePostal;
+    @Column(name = "RUE")
+    private String rue;
+
+    public EleveAdresse() {
+    }
+
+    public int getCodePostal() {
+        return codePostal;
+    }
+
+    public void setCodePostal(int codePostal) {
+        this.codePostal = codePostal;
+    }
+
+    public String getRue() {
+        return rue;
+    }
+
+    public void setRue(String rue) {
+        this.rue = rue;
+    }
+}
+```
+
+Nous avons marqué notre classe **EleveAdresse** avec l’annotation @Embeddable afin que cette classe soit éligible pour être une **classe intégrable**. L’annotation **@Embeddable** est utilisée pour spécifier que la classe **EleveAdresse** sera utilisée comme un composant. **EleveAdresse** ne peut pas avoir sa propre clé primaire et elle utilisera la clé primaire de la classe **Eleve**.
+
+### Eleve.java
+
+```
+package autourducode;
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/**
+ *
+ * @author autourducode
+ */
+@Entity
+@Table(name = "eleve")
+public class Eleve implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private Long id;
+    @Column(name = "NOM", length = 20)
+    private String nom;
+    @Embedded
+    private EleveAdresse adresse;
+
+    public Eleve() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public EleveAdresse getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(EleveAdresse adresse) {
+        this.adresse = adresse;
+    }
+}
+```
+
+Nous avons utilisé les annotations JPA suivantes dans notre classe Elève
+
+1. **@Entity** – Cette annotation marquera notre classe **Eleve** comme un Bean Entity.
+2. **@Table** – L’annotation **@Table** fera correspondre notre classe à la table de base de données correspondante. Vous pouvez également spécifier d’autres attributs tels que les **index**, le **catalogue**, le **schéma**, **uniqueConstraints**. L’annotation **@Table** est une annotation facultative ; si cette annotation n’est pas fournie, le nom de la classe sera utilisé comme nom de la table.
+3. **@Id** – L’annotation **@Id** marque le champ particulier comme étant la **clé primaire** de **l’entité**.
+4. **@GeneratedValue** – Cette annotation est utilisée pour spécifier comment la **clé primaire** doit être générée.
+5. **@Column** – Cette annotation associe les champs correspondants à leurs colonnes respectives dans la table de la base de données.
+6. **@Embedded –** L’annotation **@Embedded** est utilisée pour spécifier que l’entité **EleveAdresse** doit être stockée dans la table « eleve » en tant que composant.
+
+### **persistence.xml**
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="JpaComponentMappingPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>autourducode.Eleve</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/component_mapping?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
+      <property name="javax.persistence.jdbc.user" value="autourducode"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.password" value="autourducode"/>
+      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+    </properties>
+  </persistence-unit>
+</persistence>
+```
+
+#### La première et la plus importante propriété sert à spécifier la classe du pilote JDBC, dans mon cas Driver.
+
+```
+<property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+```
+
+#### Donnez **l’URL de connexion** de la base de données et fournissez le **nom** d’utilisateur et le **mot de passe** pour la connexion de la base de données ci-dessus.
+
+```
+<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/component_mapping?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
+      <property name="javax.persistence.jdbc.user" value="autourducode"/>
+      <property name="javax.persistence.jdbc.password" value="autourducode"/>
+```
+
+#### Si la propriété « **javax.persistence.schema-generation.database.action** » est définie sur « **create**« , le schéma de la base de données sera abandonné et recréé à chaque exécution.
+
+```
+<property name="javax.persistence.schema-generation.database.action" value="create"/>
+```
+
+#### vous pouvez aussi utiliser cette propriété
+
+```
+<property name="eclipselink.ddl-generation" value="create-tables"/>
+```
+
+### Création du shéma de la base de données
+
+Après avoir démarré notre application, **eclipseLink** crée le schéma de la base de données
+
+```
+Thread(Thread[main,5,main])--CREATE TABLE eleve (ID BIGINT AUTO_INCREMENT NOT NULL, NOM VARCHAR(20), CODE_POSTAL INTEGER, RUE VARCHAR(255), PRIMARY KEY (ID))
+```
+
+Les colonnes **CODE_POSTAL** et **RUE** de la classe **EleveAdresse** utilisée comme un **composant** ont été intégrés dans la table « **eleve**«
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-22.20.27.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-22.20.27.png)
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

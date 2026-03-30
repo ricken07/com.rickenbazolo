@@ -1,0 +1,321 @@
+---
+title: "Spring Boot – Approches De Tests D’une API Rest"
+slug: "spring-boot-approches-pour-tester-une-api-rest"
+language: "fr"
+publishedAt: "2022-10-15"
+tags: ["java", "junit", "mock", "mockito", "spring-boot", "test-unitaire"]
+readingTime: 6
+excerpt: "Dans cet article, nous allons apprendre à créer des classes de test JUnit 5 avec Mockito dans une application Spring Boot . JUnit est l’un des cadres de test les plus populaires pour les applications Java. JUnit 5 prend en charge toutes les fonctionnalités modernes de Java 8 et permet d’utiliser de "
+status: "published"
+canonical: "https://autourducode.net/java/spring-boot-approches-pour-tester-une-api-rest/"
+---
+
+Dans cet article, nous allons apprendre à créer des classes de test **[JUnit 5](https://junit.org/junit5/docs/current/user-guide/)** avec **[Mockito](https://site.mockito.org/)** dans une **application Spring Boot**. JUnit est l’un des cadres de test les plus populaires pour les applications Java. JUnit 5 prend en charge toutes les fonctionnalités modernes de Java 8 et permet d’utiliser de nombreuses approches et styles différents dans les tests.
+
+### **Dépendances Maven**
+
+La dépendance **spring-boot-starter-test** est déjà fournie avec **Junit 5** et contient également les bibliothèques **Hamcrest**, et **Mockito** pour les tests. C’est une bonne nouvelle, car nous n’avons pas besoin d’ajouter beaucoup de dépendances dans notre fichier **pom.xml** final.
+
+Le JUnit 5 est composé de trois sous-projets, tels que :
+
+* **JUnit Platform** – pour lancer des frameworks de test sur la JVM ;
+* **JUnit Jupiter** – pour écrire des tests et des extensions en JUnit 5 ;
+* **JUnit Vintage** – fournit un *TestEngine* pour exécuter des tests basés sur JUnit 3 et JUnit 4 sur la plateforme.
+
+Dans notre cas, nous n’avons pas besoin du support de JUnit 3 et JUnit 4, c’est pourquoi nous allons exclure cette dépendance.
+
+Le **pom.xml** final a la structure suivante :
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.1</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.rickenbazolo</groupId>
+    <artifactId>tddLab</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>tddLab</name>
+    <description>tddLab</description>
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+Nous avons deux dépendances principales :
+
+* **spring-boot-starter-web** – le conteneur web est utilisé pour créer l’API REST de Spring ;
+* **spring-boot-starter-test** – dépendances principales pour les tests unitaires et d’intégration.
+
+Le plugin **spring-boot-maven** est utilisé pour créer un jar exécutable avec l’application Spring Boot.
+
+### **Structure du projet**
+
+Le projet de test a la structure suivante :
+
+```
+├── pom.xml
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── autourducode
+│   │   │           └── springboot
+│   │   │               ├── Application.java
+│   │   │               ├── controller
+│   │   │               │   └── HelloController.java
+│   │   │               └── service
+│   │   │                   └── HelloService.java
+│   └── test
+│       └── java
+│           └── com
+│               └── autourducode
+│                   └── springboot
+│                       └── controller
+│                           ├── HelloControllerMockitoTest.java
+│                           ├── HelloControllerMockMvcTest.java
+│                           └── HelloControllerRestTemplTest.java
+```
+
+Nous pouvons y distinguer les classes suivantes :
+
+* **Application** – la classe principale de l’application Spring Boot utilisée pour le démarrage du conteneur web ;
+* **HelloController** – contrôleur Spring Rest utilisé à des fins de test ;
+* **HelloService** – Service Spring utilisé pour vérifier le fonctionnement d’autowire dans les tests ;
+* **HelloControllerMockitoTest** – test pour HelloController utilisant Mockito ;
+* **HelloControllerMockMvcTest** – test pour HelloController en utilisant MockMvc ;
+* **HelloControllerRestTemplTest** – test pour HelloController en utilisant TestRestTemplate.
+
+### **HelloController pour les tests JUnit 5**
+
+*Le contrôleur REST de Spring* appelé **HelloController** sera utilisé comme classe principale pour les tests. Elle utilise l’annotation *@Autowired* pour injecter *HelloService*.
+
+Le **HelloController** a la structure suivante :
+
+```
+import com.autourducode.springboot.service.HelloService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @author autouducode
+ */
+@RestController
+public class HelloController {
+    private final HelloService helloService;
+
+    @Autowired
+    public HelloController(HelloService helloService) {
+        this.helloService = helloService;
+    }
+
+    @GetMapping("/")
+    public String sayHello() {
+        return helloService.hello();
+    }
+}
+```
+
+L’annotation **@GetMapping** marque la méthode **sayHello()** qui sera dorénavant utilisée pour traiter toutes les requêtes **GET** vers le chemin racine **/**.
+
+### **Hello Service**
+
+**HelloService** est un simple *service Spring* avec la méthode *hello()* qui sera exécutée dans la classe du contrôleur REST :
+
+```
+import org.springframework.stereotype.Service;
+
+/**
+ * @author autouducode
+ */
+@Service
+public class HelloService {
+    public String hello() {
+        return "Hello";
+    }
+}
+```
+
+> ***L’objectif principal de cet article est de montrer comment nous pouvons simuler des classes en utilisant Mockito dans les tests JUnit.***
+
+### **Classe principale @SpringBootApplication**
+
+*La classe principale de l’application Spring Boot* est marquée de l’annotation **@SpringBootApplication** et contient une seule méthode **public static void main(String[] args)** qui démarre le conteneur web – Tomcat par défaut.
+
+```
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * @author autouducode
+ */
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+### **Test utilisant MockMvc pour effectuer des appels REST**
+
+Commençons notre aventure de test avec une classe de test qui utilise **MockMvc**. Dans cette approche, ***le serveur d’application Spring Boot ne sera pas lancé***, mais le code sera appelé exactement de la même manière que s’il traitait une requête HTTP.
+
+La classe de test se présente comme suit :
+
+```
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+/**
+ * @author autourducode
+ */
+@SpringBootTest
+@AutoConfigureMockMvc
+public class HelloControllerMockMvcTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    public void shouldReturnDefaultMessage() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString("Hello")));
+    }
+}
+```
+
+Nous avons utilisé la classe **MockMvc** et **@AutoConfigureMockMvc** qui va la configurer et l’injecter dans la classe testée. La classe **MockMvc** est *utilisée pour effectuer des appels API, mais au lieu de faire des requêtes HTTP, Spring testera seulement l’implémentation qui les gère dans HelloController.*
+
+### **Test utilisant TestRestTemplate pour appeler l’API REST**
+
+Dans l’approche suivante, nous allons utiliser l’annotation **@SpringBootTest** qui est utilisée pour démarrer le contexte de l’application Spring.
+
+```
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class HelloControllerRestTemplTest {
+    @LocalServerPort
+    private int port;
+    private String url;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @BeforeEach
+    public void setUp() {
+        url = String.format("http://localhost:%d/", port);
+    }
+
+    @Test
+    public void greetingShouldReturnDefaultMessage() {
+        Assertions.assertThat(this.restTemplate.getForObject(url, String.class)).contains("Hello");
+    }
+}
+```
+
+Dans cette approche, nous pouvons utiliser l’annotation **@Autowired** comme dans les applications d’exécution. Spring les interprétera et effectuera les injections nécessaires. Dans les tests **@SpringBootTest**, le serveur d’application Spring Boot réel est démarré.
+
+Dans le test, nous avons utilisé :
+
+* **webEnvironment** = ***SpringBootTest.WebEnvironment.RANDOM_PORT*** – pour démarrer le serveur avec un port aléatoire afin d’éviter tout conflit de port ;
+* **@LocalServerPort** – cette annotation indique à Spring d’injecter un port aléatoire dans le champ spécifique ;
+* **TestRestTemplate** – RestTemplate pour les tests utilisés pour effectuer des requêtes HTTP réelles.
+
+### **Test unitaire Mockito pour la classe HelloController**
+
+Si nous voulons simuler certains objets tout en testant la classe **HelloController**, nous pouvons utiliser le **framework Mockito** dans un test unitaire. Dans cette approche, nous testons simplement la classe avec *JUnit* et *Mockito* sans faire aucun appel HTTP. Cela est possible, car notre contrôleur REST est une classe ordinaire comme les autres.
+
+```
+import com.autourducode.springboot.controller.HelloController;
+import com.autourducode.springboot.service.HelloService;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+public class HelloControllerMockitoTest {
+    @Mock
+    private HelloService helloService;
+
+    @InjectMocks
+    private HelloController helloController;
+
+    @BeforeEach
+    void setMockOutput() {
+        Mockito.when(helloService.hello()).thenReturn("Hello Mockito");
+    }
+
+    @Test
+    public void returnMessage() {
+        String response = helloController.sayHello();
+        Assertions.assertThat(response).isEqualTo("Hello Mockito");
+    }
+}
+```
+
+Pour commencer à utiliser *Mockito* dans les tests *JUnit*, nous devons annoter une classe avec **@ExtendWith(MockitoExtension.class)**. Dans notre classe de test, nous simulons *HelloService* pour changer la réponse de la méthode *hello()*. L’annotation **@InjectMocks** indique à *Mockito* d’injecter tous les objets ‘mock’ dans la classe de test.
+
+> Dans cet article, nous avons présenté plusieurs approches pour tester le contrôleur Spring REST en utilisant JUnit 5 et la bibliothèque Mockito. C’est à nous de décider si nous voulons démarrer le vrai serveur Spring Boot en utilisant l’annotation @SpringBootTest ou simplement exécuter l’implémentation qui est appelée sur les requêtes HTTP en utilisant MockMvc. Mockito pourrait également être utilisé pour tester la classe du contrôleur REST s’il y a un besoin de simuler ou d’espionner les dépendances.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

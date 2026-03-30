@@ -1,0 +1,110 @@
+[
+  {
+    "slug": "java-17-les-nouvelles-fonctionnalites-depuis-java-11",
+    "publishedAt": "2022-07-25",
+    "url": "https://autourducode.net/java/java-17-les-nouvelles-fonctionnalites-depuis-java-11/",
+    "assets": []
+  },
+  {
+    "slug": "java-8-stream-api-illegalstateexception-supplier",
+    "publishedAt": "2022-07-25",
+    "url": "https://autourducode.net/java/java-8-stream-api-illegalstateexception-supplier/",
+    "assets": []
+  },
+  {
+    "slug": "java-comment-convertir-une-enumeration-en-stream",
+    "publishedAt": "2022-07-25",
+    "url": "https://autourducode.net/java/java-comment-convertir-une-enumeration-en-stream/",
+    "assets": []
+  },
+  {
+    "slug": "java-streams-operations-terminales-avec-exemples",
+    "publishedAt": "2022-07-25",
+    "url": "https://autourducode.net/java/java-streams-operations-terminales-avec-exemples/",
+    "assets": []
+  },
+  {
+    "slug": "jpa-hibernate-cle-primaire-composite",
+    "publishedAt": "2022-07-25",
+    "url": "https://autourducode.net/java/jpa-hibernate-cle-primaire-composite/",
+    "assets": []
+  },
+  {
+    "slug": "la-difference-entre-jdk-jre-et-jvm",
+    "publishedAt": "2022-07-25",
+    "url": "https://autourducode.net/java/la-difference-entre-jdk-jre-et-jvm/",
+    "assets": []
+  },
+  {
+    "slug": "architecture-monolithique-ou-microservices",
+    "publishedAt": "2022-07-25",
+    "url": "https://autourducode.net/non-classe/architecture-monolithique-ou-microservices/",
+    "assets": []
+  },
+  {
+    "slug": "spring-security-websecurityconfigureradapter-deprecated",
+    "publishedAt": "2022-07-25",
+    "url": "https://autourducode.net/spring/spring-security-websecurityconfigureradapter-deprecated/",
+    "assets": []
+  },
+  {
+    "slug": "spring-boot-security-api-rest-securisee",
+    "publishedAt": "2022-07-26",
+    "url": "https://autourducode.net/java/spring-boot-security-api-rest-securisee/",
+    "assets": []
+  },
+  {
+    "slug": "difference-entre-equals-et-operateur-egalite",
+    "publishedAt": "2022-07-31",
+    "url": "https://autourducode.net/java/difference-entre-equals-et-operateur-egalite/",
+    "assets": []
+  },
+  {
+    "slug": "kubernetes-introduction",
+    "publishedAt": "2022-09-08",
+    "url": "https://autourducode.net/cloud/kubernetes-introduction/",
+    "assets": []
+  },
+  {
+    "slug": "architecture-en-couches-springboot",
+    "publishedAt": "2022-09-08",
+    "url": "https://autourducode.net/java/architecture-en-couches-springboot/",
+    "assets": []
+  },
+  {
+    "slug": "java-persistence-api-conversion-mappage-xml-hibernate-annotations-jpa",
+    "publishedAt": "2022-09-08",
+    "url": "https://autourducode.net/java/java-persistence-api-conversion-mappage-xml-hibernate-annotations-jpa/",
+    "assets": []
+  },
+  {
+    "slug": "jpa-eclipse-link-mappage-de-composants",
+    "publishedAt": "2022-09-08",
+    "url": "https://autourducode.net/java/jpa-eclipse-link-mappage-de-composants/",
+    "assets": []
+  },
+  {
+    "slug": "spring-vs-springboot-vs-springmvc",
+    "publishedAt": "2022-09-08",
+    "url": "https://autourducode.net/java/spring-vs-springboot-vs-springmvc/",
+    "assets": []
+  },
+  {
+    "slug": "spring-boot-approches-pour-tester-une-api-rest",
+    "publishedAt": "2022-10-15",
+    "url": "https://autourducode.net/java/spring-boot-approches-pour-tester-une-api-rest/",
+    "assets": []
+  },
+  {
+    "slug": "spring-webclient-client-web-non-bloquant-et-reactif",
+    "publishedAt": "2022-10-16",
+    "url": "https://autourducode.net/java/spring-webclient-client-web-non-bloquant-et-reactif/",
+    "assets": []
+  },
+  {
+    "slug": "jakarta-ee-10-comment-creer-une-api-rest",
+    "publishedAt": "2022-11-12",
+    "url": "https://autourducode.net/java/jakarta-ee-10-comment-creer-une-api-rest/",
+    "assets": []
+  }
+]

@@ -1,0 +1,247 @@
+---
+title: "Spring WebClient – Client Web non bloquant et réactif"
+slug: "spring-webclient-client-web-non-bloquant-et-reactif"
+language: "fr"
+publishedAt: "2022-10-16"
+tags: ["java", "spring", "spring-boot"]
+readingTime: 6
+excerpt: "Dans cet article, nous allons voir comment configurer Spring WebClient et comment l’utiliser pour effectuer des requêtes GET , POST ou toute autre requête HTTP. Nous apprendrons également comment configurer le client pour gérer le timeout et d’autres configurations liées à HTTP."
+status: "published"
+canonical: "https://autourducode.net/java/spring-webclient-client-web-non-bloquant-et-reactif/"
+---
+
+[![](https://autourducode.net/wp-content/uploads/2022/10/reactor-header-1024x536.png)](https://autourducode.net/wp-content/uploads/2022/10/reactor-header.png)
+
+Dans cet article, nous allons voir comment configurer **Spring WebClient** et comment l’utiliser pour effectuer des requêtes **GET**, **POST** ou toute autre requête HTTP. Nous apprendrons également comment configurer le client pour gérer le **timeout** et d’autres configurations liées à HTTP.
+
+### **Spring WebClient ?**
+
+Spring **WebClient** est un *client réactif non bloquant qui permet d’effectuer des requêtes HTTP*. Il a été introduit dans Spring 5. Les API du WebClient sont introduites dans le cadre du remplacement du Spring **RestTemplate** existant.
+
+#### **Caractéristiques importantes de Spring WebClient**
+
+Examinons quelques-unes des caractéristiques importantes de ce nouveau client.
+
+* Spring WebClient est à la fois synchrone et asynchrone.
+* Supporte le streaming ascendant et descendant.
+* Fonctionne avec HTTP/1.1
+* Prend en charge un cadre hautement concurrent, réactif, non bloquant et moins gourmand en ressources.
+* Prise en charge du module réactif traditionnel et du module réactif de Spring.
+* Fournit une API fonctionnelle qui tire parti des [lambdas de Java 8](https://www.oracle.com/technical-resources/articles/java/architect-lambdas-part1.html).
+
+> À partir de la version 5.0, le **WebClient** non bloquant et réactif offre une alternative moderne à **RestTemplate** avec une prise en charge efficace des scénarios *sync* et *async*, ainsi que des scénarios de *streaming*. *RestTemplate sera déprécié dans une prochaine version et ne disposera pas de nouvelles fonctionnalités majeures à partir de maintenant*. Je recommande vivement de passer à **WebClient**
+
+Nous allons mettre en place une application spring boot pour configurer et utiliser Spring WebClient
+
+### **1- Ajout de Spring WebClient dans le pom.xml**
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>net.autourducode</groupId>
+    <artifactId>spring-WebClient</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>spring-WebClient</name>
+    <description>spring-WebClient</description>
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+    <dependencies>
+        <!-- Construire une application web réactive avec spring webflux et netty -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!-- Utile pour les tests unitaires -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+J’utilise **https://reqres.in** pour simuler notre appel HTTP REST.
+
+### **2-** Création de WebClient
+
+**WebClient** fournit la méthode **create()** pour créer une instance par défaut. Il s’agit des étapes les plus élémentaires pour créer le client. L’API fonctionnelle offre un moyen plus flexible et plus puissant de créer le client, qui comprend :
+
+* Initialisation du client avec l’URI de base ;
+* Configuration des cookies ;
+* Configuration des en-têtes HTTP.
+
+```
+@Configuration
+public class WebClientConfig {
+    // Configuration de WebClient
+    @Bean
+    public WebClient webClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder
+                .baseUrl("https://reqres.in/api")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+}
+```
+
+Spring Boot rend la tâche très facile en injectant **WebClient.Builder**. Celui-ci fait partie de la classe **DefaultWebClientBuilder**. Nous pouvons utiliser le constructeur pour personnaliser le comportement du client. Une autre option consiste à créer le **WebClient** en utilisant **WebClient.create()** et à le configurer en conséquence.
+
+```
+WebClient client = WebClient.create("https://reqres.in/api");
+```
+
+### **3- Envoyer une requete**
+
+L’envoi de requêtes à l’aide de **Spring WebClient** est similaire à ce que nous faisions avec RestTemplate, sauf qu’il fournit une API plus fluide et un contrôle sur les appels d’API. Regardons certains points importants lors de l’utilisation de WebClient pour envoyer des requêtes.
+
+1. **L’option RequestHeadersUriSpec permet d’utiliser la méthode HTTP (par exemple, GET ou POST, etc.) lors de l’appel de l’API.**
+2. **Ajoutez un en-tête, des cookies ou des détails d’authentification (si nécessaire).**
+3. **Définissez l’URI de la demande.**
+4. **Corps de la requête de configuration (par exemple, envoi d’une requête POST).**
+5. **Appelez la méthode *retrieve()* ou *exchange()*.**
+6. **Gérer la réponse de l’API.**
+
+```
+WebClient webClient = webClientBuilder
+     .clientConnector(new ReactorClientHttpConnector(getHttpClient()))
+     .baseUrl("https://reqres.in/api")
+     .build();
+
+Mono<Utilisateur> utilisateur = webClient.get()
+     .uri("/users/{id}", id)
+     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+     .retrieve()
+     .bodyToMono(Utilisateur.class);
+```
+
+### **4- Recevoir une réponse**
+
+Nous pouvons utiliser la méthode **retrieve()**, puis les méthodes **bodyToFlux()** et **bodyToMono()** si nous ne sommes intéressés que par la réponse de l’API.
+
+Nous pouvons utiliser la méthode **exhange()** si nous avons besoin de plus de détails dans la réponse.
+
+### **5- Web Client – Requête GET**
+
+Examinons l’appel HTTP GET à l’aide du WebClient. Nous utilisons la méthode GET chaque fois que nous voulons obtenir/récupérer des ressources.
+
+```
+    @Resource
+    private WebClient webClient;
+
+    @Test
+    public void getUtilisateurs() {
+        String str = webClient.get()
+                .uri("/users/")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        System.out.println(str);
+    }
+```
+
+### **6-** **Web Client – Requête POST**
+
+```
+    @Resource
+    private WebClient webClient;
+
+    @Test
+    public void postUtilisateur() {
+        Utilisateur utilisateur = new Utilisateur();
+        String str = webClient.post()
+                .uri("/users/")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(utilisateur), Utilisateur.class)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        System.out.println(str);
+    }
+```
+
+### **7- WebClient – retrieve() vs exchange()**
+
+En utilisant le Spring WebClient, nous avons la possibilité d’utiliser la méthode **retrieve()** ou **exchange()**. Voyons la différence entre ces 2 méthodes pour comprendre leurs cas d’utilisation.
+
+* La méthode **retrieve()** doit être préférée dans le cas où nous sommes intéressés par le corps de la réponse.
+* La méthode **exchange()** fournit plus de contrôle et de détails comme *le statut, les en-têtes et le corps de la réponse, etc.*
+* La méthode **retrieve()** fournit un signal d’erreur automatique (par exemple 4xx et 5xx).
+* Aucun signal d’erreur automatique n’est disponible pour la méthode **exchange()** et nous devons vérifier le code d’état et le gérer.
+
+> Pour comprendre les types **[Flux](https://projectreactor.io/docs/core/release/reference/#flux)** et **[Mono](https://projectreactor.io/docs/core/release/reference/#mono)** disponibles avec Reactor.
+
+### **8- Configuration du délai d’attente avec Spring WebClient**
+
+Semblable à Spring RestTemplate, nous pouvons configurer le délai de connexion pour le WebClient. Utilisez la classe **HttpClient** pour configurer le délai d’attente pour le client. Voyons comment procéder :
+
+```
+@Configuration
+public class WebClientConfig {
+    // Configuration de WebClient
+    @Bean
+    public WebClient webClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder
+                .clientConnector(new ReactorClientHttpConnector(getHttpClient()))
+                .baseUrl("https://reqres.in/api")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
+    private HttpClient getHttpClient() {
+        return HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+                .doOnConnected(connect -> connect
+                        .addHandlerLast(new ReadTimeoutHandler(10))
+                        .addHandlerLast(new WriteTimeoutHandler(10)));
+    }
+}
+```
+
+Examinons quelques points importants :
+
+* L’option **ChannelOption.CONNECT_TIMEOUT_MILLIS** nous permet de définir le délai de connexion.
+* Configuration des délais de lecture et d’écriture à l’aide des modules **ReadTimeoutHandler** et **WriteTimeoutHandler**.
+* Si vous le souhaitez, vous pouvez définir le délai de réponse à l’aide de **Duration.ofMillis()**
+
+#### **Limite de mémoire**
+
+La limite de mémoire par défaut pour les données du tampon en mémoire est de **256 Ko**. Si cette limite est dépassée, Spring lancera l’erreur **DataBufferLimitException**. Spring offre la possibilité d’augmenter la limite de données du tampon en utilisant la propriété **max-in-memory-size**. Nous pouvons définir cette propriété dans notre fichier application.properties.
+
+```
+spring.codec.max-in-memory-size=5MB
+```
+
+Dans cet article, nous avons étudié le **WebClient** de Spring. Nous avons vu comment configurer et paramétrer le client. Nous avons également vu comment configurer le timeout et la limite de mémoire pour votre client.
+
+**[Le code source](https://github.com/autourducode/spring-web-client.git)**
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube :**\1**

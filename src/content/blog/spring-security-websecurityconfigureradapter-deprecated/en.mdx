@@ -1,0 +1,204 @@
+---
+title: "Spring Security – WebSecurityConfigurerAdapter deprecated!"
+slug: "spring-security-websecurityconfigureradapter-deprecated"
+language: "en"
+publishedAt: "2022-07-25"
+tags: ["java", "jpa", "spring", "spring-boot"]
+readingTime: 3
+excerpt: "In this article, I would like to share how to get rid of the warning saying “WebSecurityConfigurerAdapter is deprecated” in a Spring based application with Spring Security."
+status: "published"
+canonical: "https://autourducode.net/spring/spring-security-websecurityconfigureradapter-deprecated/"
+---
+
+In this article, I would like to share how to get rid of the warning saying "**WebSecurityConfigurerAdapter is deprecated**" in a **Spring** based application with **Spring Security**.
+
+Perhaps you are used to having a configuration class **Spring** that extends the abstract class **WebSecurityConfigurerAdapter** like this:
+
+```
+@Configuration
+@EnableWebSecurity
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+
+// configure HTTP security...
+
+}
+
+@Override
+public void configure(WebSecurity web) throws Exception {
+
+// configure web security...
+
+}
+}
+```
+
+This works well with ***Spring Security version 5.6.5 or earlier***, or with ***Spring Boot version 2.6.8 or earlier***.However, if your project uses ***Spring Security 5.7.1 or newer***, or ***Spring Boot 2.7.0 or newer***, you will get this warning in your IDE:
+
+[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-22.15.24-1024x47.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-22.15.24.png)
+
+Warning
+
+So why does Spring Security deprecate the use of **WebSecurityConfigurerAdapter**?and what is the alternative?
+
+Well, that's because the Spring framework developers encourage users to move towards a component-based security setup.
+
+So, instead of extending **WebSecurityConfigurerAdapter** and overriding the configuration methods of **HttpSecurity** and **WebSecurity** like in the old method, ***you now need to declare two beans of type SecurityFilterChain and WebSecurityCustomizer*** as follows:
+
+```
+@Configuration
+public class SecurityConfiguration {
+
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+}
+
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+
+}
+}
+```
+
+Here is sample code for migrating security configuration to a **component**-based approach.First, let's look at a typical security configuration class with **WebSecurityConfigurerAdapter** as shown below:
+
+```
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+@Bean
+public UserDetailsService userDetailsService() {
+return new MyUserDetailsService();
+}
+
+@Bean
+public BCryptPasswordEncoder passwordEncoder() {
+return new BCryptPasswordEncoder();
+}
+
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+http.authorizeRequests().antMatchers("/login").permitAll()
+.antMatchers("/users/**", "/settings/**").hasAuthority("Admin")
+.hasAnyAuthority("Admin", "Editor")
+.anyRequest().authenticated()
+.and().formLogin()
+.loginPage("/login")
+.usernameParameter("email")
+.permitAll()
+.and()
+.rememberMe().key("GFjhirnjFGhtjvKOPjth_956823561")
+.and()
+.logout().permitAll();
+
+http.headers().frameOptions().sameOrigin();
+}
+
+@Override
+public void configure(WebSecurity web) throws Exception {
+web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
+}
+}
+```
+
+And here is an alternative, without **WebSecurityConfigurerAdapter**:
+
+```
+package net.aroundcode;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfiguration {
+
+@Bean
+public UserDetailsService userDetailsService() {
+return new MyUserDetailsService();
+}
+
+@Bean
+public BCryptPasswordEncoder passwordEncoder() {
+return new BCryptPasswordEncoder();
+}
+
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+http.authorizeRequests().antMatchers("/login").permitAll()
+.antMatchers("/users/**", "/settings/**").hasAuthority("Admin")
+.hasAnyAuthority("Admin", "Editor")
+.anyRequest().authenticated()
+.and().formLogin()
+.loginPage("/login")
+.usernameParameter("email")
+.permitAll()
+.and()
+.rememberMe().key("GFjhirnjFGhtjvKOPjth_956823561")
+.and()
+.logout().permitAll();
+
+http.headers().frameOptions().sameOrigin();
+
+return http.build();
+}
+
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+return (web) -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
+}
+
+}
+```
+
+### **Declares a bean of type AuthenticationProvider:**
+
+In case you need to expose a bean of type **AuthenticationManager**, you can put the following code:
+
+```
+@Bean
+public AuthenticationManager authenticationManager(
+AuthenticationConfiguration authConfig) throws Exception {
+return authConfig.getAuthenticationManager();
+}
+```
+
+### **Declare a bean of type AuthenticationProvider:**
+
+If you need to expose a bean of type **AuthenticationProvider**, such as **DaoAuthenticationProvider**, use the following code:
+
+```
+@Bean
+public DaoAuthenticationProvider authenticationProvider() {
+DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
+authProvider.setUserDetailsService(userDetailsService());
+authProvider.setPasswordEncoder(passwordEncoder());
+
+return authProvider;
+}
+```
+
+and specify this authentication provider for **HttpSecurity** in the **SecurityFilterChain** code as follows:
+
+```
+http.authenticationProvider(authenticationProvider());
+```
+
+Here's how to remove the "**WebSecurityConfigurerAdapter is deprecated**" warning in a Spring-based application with Spring Security.You should declare the SecurityFilterChain and WebSecurityCustomizer beans instead of overriding the methods of the WebSecurityConfigurerAdapter class.
+
+> NOTE: If you do not want to modify your current code, **you must keep a Spring Boot version lower than 2.7.0 or a Spring Security version lower than 5.7.1**.
+
+I hope this article was useful to you.Thanks for reading it.
+Reference: [Spring Security without the WebSecurityConfigurerAdapter](https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter)
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

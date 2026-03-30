@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "title": "Newsletter - Ricken Bazolo",
+    "description": "Subscribe to my newsletter for insights on software architecture, AI engineering, and open source."
+  },
+  "hero": {
+    "tag": "Newsletter",
+    "title": "Stay in the loop",
+    "description": "Join hundreds of developers getting insights on software architecture, AI engineering, Spring ecosystem, and open source. No spam, unsubscribe anytime."
+  },
+  "form": {
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "nameLabel": "First name (optional)",
+    "namePlaceholder": "John",
+    "submitButton": "Subscribe",
+    "submitting": "Subscribing...",
+    "errors": {
+      "invalidEmail": "Please enter a valid email address",
+      "required": "Email is required",
+      "generic": "Something went wrong. Please try again."
+    },
+    "success": {
+      "title": "You're subscribed!",
+      "description": "Check your inbox to confirm your subscription."
+    }
+  },
+  "features": {
+    "title": "What you'll get",
+    "items": [
+      {
+        "title": "Architecture insights",
+        "description": "Deep dives into software design patterns, microservices, and platform engineering."
+      },
+      {
+        "title": "AI engineering",
+        "description": "Practical guides on building AI-powered applications with Spring AI and LangChain4j."
+      },
+      {
+        "title": "Open source updates",
+        "description": "News about my projects and contributions to the Java ecosystem."
+      }
+    ]
+  },
+  "frequency": "Weekly on Thursdays",
+  "privacy": "Your email is safe. No spam, ever."
+}

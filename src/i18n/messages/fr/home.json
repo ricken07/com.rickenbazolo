@@ -1,0 +1,34 @@
+{
+  "hero": {
+    "title": "Construire des produits, des plateformes et de l'IA",
+    "subtitle": "Je conçois des produits et des outils open source.",
+    "description": "Je documente comment je conçois des produits IA-first, industrialise les workflows, et partage du code réutilisable.",
+    "primaryCta": "Lire le blog",
+    "secondaryCta": "À propos",
+    "role": "Ingénieur logiciel & IA",
+    "profile": "Profil",
+    "focus": "Focus",
+    "focusValue": "Produits IA et outils de plateforme",
+    "availability": "Disponibilité",
+    "availabilityValue": "Ouvert aux collaborations",
+    "stack": "Stack"
+  },
+  "sections": {
+    "featured": "Article mis en avant",
+    "latest": "Derniers écrits",
+    "opensource": "Open source",
+    "speaking": "Conférences",
+    "tools": "Boîte à outils",
+    "toolbelt": "Ma boîte à outils",
+    "toolLabel": "Outil",
+    "viewAll": "Tout voir",
+    "readArticle": "Lire l'article",
+    "empty": "Pas encore d'articles."
+  },
+  "stats": {
+    "posts": "Articles",
+    "projects": "Projets OSS",
+    "talks": "Talks",
+    "tools": "Outils"
+  }
+}

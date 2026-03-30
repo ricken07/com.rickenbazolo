@@ -1,0 +1,95 @@
+---
+title: "Java 8 Stream API – Exception I"
+slug: "java-8-stream-api-illegalstateexception-supplier"
+language: "fr"
+publishedAt: "2022-07-25"
+tags: ["java"]
+readingTime: 2
+excerpt: "Dans cette partie nous allons aborder une exception commune que nous pouvons rencontrer lorsque nous travaillons avec les Stream en Java 8"
+status: "published"
+canonical: "https://autourducode.net/java/java-8-stream-api-illegalstateexception-supplier/"
+---
+
+Dans cette partie nous allons aborder une exception commune que nous pouvons rencontrer lorsque nous travaillons avec les [Stream](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html) en Java 8
+
+```
+IllegalStateException: stream has already been operated upon or closed.
+```
+
+En Java 8, chaque Stream représente une séquence de données à usage unique et prend en charge plusieurs opérations d’entrée/sortie.
+
+#### *Un flux (Stream) ne doit être exploité (en invoquant une opération de flux intermédiaire ou terminale) qu’une seule fois. Une implémentation de **Stream** peut lever l’exception **IllegalStateException** si elle détecte que le **Stream** est réutilisé.*
+
+Chaque fois qu’une opération terminale est appelée sur un objet **Stream**, l’instance est consommée et fermée.
+
+Par conséquent, nous ne sommes autorisés qu’à effectuer une seule opération qui consomme un **Stream**, sinon nous obtiendrons une exception indiquant que le **Stream** a déjà été exploité ou fermé.
+
+#### Exemple
+
+```
+import java.util.stream.Stream;
+
+/**
+ * @author autourducode
+ */
+public class Main {
+    public static void main(String[] args) {
+        Stream<String> fruits
+                = Stream.of("Pomme", "Mangue", "Fraise", "Banane", "Avocat", "Framboise");
+        fruits.filter(f -> f.contains("m")).map(String::toUpperCase).forEach(System.out::println);
+        boolean anyMatch = fruits.anyMatch(f -> f.length() > 6);
+        System.out.println("Any Match "+anyMatch);
+    }
+}
+```
+
+Après l’invocation de la méthode #**forEach**(), le **Stream** est fermé, par conséquent, toute autre opération sur le **Stream** lèvera l’exception IllegalStateException, et c’est ce qui s’est passé après l’invocation de la méthode #**anyMatch**().
+
+```
+Exception in thread "main" java.lang.IllegalStateException: stream has already been operated upon or closed
+	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:229)
+	at java.util.stream.ReferencePipeline.anyMatch(ReferencePipeline.java:516)
+	at Main.main(Main.java:11)
+```
+
+#### Approche de solution
+
+En termes simples, la solution consiste à créer un nouveau flux chaque fois que nous en avons besoin.
+
+Nous pouvons, bien sûr, le faire manuellement
+
+```
+Stream<String> fruits
+                = Stream.of("Pomme", "Mangue", "Fraise", "Banane", "Avocat", "Framboise");
+        fruits.filter(f -> f.contains("m")).map(String::toUpperCase).forEach(System.out::println);
+        fruits
+                = Stream.of("Pomme", "Mangue", "Fraise", "Banane", "Avocat", "Framboise");
+        boolean anyMatch = fruits.anyMatch(f -> f.length() > 6);
+        System.out.println("Any Match "+anyMatch);
+```
+
+### mais c’est là que l’interface fonctionnelle *[Supplier](https://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html)*  devient vraiment pratique
+
+```
+Supplier<Stream<String>> fruits
+                = () -> Stream.of("Pomme", "Mangue", "Fraise", "Banane", "Avocat", "Framboise");
+        fruits.get().filter(f -> f.contains("m")).map(String::toUpperCase).forEach(System.out::println);
+        boolean anyMatch = fruits.get().anyMatch(f -> f.length() > 6);
+        System.out.println("Any Match "+anyMatch);
+```
+
+Nous avons défini l'objet stream **Supplier** avec le type **`Stream<String>`**, qui est exactement le même type que celui que renvoie la méthode #get(). Le Supplier (fournisseur) est basé sur une expression lambda qui ne prend aucune entrée et renvoie un nouveau Stream.
+
+L’appel de la méthode fonctionnelle get() sur le Supplier renvoie un objet Stream fraîchement créé, sur lequel nous pouvons effectuer une autre opération Stream en toute sécurité.
+
+```
+POMME
+FRAMBOISE
+Any Match true
+```
+
+Nous avons vu comment effectuer des opérations terminales sur un **Stream** plusieurs fois, tout en évitant la fameuse IllegalStateException qui est levée lorsque le Stream est déjà fermé ou opéré.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

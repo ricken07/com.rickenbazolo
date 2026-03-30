@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "ai-design-kit",
+    "name": "AI Design Kit",
+    "description": "Prompts, patterns et composants UI pour concevoir plus vite.",
+    "url": "https://gad.digital/tools/ai-kit"
+  },
+  {
+    "slug": "oss-template",
+    "name": "OSS Template",
+    "description": "Template Next.js + Turborepo prêt pour l'open source.",
+    "url": "https://github.com/rickenbazolo/oss-template"
+  }
+]

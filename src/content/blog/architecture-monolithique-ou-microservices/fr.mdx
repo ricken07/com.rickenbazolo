@@ -1,0 +1,86 @@
+---
+title: "Architecture monolithique ou microservices ?"
+slug: "architecture-monolithique-ou-microservices"
+language: "fr"
+publishedAt: "2022-07-25"
+tags: ["news", "non-classe"]
+readingTime: 7
+excerpt: "Afin de comprendre les microservices , nous devons comprendre ce que sont les applications monolithiques et ce qui nous a amené à passer des applications monolithiques aux microservices ces derniers temps."
+status: "published"
+canonical: "https://autourducode.net/non-classe/architecture-monolithique-ou-microservices/"
+---
+
+Afin de comprendre les **microservices**, nous devons comprendre ce que sont les applications monolithiques et ce qui nous a amené à passer des applications monolithiques aux microservices ces derniers temps.
+
+### Applications monolithiques
+
+Si toutes les fonctionnalités d’un projet existent dans une seule **codebase**/**base de code** (***ensemble du code source utilisé***), alors cette application est connue comme une application **monolithique**. Nous avons tous dû concevoir une application monolithique dans notre vie, dans laquelle on nous a donné un énoncé de problème et on nous a demandé de concevoir un système avec diverses fonctionnalités. Nous concevons notre application en plusieurs couches comme la présentation, le service et la persistance, puis nous déployons cette *base de code* sous la forme d’un seul fichier jar/war. Ce n’est rien d’autre qu’une application monolithique, où « **mono** » représente la base de code unique contenant toutes les fonctionnalités requises.
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-05-à-02.17.41.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-05-à-02.17.41.png)
+
+Architecture Monolithique
+
+##### *Mais si nous utilisions déjà des applications monolithiques, qu’est-ce qui nous a conduit aux microservices ?*
+
+#### Inconvénients des applications monolithiques :
+
+* Il devient trop grand avec le temps et donc difficile à gérer.
+* Nous devons redéployer toute l’application, même pour un petit changement.
+* À mesure que la taille de l’application augmente, son temps de démarrage et de déploiement augmente également.
+* Pour tout nouveau développeur rejoignant le projet, il est très difficile de comprendre la logique d’une grosse application Monolithique même si sa responsabilité est liée à une seule fonctionnalité.
+* Même si une seule partie de l’application est confrontée à une charge/un trafic important, nous devons déployer les instances de l’application entière sur plusieurs serveurs. Cela est très inefficace et consomme inutilement des ressources supplémentaires. Par conséquent, ***la mise à l’échelle horizontale*** n’est pas réalisable dans les applications monolithiques.
+
+#### Avantages des applications monolithiques :
+
+* Simple à développer par rapport aux microservices, où des développeurs qualifiés sont nécessaires pour identifier et développer les services.
+* Plus facile à déployer, car un seul fichier jar/war est déployé.
+* Relativement plus simple à développer par rapport à l’architecture microservices.
+* Les problèmes de latence du réseau et de sécurité sont relativement moindres par rapport à l’architecture microservices.
+* Les développeurs ne doivent pas apprendre différentes applications, ils peuvent se concentrer sur une seule application.
+
+### **Microservices**
+
+Il s’agit d’un style de développement architectural dans lequel l’application est constituée de services plus petits qui gèrent une petite partie des fonctionnalités et des données en communiquant directement entre eux à l’aide de protocoles légers comme **HTTP**. [Selon Sam Newman](https://samnewman.io/index.html), « *les microservices sont les petits services qui fonctionnent ensemble*« .
+
+[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-05-à-03.36.29.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-05-à-03.36.29.png)
+
+Architecture Microservice
+
+L’architecture microservice a un impact important sur la relation entre l’application et la base de données. Au lieu de partager une base de données unique avec les autres microservices, chaque microservice possède sa propre base de données. *Cela entraîne souvent la duplication de certaines données*, mais avoir une base de données par microservice est essentiel si vous voulez bénéficier de cette architecture, car cela garantit un couplage souple. Un autre avantage d’avoir une base de données séparée par microservice est que chaque microservice peut utiliser le type de base de données le mieux adapté à ses besoins. Chaque service offre une frontière de module sécurisée afin que les différents services puissent être écrits dans différents langages de programmation. De nombreux modèles sont impliqués dans l’architecture de microservices, comme le registre de services, la mise en cache, la passerelle et la communication API, l’observabilité, la sécurité, etc.
+
+#### Principes des microservices :
+
+* **Single responsibility :** Il s’agit de l’un des principes définis dans le cadre du modèle de conception SOLID. Il stipule qu’une unité unique, que ce soit une classe, une méthode ou un microservice, doit avoir une et une seule responsabilité. Chaque microservice doit avoir une seule responsabilité et fournir une seule fonctionnalité. On peut également dire que : le nombre de microservices que vous devez développer est égal au nombre de fonctionnalités dont vous avez besoin. La base de données est également décentralisée et, généralement, chaque microservice dispose de sa propre base de données.
+* **Built around business capabilities :** Dans le monde d’aujourd’hui, où il existe tant de technologies, il y a toujours une technologie qui convient le mieux pour mettre en œuvre une fonctionnalité particulière. Mais dans les applications monolithiques, c’était un inconvénient majeur, car nous ne pouvons pas utiliser une technologie différente pour chaque fonctionnalité et donc, nous devons faire des compromis dans des domaines particuliers. Un microservice ne doit jamais se restreindre à l’adoption d’une pile technologique appropriée ou d’une base de données qui convient le mieux à la résolution de l’objectif métier, c’est-à-dire que chaque microservice peut utiliser une technologie différente en fonction des exigences métier.
+* **Design for failure :** Les microservices doivent être conçus en tenant compte des cas d’échec. Les microservices doivent exploiter l’avantage de cette architecture et la défaillance d’un microservice ne doit pas affecter l’ensemble du système, les autres fonctionnalités doivent rester accessibles à l’utilisateur. Mais ce n’était pas le cas dans les applications monolithiques, où la défaillance d’un module entraîne la chute de l’ensemble de l’application.
+
+### Architecture orientée services (SOA) vs Architecture microservices :
+
+Si nous parlons d’un **gâteau** et d’une **pâtisserie**, nous trouverons plus de similitudes que de différences. Essayons donc de comprendre les différences entre les deux.
+
+**L’architecture orientée services (SOA)** a évolué afin de résoudre les problèmes liés à l’architecture monolithique et est devenue populaire au début des années 2000. Dans l’architecture SOA, la grande application est divisée en plusieurs petits services qui sont déployés indépendamment. Ces services ne communiquent pas directement entre eux. Auparavant, il existait un bus de services d’entreprise (ESB, un *middleware* (intergiciel) ou un serveur qui, à l’aide de services utilisant différents protocoles ou normes de messages, pouvait communiquer facilement entre eux) où ces services s’exposaient et communiquaient entre eux. En outre, il n’y avait pas de directive pour avoir une base de données indépendante pour chaque service.
+
+**L’architecture des microservices** est une évolution de SOA. Les gens considèrent également SOA comme un sur-ensemble de microservices. En termes simples, les microservices sont des très petits services SOA. Ici, les microservices communiquent directement entre eux et il n’y a pas de dépendance centrale pour la communication comme l’ESB dans SOA. Il est aussi recommandé d’avoir une base de données distincte pour chaque microservice. ***L’idée fondamentale de l’évolution des microservices à partir de l’architecture SOA est de réduire la dépendance entre les services et de les coupler de manière souple*** avec les directives mentionnées ci-dessus.
+
+#### Les avantages des microservices :
+
+* Il est facile à gérer, car il est relativement petit.
+* S’il y a une mise à jour dans l’un des microservices, alors nous devons redéployer uniquement ce microservice.
+* Les microservices sont autonomes et, par conséquent, déployés de façon indépendante. Leurs temps de démarrage et de déploiement sont relativement réduits.
+* Il est très simple pour un nouveau développeur d’intégrer le projet, car il n’a besoin de comprendre qu’un microservice particulier fournissant la fonctionnalité sur laquelle il travaillera et non l’ensemble du système.
+* Si un microservice particulier est confronté à une charge importante en raison de l’utilisation excessive de cette fonctionnalité par les utilisateurs, nous devons mettre à l’échelle ce microservice uniquement. L’architecture de microservices prend donc en charge **la mise à l’échelle horizontale**.
+* Chaque microservice peut utiliser une technologie différente en fonction des besoins du métier.
+* Si un microservice particulier tombe en panne à cause d’un bogue, cela n’affecte pas les autres microservices et l’ensemble du système reste intact et continue à fournir d’autres fonctionnalités aux utilisateurs.
+
+#### Inconvénients des microservices :
+
+* En tant que système distribué, il est beaucoup plus complexe que les applications monolithiques. Sa complexité augmente avec l’accroissement du nombre de microservices.
+* Des développeurs compétents sont nécessaires pour travailler avec une architecture de microservices, qui permet d’identifier les microservices et de gérer leurs intercommunications.
+* Le déploiement indépendant de microservices est compliqué.
+* Les microservices sont coûteux en termes d’utilisation du réseau, car ils doivent interagir les uns avec les autres et tous ces appels à distance entraînent une latence du réseau.
+* Les microservices sont moins sûrs que les applications monolithiques en raison de la communication inter-services sur le réseau.
+* Le débogage est difficile parce que le contrôle passe par de nombreux microservices et il est difficile de déterminer pourquoi et où l’erreur s’est produite.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)
