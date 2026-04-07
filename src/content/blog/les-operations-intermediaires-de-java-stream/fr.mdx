@@ -1,0 +1,142 @@
+---
+title: "Les opérations intermédiaires de Java Stream"
+slug: "les-operations-intermediaires-de-java-stream"
+language: "fr"
+publishedAt: "2021-11-28"
+tags: ["api", "java", "stream"]
+readingTime: 3
+excerpt: "Salut, aujourd’hui nous sommes à la version 17 de java ce qui ne nous empêche pas ici Autour du code de faire un tour d’horizon sur les opérations intermédiaires de l'API Stream dévoilé depuis la version 8 de Java ; Comp"
+status: "published"
+coverImage: "/legacy/blogger/les-operations-intermediaires-de-java-stream/01.png"
+---
+
+Salut, aujourd’hui nous sommes à la version 17 de java ce qui ne nous empêche pas ici **Autour du code** de faire un tour d’horizon sur les opérations intermédiaires de l'API Stream dévoilé depuis la version 8 de Java ;
+
+Comprenons avec des exemples les opérations suivantes :
+
+* filter()
+* map()
+* flatMap()
+* distinct()
+* sorted()
+* peek()
+* limit()
+* skip()
+
+Avant de voir une série d'exemples pour comprendre les opérations cités, nous reprendre a une question,
+
+Qu’est-ce qu’un Stream ?
+
+Un Stream est une séquence d'éléments sur laquelle on peut effectuer un groupe d'opération de manière séquentielle ou parallèle contrairement a une collection ou une structure de donnée de manière générale.
+
+D’ailleurs l’implémentation Java définit bien une interface spécifique : `public interface Stream<T>`
+
+#### **filter()**
+
+La méthode Java Stream filter() peut être utilisée pour filtrer les éléments d'un flux Java Stream. La méthode filter prend un prédicat (une condition) qui est appelé pour chaque élément du flux. Si l'élément doit être inclus dans le flux résultant, le prédicat doit renvoyer true. Si l'élément ne doit pas être inclus, le prédicat doit renvoyer false.
+
+Voici un exemple d'un filtre avant l'arrivée de Java 8 :
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/01.png)
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/02.png)
+
+Voici un exemple d'appel de la méthode Java Stream filter() :
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/03.png)
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/04.png)
+
+#### **map()**
+
+La méthode Java Stream map() convertit (map) un élément en un autre objet. Par exemple, si vous avez une liste de chaînes de caractères, elle peut convertir chaque chaîne en minuscule, en majuscule, en une sous-chaîne de la chaîne d'origine ou en quelque chose de complètement différent.
+
+Voici un exemple de Java Stream map() :
+
+Si vous avez une liste de chaînes et que vous voulez la convertir en une liste d'entiers, vous pouvez utiliser map() pour le faire.
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/06.png)
+
+****flatMap()****
+
+La fonction Stream.flatMap(), comme son nom l'indique, est la combinaison d'une map (converti on) et d'une opération flat (aplatissement). Cela signifie que vous appliquez d'abord la fonction map, puis vous aplatissez le résultat.
+
+Pour comprendre en quoi consiste l'aplatissement d'un flux, considérez une structure comme [ [1,2,3], [4,5,6], [7,8,9] ] qui a "deux niveaux". Il s'agit en fait d'une grande liste contenant trois autres listes. L'aplatir signifie la transformer en une structure à "un niveau", par exemple [ 1,2,3,4,5,6,7,8,9 ], c'est-à-dire une seule liste.
+
+Par exemple : Dans le programme ci-dessous, vous pouvez voir que nous avons trois listes qui sont fusionnées en une seule en utilisant une fonction flatMap().
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/07.png)
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/08.png)
+
+#### **distinct()**
+
+La méthode Java Stream distinct() est une opération non terminale qui renvoie un nouveau Stream qui ne contiendra que les éléments distincts du flux d'origine. Les éventuels doublons seront éliminés.
+
+Voici un exemple de la méthode Java Stream distinct() :
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/09.png)
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/10.png)
+
+#### **sorted()**
+
+La méthode Java Stream sorted() est une opération non terminale qui renvoie un nouveau Stream qui contiendra les éléments triés du flux d'origine. Les éventuels doublons seront éliminés.
+
+Voici un exemple de la méthode Java Stream sorted() :
+
+**![](/legacy/blogger/les-operations-intermediaires-de-java-stream/11.png)**
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/12.png)
+
+La méthode Java Stream stored() utilise un comparateur.
+
+#### **peek()**
+
+La méthode Java Stream peek() est une opération non terminale qui prend une interface Consumer comme paramètre. Le Consumer sera appelé pour chaque élément du flux. La méthode peek() renvoie un nouveau Stream qui contient tous les éléments du flux d'origine.
+
+L'objectif de la méthode peek() est, comme elle le dit, de regarder les éléments du flux, et non de les transformer. Gardez à l'esprit que la méthode peek ne lance pas l'itération interne des éléments du flux. Vous devez appeler une opération terminale pour cela.
+
+Voici un exemple de la méthode Java Stream peek() :
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/13.png)
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/14.png)
+
+#### **limit()**
+
+La méthode Java Stream limit() permet de limiter le nombre d'éléments d'un flux à un nombre donné à la méthode limit() en tant que paramètre. La méthode limit() renvoie un nouveau flux qui contiendra au maximum le nombre d'éléments donné.
+
+Voici un exemple de la méthode limit() de Java Stream :
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/15.png)
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/16.png)
+
+#### **skip()**
+
+La méthode Java Stream skip() permet de sauter le nombre d'éléments d'un flux à un nombre donné à la méthode skip() en tant que paramètre. La méthode skip() renvoie un nouveau flux.
+
+Voici un exemple de la méthode skip() de Java Stream :
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/17.png)
+
+Output:
+
+![](/legacy/blogger/les-operations-intermediaires-de-java-stream/18.png)

@@ -7,7 +7,6 @@ tags: ["hibernate", "java", "jpa", "spring-boot"]
 readingTime: 3
 excerpt: "Dans cet exemple, nous allons apprendre à intégrer une clé primaire composite , nous allons déclarer les ID (champs de clé primaire) comme une classe distincte annotée de l’annotation @Embeddable . Un élève est identifié par son EleveCompositeId , qui est défini par eleveId et classe ."
 status: "published"
-canonical: "https://autourducode.net/java/jpa-hibernate-cle-primaire-composite/"
 ---
 
 Dans cet exemple, nous allons apprendre à intégrer une ***clé primaire composite***, nous allons déclarer les ID (champs de clé primaire) comme une classe distincte annotée de l’annotation ***@Embeddable***. Un élève est identifié par son **EleveCompositeId**, qui est défini par **eleveId** et **classe**.
@@ -21,8 +20,6 @@ Entrons dans le code…
 ### Créez un simple projet Spring Boot « TutoHibernatePK »
 
 ### Structure des dossiers :
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-09-à-01.26.16-822x1024.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-09-à-01.26.16.png)
 
 ### Le fichier POM.xml
 
@@ -210,8 +207,6 @@ Hibernate: create table eleve (classe varchar(50) not null, eleve_id integer not
 ```
 
 La combinaison de la colonne **classe** et **eleve_id** constitue une clé composite, elle sera utilisé pour identifier de manière unique chaque ligne de la table.
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-10-à-00.51.32.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-10-à-00.51.32.png)
 
 J’espère que cet article vous a été utile. Merci de l’avoir lu.
 

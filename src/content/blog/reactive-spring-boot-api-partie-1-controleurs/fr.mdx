@@ -1,0 +1,118 @@
+---
+title: "Reactive Spring Boot API – Partie I, Contrôleurs"
+slug: "reactive-spring-boot-api-partie-1-controleurs"
+language: "fr"
+publishedAt: "2022-10-30"
+tags: ["api", "flux", "java", "mono", "reactive", "spring", "spring-boot", "webflux"]
+readingTime: 3
+excerpt: "Au revoir la synchronisation, Bienvenue a l’asynchrone, finis avec le blocage de code"
+status: "published"
+---
+
+Nous sommes en 2022, et nous ne devrions plus être limités au code bloquant. *Par code bloquant, nous voulons dire que pendant l’exécution d’une ligne de code, le contrôle sera bloqué jusqu’à ce que le code finisse de s’exécuter et seulement alors, nous pourrons passer à la ligne suivante.*
+
+Donc, si les demandes (requêtes) sont bloquées, cela **signifie-t-il que nous ne pouvons servir qu’une seule demande à la fois ?** **Non**. *Pour chaque demande, un thread séparé est créé. Cependant, cela prend du temps lorsque le nombre de demandes augmente considérablement.*
+
+Je me concentre ici sur Spring Boot avec [WebFlux](https://spring.io/reactive). Spring Boot est un framework fantastique, mais étant donné sa vaste bibliothèque et sa verbosité, il peut être décourageant de passer du modèle traditionnel de blocage basé sur les threads au modèle réactif. Donc, si vous êtes un développeur Spring Boot et que vous souhaitez passer au modèle réactif, ce guide est pour vous !
+
+### **Serveur Bloquant vs Non Bloquant**
+
+Le Spring Boot traditionnel utilise **[Apache Tomcat](https://tomcat.apache.org)** comme serveur sous-jacent, qui est bloquant par nature. Cependant, dans le cadre réactif, Spring a introduit le serveur **[Netty](https://netty.io)** qui est non bloquant et asynchrone par nature. Vous trouverez cela très similaire à la façon dont NodeJS fonctionne.
+
+### **Style de programmation**
+
+La syntaxe du code est très similaire à ce que vous avez l’habitude de faire dans spring, notamment les *contrôleurs*, les *exceptions*, les *DTO*, etc. La différence vient, fondamentalement, dans le style de programmation. Rappelez-vous que vous n’écrivez plus de code synchrone ! ***Cela signifie que chaque ligne de code que vous écrivez, vous devez tenir compte de la nature asynchrone du code***. Qu’il s’agisse d’appeler une API externe ou d’utiliser une bibliothèque, vous devez vous assurer que vous ne bloquez pas le thread.
+
+Cela étant dit, c’est quelque chose auquel vous vous habituerez une fois que vous commencerez à écrire du code.
+
+### **Configurer un service rest Reactive**
+
+Vous pouvez suivre ce guide https://spring.io/guides/gs/reactive-rest-service de Spring pour avoir une configuration de départ.
+
+Notre parent dans pom.xml serait le parent de départ.
+
+```xml
+<parent>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-parent</artifactId>
+   <version>2.7.4</version>
+   <relativePath/>
+</parent>
+```
+
+Ensuite, nous aurons besoin des dépendances principales, à savoir le starter **webflux** et les starters de test.
+
+```xml
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-webflux</artifactId>
+</dependency>
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-test</artifactId>
+   <scope>test</scope>
+</dependency>
+<dependency>
+   <groupId>io.projectreactor</groupId>
+   <artifactId>reactor-test</artifactId>
+   <scope>test</scope>
+</dependency>
+```
+
+Cela devrait être suffisant pour une configuration de base, et nous continuerons à ajouter des dépendances selon nos besoins.
+
+### **Les types** **Mono et Flux**
+
+Avant de passer au code, il y a quelques concepts que vous devez connaître. Spring webflux est construit au-dessus de https://projectreactor.io/ qui est un cadre réactif. Essentiellement, nous traitons avec un flux de données. Afin de recevoir ou de manipuler ce flux, nous avons besoin de certains types de données.
+
+Le premier est **Mono**, qui est utilisé lorsque nous voulons exactement un résultat (valeur unique) ou zéro (optionnel) . Pour les tableaux ou une liste de résultats, nous utilisons **Flux** . Ensemble, ces deux éléments forment le noyau des types de données de demande et de réponse. C’est similaire à la façon dont nous avons les Observables dans RxJs.
+
+Si vous voulez plus d’informations, vous pouvez consulter les documents officiels [ici](https://projectreactor.io/docs/core/snapshot/reference/#core-features).
+
+### Contrôleurs
+
+```xml
+@RestController
+@RequestMapping("/reactive")
+public class ReativeController {
+
+    @GetMapping("/hello/{nom}")
+    public Mono<String> sayHello(@PathVariable String nom) {
+        return Mono.just("Bonjour " + nom);
+    }
+}
+```
+
+Nous définissons les contrôleurs de la même manière que dans Spring, c’est-à-dire avec l’annotation **@RestController**. J’ai créé un simple endpoint retournant une chaîne de caractères. La différence à noter ici est le type de retour qui est de **Mono** . Il est important d’envelopper les types de retour primaires ou complexes dans **Mono** ou **Flux**. *Cela rend notre endpoint réactif*.
+
+**Mono.just()** est utilisé pour convertir des valeurs uniques en valeurs **réactives**. Encore une fois, il s’agit de résumer les données. La même chose peut être faite avec **Flux.just()**.
+
+Un exemple plus familier peut être l’utilisation de la classe **ResponseEntity** fournie par spring.
+
+#### Disons que nous avons un DTO
+
+```java
+//utilisation de Lombok pour getter et setter
+@Getter
+@Setter
+public class ResponseDTO {
+    private String nom;
+}
+```
+
+et nous voulons le renvoyer comme réponse de notre API, nous l’enveloppons simplement en Mono ou Flux en fonction de la valeur.
+
+```xml
+@GetMapping("/hello/{nom}")
+public Mono<ResponseEntity<ResponseDTO>> sayHello(@PathVariable String nom) {
+    ResponseDTO dto = new ResponseDTO();
+    dto.setNom(nom);
+    return Mono.just(ResponseEntity.status(200).body(dto));
+}
+```
+
+**Voilà pour la partie 1 ! La partie suivante couvrirait les validations de requêtes.**
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

@@ -1,0 +1,105 @@
+---
+title: "Reactive Spring Boot API – Part II, Validations"
+slug: "reactive-spring-boot-api-partie-2-validations"
+language: "en"
+publishedAt: "2022-11-05"
+tags: ["api", "java", "spring", "spring-boot", "validations"]
+readingTime: 1
+excerpt: "In this article we will set up the validation of the inputs of a query"
+status: "published"
+---
+
+In [first part](/en/blog/reactive-spring-boot-api-partie-1-controleurs), we saw how to configure Spring Reactive and create a controller and an endpoint. Now that we have an endpoint, we would probably want to validate our request bodies!
+
+**Validations** are necessary to prevent our application from accepting erroneous or incorrect inputs. Let's say we have the endpoint below to update our profile,
+
+```
+@PostMapping("/profile/{id}")
+public String update(@PathVariable String id, @RequestBody ProfileRequestDTO updateDTO) {
+    ...
+}
+```
+
+and our DTO request looks like this,
+
+```java
+//Utilisation de Lombok pour les getter et setter
+@Getter 
+@Setter 
+public class ProfileRequestDTO {
+    private String name;
+    private String phone;
+}
+```
+
+Now, let's say that name and phone are required parameters, and we should reject a query if it doesn't have the parameters above. To do this, we use the **javax.validation** class. This is again the same as what we do in traditional Spring Boot. To add validations, simply use annotations like @NotNull, @NotEmpty, etc.
+
+```java
+@Getter
+@Setter
+public class ProfileRequestDTO {
+  @NotNull
+  @NotEmpty 
+  private String name;
+  @NotNull
+  @NotEmpty  
+  private String phone;
+}
+```
+
+After adding our annotations, we also need to tell our endpoint to trigger these validations. We use the **@Validated** annotation to tell spring to validate whatever comes next.
+
+```
+@PostMapping("/profile/{id}")
+public String update(@PathVariable String id, @RequestBody @Validated ProfileRequestDTO updateDTO) {
+    ...
+}
+```
+
+This will trigger validations, if we don't pass any of the parameters.
+
+### **Nested validations**
+
+```java
+@Getter
+@Setter
+public class Address {
+  @NotNull
+  @NotEmpty 
+  private String street;
+  @NotNull
+  @NotEmpty  
+  private String zipCode;
+}
+
+@Getter
+@Setter
+public class ProfileRequestDTO {
+  private Address address;
+  @NotNull
+  @NotEmpty  
+  private String phone;
+}
+```
+
+If you try to trigger the validations now, you will notice that nothing happens for the **address** field. This is because Spring doesn't yet know that it needs to validate this field. To do this, add an annotation **@valid**
+
+```java
+@Getter
+@Setter
+public class ProfileRequestDTO {
+  @Valid
+  private Address address;
+  @NotNull
+  @NotEmpty  
+  private String phone;
+}
+```
+
+This way we can enable nested validations.
+
+**That’s it for part 2! The next part would cover query exceptions.**
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel:**https://bit.ly/3IwIK04**

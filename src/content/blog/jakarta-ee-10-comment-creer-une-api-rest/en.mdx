@@ -7,10 +7,7 @@ tags: ["api", "jakarta", "jakarta-ee", "java"]
 readingTime: 10
 excerpt: "In this article, we walk you through some basic scenarios using the REST specification.Although most people use the term REST or RESTful API only to indicate that they are transferring data over HTTP, and ignore the \"Hypermedia as a state engine\" part."
 status: "published"
-canonical: "https://autourducode.net/java/jakarta-ee-10-comment-creer-une-api-rest/"
 ---
-
-[![](https://autourducode.net/wp-content/uploads/2022/11/jakarta-1024x778.png)](https://autourducode.net/wp-content/uploads/2022/11/jakarta.png)
 
 In this article, we walk you through some basic scenarios using the **REST** specification.Although most people use the term **REST** or **RESTful** API only to indicate that they are transferring data over HTTP, and ignore the "*Hypermedia as an Application State Engine* (**HATEOS**)" part of REST.This technique is widely used recently to connect the front-end to the back-end.
 
@@ -20,7 +17,7 @@ Just like the other **Jakarta** specifications, you just need to add the Web API
 
 When using Maven as a build tool, you must have the following dependency in the **pom.xml** file for your WAR application
 
-```
+```xml
 <dependency>
 <groupId>jakarta.platform</groupId>
 <artifactId>jakarta.jakartaee-web-api</artifactId>

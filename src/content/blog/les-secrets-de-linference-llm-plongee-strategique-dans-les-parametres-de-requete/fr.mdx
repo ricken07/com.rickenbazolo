@@ -1,0 +1,124 @@
+---
+title: "les Secrets de l’Inférence LLM : Plongée Stratégique dans les Paramètres de Requête"
+slug: "les-secrets-de-linference-llm-plongee-strategique-dans-les-parametres-de-requete"
+language: "fr"
+publishedAt: "2024-02-21"
+tags: ["ia", "llm"]
+readingTime: 7
+excerpt: "Les modèles de langage (LLMs) ont révolutionné le domaine du traitement automatique du langage (NLP) par leur capacité à produire du texte similaire à celui de l’homme, offrant entre autres la traduction, la création de contenu, et la réponse éclairée aux questions, appuyés par des ensembles de données textuelles immenses."
+status: "published"
+---
+
+Les modèles de langage (LLM) ont révolutionné le traitement automatique du langage naturel (NLP) grâce à leurs performances impressionnantes. Capables de générer des textes de qualité comparable à celle des humains, de traduire entre langues fluidement, de créer variétés de contenus originaux, et de fournir des réponses précises aux interrogations, ils marquent une avancée significative dans le domaine. Cette expertise découle de leur apprentissage basé sur d’immenses volumes de données textuelles, qui leur permet de comprendre et reproduire les complexités linguistiques avec une grande finesse, produisant ainsi des textes à la fois naturels et logiques.
+
+Pour tirer pleinement parti des LLMs, saisir les subtilités des paramètres de requête qui orchestrent le processus d’inférence est fondamental. Ces leviers vous offrent la possibilité d’affiner le comportement des LLMs, vous menant ainsi vers les résultats escomptés. Dans cet article, nous plongerons au cœur des paramètres cruciaux pour l’Inférence de Génération de Texte (IGT), explorant leur influence déterminante sur le rendu des LLMs.
+
+Découvrons Ensemble un Exemple :
+
+```
+inputs: Bienvenue chez nous, autour du
+parameters:
+  best_of: 1
+  decoder_input_details: true
+  details: true
+  do_sample: true
+  max_new_tokens: 20
+  repetition_penalty: 1.03
+  return_full_text: false
+  seed: 
+  stop:
+  - code
+  temperature: 0.5
+  top_k: 10
+  top_n_tokens: 5
+  top_p: 0.95
+  truncate: 
+  typical_p: 0.95
+  watermark: true
+```
+
+### Plongée rapide dans l’univers des paramètres : comment ils sculptent les performances du LLM.
+
+### **inputs**
+
+La porte d’entrée vers l’ingéniosité créative des LLM, le paramètre d’entrée ‘**inputs**‘ vous permet de poser les fondations avec un texte initial. Ce texte sert de catalyseur, orientant la génération de contenu nouveau. Qu’il s’agisse de langage naturel, de programmation ou de n’importe quelle forme textuelle, le LLM exploite cette entrée comme un tremplin pour son expédition linguistique 😀.
+
+### **parameters**
+
+Plongeant au cœur de la configuration des LLMs, le dictionnaire de paramètres détient les secrets pour peaufiner le processus d’inférence. Examinons en détail chaque paramètre pour en révéler la fonction spécifique :
+
+### **best_of**
+
+Le paramètre ‘**best_of‘** détermine le nombre de fois que les modèles de langage (LLMs) exécutera le processus d’inférence, en sélectionnant et retournant le résultat ayant la plus haute probabilité de pertinence. En le configurant à 1, vous garantissez une unique exécution, ce qui permet d’équilibrer la qualité du résultat avec le temps de traitement nécessaire.
+
+> Dans le contexte de l’intelligence artificielle (IA) et des modèles de langage comme GPT, l’« inference » est le processus par lequel l’IA génère des réponses ou des contenus basés sur les données d’entrée qu’elle reçoit.
+
+### **decoder_input_details**
+
+Le paramètre ‘`decoder_input_details`‘ lorsqu’il est activé (c’est-à-dire, réglé sur `true`), permet de fournir des informations détaillées sur les entrées du décodeur du modèle. Ces informations peuvent inclure des éléments tels que les poids d’attention et les probabilités softmax, qui sont cruciaux pour comprendre comment le modèle prend ses décisions de génération de texte.
+
+> – **Poids d’attention :** Ces poids montrent comment le décodeur alloue son attention à différentes parties de l’entrée lors de la génération de texte. Cela aide à comprendre sur quelles informations le modèle se concentre à chaque étape de la génération.
+>
+> – **Probabilités softmax :** Les probabilités softmax donnent une distribution de probabilité sur le vocabulaire du modèle pour la prochaine sortie de mot. Cela indique la confiance du modèle dans ses prédictions à chaque étape.
+
+### **details**
+
+Activer le paramètre ‘details‘ entraîne l’ajout d’informations supplémentaires dans le résultat final. Allant de la température d’échantillonnage aux valeurs top-k/top-p, cette fonctionnalité s’avère être un atout précieux pour le débogage et pour acquérir une compréhension plus approfondie du comportement du modèle de langage à grande échelle (LLM).
+
+### **do_sample**
+
+Le paramètre ‘do_sample‘ détermine si le processus de génération doit utiliser un mécanisme d’échantillonnage. Lorsqu’il est activé (réglé sur true), il introduit un élément d’aléatoire, infusant ainsi une dose de créativité dans les productions du modèle (LLM).
+
+### **max_new_tokens**
+
+Le paramètre ‘max_new_tokens‘ détermine le nombre maximal de nouveaux tokens que le modèle de langage (LLM) est autorisé à générer, limitant ainsi la longueur de la séquence produite. Ajuster soigneusement ce paramètre permet de maîtriser à la fois la longueur de la sortie et la qualité du contenu généré.
+
+### **repetition_penalty**
+
+Pour éviter la production de texte répétitif, le paramètre ‘repetition_penalty‘ impose une pénalité aux tokens déjà générés. Un ajustement fin de ce paramètre, par exemple à une valeur de 1.03, permet d’atteindre un équilibre délicat entre diversité du contenu et cohérence textuelle.
+
+### **return_full_text**
+
+Le paramètre ‘return_full_text‘ permet de choisir si la sortie inclura la séquence générée dans son intégralité, y compris le texte d’entrée (quand régler sur true), ou uniquement le texte nouvellement généré (quand régler sur false).
+
+### **seed**
+
+Le paramètre ‘`seed`‘ (graine en français 😁) est utilisé pour initialiser l’algorithme de génération de nombres aléatoires. Dans les processus qui impliquent de la randomisation, comme l’échantillonnage ou la division des données en ensembles d’entraînement et de test, le *`seed`* garantit que les résultats peuvent être reproductibles. En d’autres termes, utiliser le même *`seed`* permet de générer les mêmes séquences de nombres aléatoires d’une exécution à l’autre, *ce qui est crucial pour la reproductibilité des expériences et le débogage en IA*.
+
+### **stop**
+
+Le paramètre ‘`stop`‘ est utilisé pour définir un ou plusieurs *tokens* (mots ou séquences de caractères) qui signalent au modèle qu’il doit arrêter la génération de texte une fois ces *tokens* rencontrés. Ce mécanisme permet de contrôler la longueur du contenu généré ou de terminer une réponse lorsque certaines conditions sont remplies, telles que la fin d’une phrase, d’un paragraphe ou la conclusion d’un raisonnement.
+
+> L’utilisation du paramètre *`stop`* est particulièrement utile dans les cas où il est nécessaire de limiter la réponse à un segment spécifique d’information, d’éviter les répétitions inutiles, ou de prévenir la génération de contenu qui sortirait du contexte désiré. En d’autres termes, ce paramètre agit comme un dispositif de contrôle pour affiner la pertinence et la précision des sorties du modèle, en assurant que le contenu généré reste aligné avec les objectifs spécifiques de la requête utilisateur.
+
+### temperature
+
+Le paramètre de ‘temperature‘ ajuste le niveau de créativité dans la production textuelle du modèle. Agissant comme un levier numérique, il modifie la façon dont le modèle pondère les probabilités lorsqu’il choisit les mots à générer. Une température basse conduit à des choix plus sûrs et conventionnels, privilégiant les mots et tournures fréquemment rencontrés durant l’entraînement du modèle. À l’inverse, une température élevée favorise l’expérimentation, en donnant aux options moins évidentes une chance d’être sélectionnées, ce qui peut enrichir le texte de variations plus audacieuses et originales.
+
+> – Une **température basse** (*proche de 0*) rend le modèle plus conservateur dans ses choix, favorisant les mots ou phrases les plus probables selon l’entraînement qu’il a reçu. Cela conduit à des réponses plus prévisibles, souvent plus cohérentes, mais potentiellement moins diversifiées ou créatives.
+>
+> – Une **température élevée** (*par exemple, supérieure à 1*) augmente l’aléatoire dans la sélection des mots, ce qui permet au modèle d’explorer des réponses plus diverses originales ou inattendues. Cela peut encourager la créativité dans la génération de texte, mais aussi augmenter le risque de produire des réponses moins pertinentes ou moins cohérentes.
+
+### top_k
+
+Le paramètre ‘`top_k`‘ est une technique de filtrage utilisée lors du processus de décision pour la génération de texte. Ce paramètre spécifie le nombre ***k*** d’options de vocabulaire ayant la plus haute probabilité qui sont considérées par le modèle à chaque étape de la génération.
+
+> – **Si `top_k` est élevé**, le modèle a une plus grande liberté de choix, ce qui peut augmenter la diversité et la créativité du texte généré, mais peut aussi introduire plus d’aléatoire et potentiellement réduire la pertinence ou la cohérence du texte.
+>
+> – **Si `top_k` est faible**, la génération du texte est plus contrôlée et concentrée sur les options les plus probables, ce qui peut augmenter la cohérence et la pertinence du texte, mais réduire sa diversité et sa créativité.
+
+### **top_n_tokens**
+
+À l’instar de *max_new_tokens*, le paramètre ‘top_n_tokens‘ restreint le nombre total de tokens générés, en prenant en compte aussi le texte d’entrée. Un choix judicieux de cette valeur permet de maîtriser la longueur globale de la sortie, en assurant que le volume du contenu produit reste dans les limites souhaitées et adaptées à l’objectif de la tâche.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre [chaîne YouTube](https://bit.ly/3IwIK04)
+
+Pour obtenir des informations plus approfondies, veuillez consulter les liens fournis ci-dessous.
+
+[The Secrets of Large Language Models](https://michaelehab.medium.com/the-secrets-of-large-language-models-parameters-how-they-affect-the-quality-diversity-and-32eb8643e631?source=post_page-----68aba00914a3--------------------------------)
+
+[Text Generation Inference API](https://huggingface.github.io/text-generation-inference/?source=post_page-----68aba00914a3--------------------------------)
+
+[Inference](https://huggingface.co/docs/huggingface_hub/main/en/package_reference/inference_client?source=post_page-----68aba00914a3--------------------------------#huggingface_hub.inference._text_generation.TextGenerationParameters)

@@ -1,0 +1,174 @@
+---
+title: "Kubernetes : Utilisation de kubectl."
+slug: "kubernetes-utilisation-de-kubectl"
+language: "fr"
+publishedAt: "2022-07-20"
+tags: ["cloud", "container", "devops", "k8s", "kubernetes", "pods"]
+readingTime: 3
+excerpt: "je voudrais parler de l’utilisation de kubectl. « kubectl » comme nous l’avons mentionné, c’est l’outil CLI pour Kubernetes qui est un moyen sécurisé de communiquer avec le serveur API Kube."
+status: "published"
+---
+
+Dans cet article, je voudrais parler de l’utilisation de kubectl. « **kubectl** » comme nous l’avons mentionné, c’est l’outil CLI pour Kubernetes qui est un moyen sécurisé de communiquer avec le **serveur API Kube**.
+
+Cela signifie que je peux créer, lister, supprimer et mettre à jour les ressources Kubernetes en utilisant « kubectl ». En d’autres termes, nous pouvons appliquer les méthodes HTTP sur l’API de restauration au serveur kube-api de manière simple et sécurisée !
+
+Je vais commencer par les bases jusqu’à l’utilisation avancée. Une excellente liste de commandes est disponible ici : [**https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands**](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands)
+
+## **Kubectl Create**
+
+Commençons par créer une ressource :
+
+```xml
+kubectl create <ressourceType> <nomDeLaResource>
+```
+
+```
+kubectl create deployment testdeploy --image=nginx
+```
+
+Nous pouvons le créer à partir d’un fichier YAML :
+
+```
+kubectl create -f demok8sresource.yaml
+```
+
+```
+kubectl apply -f demok8sresource.yaml
+```
+
+> Remarque importante : La différence entre « **create** » et « **apply** » est que, « create » ne peut que créer une ressource, alors que « apply » peut créer et mettre à jour une ressource.
+>
+> Par exemple, si la ressource est déjà opérationnelle et que vous avez apporté des modifications dans le YAML, la commande « create » échouera mais « apply » mettra à jour la ressource.
+
+Créer la ressource et exécuter directement le Pod
+
+```xml
+kubectl run <nomDuPod> --image=<image>
+```
+
+```
+kubectl run nginx --image=nginx
+```
+
+## **Répertorier les ressources avec Kubectl**
+
+Pour lister n’importe quelle ressource, nous utilisons « get » :
+
+```xml
+kubectl get <ressourceType>
+```
+
+```
+kubectl get deployments
+```
+
+Cela obtiendra tous les déploiements disponibles dans l’espace de noms par défaut. Pour un espace de noms spécifique, nous devons ajouter le paramètre « **–namespace** » ou « **-n** » et spécifier le nom de l’espace de noms.
+
+```
+kubectl get pods -n default
+```
+
+Pour répertorier les pods dans tous les espaces de noms :
+
+```
+kubectl get pods --all-namespaces
+```
+
+Pour répertorier toutes les ressources liées au développement disponibles dans, vous pouvez utiliser :
+
+```
+kubectl get all
+```
+
+Cela vous donnera la plupart des ressources, mais à l’exception de quelques types comme les secrets, etc.
+
+Nous pouvons obtenir une ressource spécifique :
+
+```xml
+kubectl get <ressourceType> <nomDeLaResource>
+```
+
+Pour plus d’options, veuillez vous référer [ici](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
+
+Pour obtenir plus d’informations sur une ressource, nous pouvons la décrire :
+
+```xml
+kubectl describe <ressourceType> <nomDeLaResource>
+```
+
+```
+kubectl describe pod nginx
+```
+
+## **Utilisation avancée de Kubectl**
+
+Comme nous l’avons mentionné lors des séries précédentes, **kubectl** envoie une requête HTTP et reçoit une réponse HTTP au format JSON. Kubectl embellit cette réponse et nous donne une sortie compréhensible dans un format différent.
+
+Il existe peu d’options de sortie différentes que vous pouvez utiliser avec « -o ».
+
+### Par exemple :
+
+```
+kubectl get pods -o wide
+```
+
+Comme vous pouvez le voir, cela vous donnera également les informations sur le nœud et l’adresse IP.
+
+Si nous voulons voir la sortie JSON
+
+```
+kubectl get pods -o json
+```
+
+Puisque nous avons une sortie **JSON**, nous pouvons obtenir des informations spécifiques à ce sujet en utilisant **jsonpath**.
+
+```xml
+kubectl get <ressourceType> -o jsonpath=’{jsonpath.to.the.information}’
+```
+
+```
+kubectl get pods -o jsonpath=’{.items[*].metadata.name}’
+```
+
+> Cela renverra les noms des pods.
+
+Une autre excellente option est les « **colonnes personnalisées**« . En utilisant ce drapeau, nous pouvons embellir la sortie que nous voulons. Comme son nom l’indique, nous créons nos colonnes personnalisées et ajoutons les informations qui leur correspondent.
+
+```xml
+kubectl get <ressourceType> -o custom-columns=’<TITRE1>:<jsonpath>,<TITRE2>:<jsonpath>, …’
+```
+
+Remarque importante : Lorsque vous utilisez jsonpath, vous devez mentionner le premier élément (c’est-à-dire .Items[]) car vous fournissez jsonpath. Mais lorsque vous utilisez des colonnes personnalisées, vous ignorez le premier élément.
+
+```
+kubectl get pods -o custom-columns=’NAME:.metadata.name’
+```
+
+Ou avec plusieurs colonnes :
+
+```
+kubectl get pods -o custom-columns='NAME:.metadata.name,NODE:.spec.name'
+```
+
+Nous pouvons enregistrer la sortie dans le format de notre choix en ajoutant `> <nomDuFichier>.<fichierType>` :
+
+```
+kubectl get pods -o wide > pods.txt
+```
+
+Ou
+
+```
+kubectl get pods -o json > pods.json
+```
+
+ou même les colonnes personnalisées :
+
+```
+kubectl get pods -o custom-columns=’NAME:.metadata.name,STATUS:.status.phase’ > podstatus.txt
+```
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

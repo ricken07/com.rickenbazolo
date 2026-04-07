@@ -1,0 +1,65 @@
+---
+title: "Hilla – Un nouveau Framework Frontend pour SpringBoot"
+slug: "hilla-framework-frontend-springboot-vaadin"
+language: "fr"
+publishedAt: "2022-05-29"
+tags: ["framework", "spring", "spring-boot"]
+readingTime: 1
+excerpt: "Le nouveau framework frontend pour Spring Boot"
+status: "published"
+---
+
+[Hilla](https://hilla.dev/) est un nouveau framework pour la création d’applications web réactives avec un backend en [Java](https://dev.java/). Il intègre de manière transparente un frontend réactif [Lit](https://lit.dev/) [TypeScript](https://www.typescriptlang.org/) avec un backend Spring Boot. Hilla est construit et soutenu par [Vaadin](https://vaadin.com/).
+
+Hilla est conçu pour être suffisamment simple pour les petits services publics, mais suffisamment robuste pour créer des applications complexes de niveau entreprises.
+
+### Génération automatique de code Java vers TypeScript
+
+La génération automatique de code TypeScript permet de garantir que le frontend reste toujours synchronisé avec le backend, afin que vous puissiez créer des applications plus rapidement et avec plus de confiance, même lorsque votre équipe s’agrandit. Vous pouvez explorer les méthodes « serveur end point » et leurs types d’entrée et de retour directement depuis votre IDE au fur et à mesure que vous tapez.
+
+### **Serveur endpoint :**
+
+```java
+@Endpoint
+@AnonymousAllowed
+public class PersonEndpoint {
+    private PersonRepository repository;
+
+    public PersonEndpoint(PersonRepository repository) {
+        this.repository = repository;
+    }
+
+    public @Nonnull List<@Nonnull Person> findAll() {
+        return repository.findAll();
+    }
+}
+```
+
+### **TypeScript View :**
+
+```xml
+import { PersonEndpoint } from 'Frontend/generated/endpoints';
+import Person from 'Frontend/generated/com/example/application/Person';
+
+export class PersonView extends View {
+  @state() people: Person[] = [];
+
+  async firstUpdated() {
+    this.people = await PersonEndpoint.findAll();
+  }
+
+  render() {
+    return html`
+      <vaadin-grid .items=${this.people}>
+        <vaadin-grid-column path="firstName"></vaadin-grid-column>
+        <vaadin-grid-column path="lastName"></vaadin-grid-column>
+      </vaadin-grid>`;
+  }
+}
+```
+
+### Vous pouvez en savoir plus sur https://hilla.dev/
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

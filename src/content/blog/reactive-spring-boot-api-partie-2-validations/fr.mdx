@@ -1,0 +1,105 @@
+---
+title: "Reactive Spring Boot API – Partie II, Validations"
+slug: "reactive-spring-boot-api-partie-2-validations"
+language: "fr"
+publishedAt: "2022-11-05"
+tags: ["api", "java", "spring", "spring-boot", "validations"]
+readingTime: 1
+excerpt: "Dans cet article nous allons mettre en place la validation des inputs d’une requête"
+status: "published"
+---
+
+Dans la [première partie](/fr/blog/reactive-spring-boot-api-partie-1-controleurs), nous avons vu comment configurer Spring Reactive et créer un contrôleur ainsi qu’un endpoint. Maintenant que nous avons un endpoint, nous voudrions probablement valider les corps de nos requêtes !
+
+Les **validations** sont nécessaires pour empêcher notre application d’accepter des entrées erronées ou incorrectes. Disons que nous avons le endpoint ci-dessous pour mettre à jour notre profil,
+
+```
+@PostMapping("/profile/{id}")
+public String update(@PathVariable String id, @RequestBody ProfileRequestDTO updateDTO) {
+    ...
+}
+```
+
+et notre demande DTO ressemble à ceci,
+
+```java
+//Utilisation de Lombok pour les getter et setter
+@Getter 
+@Setter 
+public class ProfileRequestDTO {
+    private String name;
+    private String phone;
+}
+```
+
+Maintenant, disons que le nom et le téléphone sont des paramètres obligatoires, et que nous devrions rejeter une requête si elle n’a pas les paramètres ci-dessus. Pour ce faire, nous utilisons la classe **javax.validation**. C’est à nouveau la même chose que ce que nous faisons dans le Spring Boot traditionnel. Pour ajouter des validations, il suffit d’utiliser des annotations comme @NotNull, @NotEmpty, ….
+
+```java
+@Getter
+@Setter
+public class ProfileRequestDTO {
+  @NotNull
+  @NotEmpty 
+  private String name;
+  @NotNull
+  @NotEmpty  
+  private String phone;
+}
+```
+
+Après avoir ajouté nos annotations, nous devons également indiquer à notre endpoint de déclencher ces validations. Nous utilisons l’annotation **@Validated** pour dire au printemps de valider tout ce qui vient ensuite.
+
+```
+@PostMapping("/profile/{id}")
+public String update(@PathVariable String id, @RequestBody @Validated ProfileRequestDTO updateDTO) {
+    ...
+}
+```
+
+Cela déclenchera des validations, si nous ne transmettons aucun des paramètres.
+
+### **Validations imbriquées**
+
+```java
+@Getter
+@Setter
+public class Address {
+  @NotNull
+  @NotEmpty 
+  private String street;
+  @NotNull
+  @NotEmpty  
+  private String zipCode;
+}
+
+@Getter
+@Setter
+public class ProfileRequestDTO {
+  private Address address;
+  @NotNull
+  @NotEmpty  
+  private String phone;
+}
+```
+
+Si vous essayez de déclencher les validations maintenant, vous remarquerez que rien ne se passe pour le champ **address**. C’est parce que Spring ne sait pas encore qu’il doit valider ce champ. Pour ce faire, ajoutez une annotation **@valid**
+
+```java
+@Getter
+@Setter
+public class ProfileRequestDTO {
+  @Valid
+  private Address address;
+  @NotNull
+  @NotEmpty  
+  private String phone;
+}
+```
+
+De cette façon, nous pouvons activer des validations imbriquées.
+
+**Voilà pour la partie 2 ! La partie suivante couvrirait les exceptions de requêtes.**
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

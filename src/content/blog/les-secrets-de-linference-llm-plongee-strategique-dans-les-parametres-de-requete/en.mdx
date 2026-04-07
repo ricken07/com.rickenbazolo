@@ -1,0 +1,124 @@
+---
+title: "Secrets of LLM Inference: Strategic Dive into Query Parameters"
+slug: "les-secrets-de-linference-llm-plongee-strategique-dans-les-parametres-de-requete"
+language: "en"
+publishedAt: "2024-02-21"
+tags: ["ia", "llm"]
+readingTime: 6
+excerpt: "Language models (LLMs) have revolutionized the field of natural language processing (NLP) with their ability to produce human-like text, offering among other things translation, content creation, and informed question answering, supported by immense textual data sets."
+status: "published"
+---
+
+Language models (LLM) have revolutionized natural language processing (NLP) with their impressive performance. Capable of generating texts of quality comparable to that of humans, translating between languages ​​fluidly, creating a variety of original content, and providing precise answers to questions, they mark a significant advance in the field. This expertise stems from their learning based on immense volumes of textual data, which allows them to understand and reproduce linguistic complexities with great finesse, thus producing texts that are both natural and logical.
+
+To take full advantage of LLMs, understanding the intricacies of the query parameters that orchestrate the inference process is fundamental. These levers offer you the possibility of refining the behavior of LLMs, thus leading you towards the expected results. In this article, we will dive deep into the crucial parameters for Text Generation Inference (TGI), exploring their determining influence on the rendering of LLMs.
+
+Let’s discover an Example together:
+
+```
+inputs: Bienvenue chez nous, autour du
+parameters:
+  best_of: 1
+  decoder_input_details: true
+  details: true
+  do_sample: true
+  max_new_tokens: 20
+  repetition_penalty: 1.03
+  return_full_text: false
+  seed: 
+  stop:
+  - code
+  temperature: 0.5
+  top_k: 10
+  top_n_tokens: 5
+  top_p: 0.95
+  truncate: 
+  typical_p: 0.95
+  watermark: true
+```
+
+### A quick dive into the world of parameters: how they shape LLM performance.
+
+### **inputs**
+
+The gateway to the creative ingenuity of LLMs, the ‘**inputs**’ input parameter allows you to lay the foundations with an initial text. This text serves as a catalyst, directing the generation of new content. Whether it is natural language, programming or any textual form, the LLM uses this input as a springboard for its linguistic expedition 😀.
+
+### **parameters**
+
+Diving into the heart of LLM configuration, the parameter dictionary holds the secrets to fine-tuning the inference process. Let's take a detailed look at each parameter to reveal its specific function:
+
+### **best_of**
+
+The ‘**best_of‘** parameter determines the number of times that language models (LLMs) will run the inference process, selecting and returning the result with the highest probability of relevance. By setting it to 1, you guarantee a single execution, which balances the quality of the result with the necessary processing time.
+
+> In the context of artificial intelligence (AI) and language models like GPT, “inference” is the process by which AI generates responses or content based on the input data it receives.
+
+### **decoder_input_details**
+
+The ‘`decoder_input_details`’ parameter when enabled (i.e., set to `true`), provides detailed information about the model decoder inputs. This information can include things like attention weights and softmax probabilities, which are crucial to understanding how the model makes its text generation decisions.
+
+> – **Attention weights:** These weights show how the decoder allocates its attention to different parts of the input when generating text. This helps understand what information the model focuses on at each generation stage.
+>
+> – **Softmax probabilities:** Softmax probabilities give a probability distribution over the model's vocabulary for the next word output. This indicates the confidence of the model in its predictions at each step.
+
+### **details**
+
+Enabling the ‘details’ parameter results in additional information being added to the final result. Ranging from sample temperature to top-k/top-p values, this feature proves to be a valuable asset for debugging and gaining a deeper understanding of large-scale language model (LLM) behavior.
+
+### **do_sample**
+
+The ‘do_sample‘ parameter determines whether the build process should use a sampling mechanism. When enabled (set to true), it introduces an element of randomness, thereby infusing a dose of creativity into the model's (LLM) outputs.
+
+### **max_new_tokens**
+
+The ‘max_new_tokens’ parameter determines the maximum number of new tokens that the language model (LLM) is allowed to generate, thus limiting the length of the sequence produced. Carefully adjusting this setting allows you to control both the length of the output and the quality of the generated content.
+
+### **repetition_penalty**
+
+To avoid the production of repetitive text, the ‘repetition_penalty‘ parameter imposes a penalty on tokens already generated. A fine adjustment of this parameter, for example to a value of 1.03, allows you to achieve a delicate balance between content diversity and textual coherence.
+
+### **return_full_text**
+
+The ‘return_full_text‘ parameter allows you to choose whether the output will include the entire generated sequence, including the input text (when to set to true), or only the newly generated text (when to set to false).
+
+### **seed**
+
+The parameter ‘`seed`‘ (seed in French 😁) is used to initialize the random number generation algorithm. In processes that involve randomization, such as sampling or dividing data into training and testing sets, *`seed`* ensures that results can be reproducible. In other words, using the same *`seed`* allows you to generate the same random number sequences from one run to the next, *which is crucial for reproducibility of experiments and debugging in AI*.
+
+### **stop**
+
+The parameter ‘`stop`‘ is used to define one or more *tokens* (words or sequences of characters) that signal to the model to stop generating text once these *tokens* are encountered. This mechanism allows you to control the length of generated content or to end a response when certain conditions are met, such as the end of a sentence, a paragraph or the conclusion of a line of reasoning.
+
+> Using the *`stop`* parameter is particularly useful in cases where it is necessary to limit the response to a specific segment of information, to avoid unnecessary repetition, or to prevent the generation of content that would go out of the desired context. In other words, this setting acts as a control device to refine the relevance and accuracy of the model outputs, ensuring that the generated content remains aligned with the specific goals of the user query.
+
+### temperature
+
+The ‘temperature’ parameter adjusts the level of creativity in the textual production of the model. Acting as a numerical lever, it changes how the model weights probabilities when choosing which words to generate. A low temperature leads to safer and more conventional choices, favoring words and expressions frequently encountered during model training. Conversely, a high temperature encourages experimentation, giving less obvious options a chance to be selected, which can enrich the text with more daring and original variations.
+
+> – A **low temperature** (*close to 0*) makes the model more conservative in its choices, favoring the most probable words or sentences depending on the training it has received. This leads to more predictable responses, often more consistent, but potentially less diverse or creative.
+>
+> – A **high temperature** (*for example, greater than 1*) increases the randomness in the selection of words, which allows the model to explore more diverse original or unexpected responses. This can encourage creativity in text generation, but also increase the risk of producing less relevant or less coherent responses.
+
+### top_k
+
+The ‘`top_k`‘ parameter is a filtering technique used during the decision process for text generation. This parameter specifies the number ***k*** of vocabulary options with the highest probability that are considered by the model at each generation step.
+
+> – **If `top_k` is high**, the model has greater freedom of choice, which can increase the diversity and creativity of the generated text, but can also introduce more randomness and potentially reduce the relevance or coherence of the text.
+>
+> – **If `top_k` is low**, text generation is more controlled and focused on the most likely options, which can increase the coherence and relevance of the text, but reduce its diversity and creativity.
+
+### **top_n_tokens**
+
+Like *max_new_tokens*, the ‘top_n_tokens’ parameter restricts the total number of tokens generated, also taking into account the input text. A judicious choice of this value allows you to control the overall length of the output, ensuring that the volume of content produced remains within the desired limits and adapted to the objective of the task.
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our [YouTube channel](https://bit.ly/3IwIK04)
+
+For more in-depth information, please see the links provided below.
+
+[The Secrets of Large Language Models](https://michaelehab.medium.com/the-secrets-of-large-language-models-parameters-how-they-affect-the-quality-diversity-and-32eb8643e631?source=post_page-----68aba00914a3--------------------------------)
+
+[Text Generation Inference API](https://huggingface.github.io/text-generation-inference/?source=post_page-----68aba00914a3--------------------------------)
+
+[Inference](https://huggingface.co/docs/huggingface_hub/main/en/package_reference/inference_client?source=post_page-----68aba00914a3--------------------------------#huggingface_hub.inference._text_generation.TextGenerationParameters)

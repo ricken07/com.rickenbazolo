@@ -1,0 +1,65 @@
+---
+title: "Hilla – A new Frontend Framework for SpringBoot"
+slug: "hilla-framework-frontend-springboot-vaadin"
+language: "en"
+publishedAt: "2022-05-29"
+tags: ["framework", "spring", "spring-boot"]
+readingTime: 1
+excerpt: "The new frontend framework for Spring Boot"
+status: "published"
+---
+
+[Hilla](https://hilla.dev/) is a new framework for creating responsive web applications with a backend in [Java](https://dev.java/). It seamlessly integrates a responsive [Lit](https://lit.dev/) [TypeScript](https://www.typescriptlang.org/) frontend with a Spring Boot backend. Hilla is built and supported by [Vaadin](https://vaadin.com/).
+
+Hilla is designed to be simple enough for small utilities, but robust enough to build complex enterprise-grade applications.
+
+### Automatic generation of Java code to TypeScript
+
+Automatic TypeScript code generation helps ensure that the frontend always stays in sync with the backend, so you can build apps faster and with more confidence, even as your team grows. You can explore server end point methods and their input and return types directly from your IDE as you type.
+
+### **Endpoint server:**
+
+```java
+@Endpoint
+@AnonymousAllowed
+public class PersonEndpoint {
+    private PersonRepository repository;
+
+    public PersonEndpoint(PersonRepository repository) {
+        this.repository = repository;
+    }
+
+    public @Nonnull List<@Nonnull Person> findAll() {
+        return repository.findAll();
+    }
+}
+```
+
+### **TypeScript View:**
+
+```xml
+import { PersonEndpoint } from 'Frontend/generated/endpoints';
+import Person from 'Frontend/generated/com/example/application/Person';
+
+export class PersonView extends View {
+  @state() people: Person[] = [];
+
+  async firstUpdated() {
+    this.people = await PersonEndpoint.findAll();
+  }
+
+  render() {
+    return html`
+      <vaadin-grid .items=${this.people}>
+        <vaadin-grid-column path="firstName"></vaadin-grid-column>
+        <vaadin-grid-column path="lastName"></vaadin-grid-column>
+      </vaadin-grid>`;
+  }
+}
+```
+
+### You can learn more about https://hilla.dev/
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

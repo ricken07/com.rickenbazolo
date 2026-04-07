@@ -1,19 +1,5 @@
-export type Language = "fr" | "en";
-
-export interface BaseContent {
-  slug: string;
-  title: string;
-  language: Language;
-  tags: string[];
-  createdAt: string;
-  updatedAt?: string;
-}
-
-export interface BlogPost extends BaseContent {
-  excerpt: string;
-  readingTime: number;
-  status: "draft" | "published";
-}
+// Language is derived from i18n config — single source of truth
+export type { Language } from "@/lib/blog/types";
 
 export interface Talk {
   slug: string;
@@ -21,7 +7,7 @@ export interface Talk {
   event: string;
   location: string;
   date: string;
-  language: Language;
+  language: string;
   tags: string[];
   slidesUrl?: string;
   videoUrl?: string;
@@ -31,7 +17,7 @@ export interface StartupProduct {
   slug: string;
   name: string;
   tagline: string;
-  description: string;
+  description: Record<string, string>;
   techStack: string[];
   websiteUrl?: string;
   docsUrl?: string;
@@ -42,9 +28,7 @@ export interface StartupProduct {
 export interface OpenSourceProject {
   slug: string;
   name: string;
-  tagline: string;
-  descriptionShort: string;
-  descriptionLong?: string;
+  description: Record<string, string>;
   tags: string[];
   repoUrl: string;
   latestVersion?: string;

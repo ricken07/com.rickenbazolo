@@ -1,11 +1,8 @@
 {
   "nav": {
     "blog": "Blog",
-    "speaking": "Prises de parole",
     "opensource": "Open Source",
-    "tools": "Outils",
-    "about": "À propos",
-    "gad-digital": "Gad Digital"
+    "about": "À propos"
   },
   "footer": {
     "rights": "Tous droits réservés"

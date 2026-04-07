@@ -1,0 +1,119 @@
+{
+  "source": "https://rickenbazolo.blogspot.com/feeds/posts/default?alt=json&max-results=500",
+  "imported": [
+    {
+      "slug": "le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend",
+      "title": "Le monde a-t-il vraiment besoin d'un autre framework frontend ?",
+      "publishedAt": "2022-03-10",
+      "sourceLang": "fr",
+      "canonical": "https://rickenbazolo.blogspot.com/2022/03/le-monde-t-il-vraiment-besoin-dun-autre.html",
+      "assets": [
+        "/legacy/blogger/le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend/01.png",
+        "/legacy/blogger/le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend/02.png",
+        "/legacy/blogger/le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend/03.png",
+        "/legacy/blogger/le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend/04.png",
+        "/legacy/blogger/le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend/05.png",
+        "/legacy/blogger/le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend/06.png",
+        "/legacy/blogger/le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend/07.png",
+        "/legacy/blogger/le-monde-a-t-il-vraiment-besoin-d-un-autre-framework-frontend/08.png"
+      ]
+    },
+    {
+      "slug": "creation-d-un-conteneur-docker-pour-une-application-spring-boot",
+      "title": "Création d'un conteneur Docker pour une application Spring Boot",
+      "publishedAt": "2022-02-13",
+      "sourceLang": "fr",
+      "canonical": "https://rickenbazolo.blogspot.com/2022/02/creation-dun-conteneur-docker-pour-une.html",
+      "assets": [
+        "/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/01.png",
+        "/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/02.png",
+        "/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/03.png",
+        "/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/04.png",
+        "/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/05.png",
+        "/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/06.png"
+      ]
+    },
+    {
+      "slug": "les-operations-intermediaires-de-java-stream",
+      "title": "Les opérations intermédiaires de Java Stream",
+      "publishedAt": "2021-11-28",
+      "sourceLang": "fr",
+      "canonical": "https://rickenbazolo.blogspot.com/2021/11/les-operations-intermediaires-de-java.html",
+      "assets": [
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/01.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/02.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/03.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/04.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/05.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/06.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/07.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/08.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/09.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/10.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/11.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/12.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/13.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/14.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/15.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/16.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/17.png",
+        "/legacy/blogger/les-operations-intermediaires-de-java-stream/18.png"
+      ]
+    },
+    {
+      "slug": "un-pool-de-connexion",
+      "title": "Un Pool de connexion ?",
+      "publishedAt": "2019-11-20",
+      "sourceLang": "fr",
+      "canonical": "https://rickenbazolo.blogspot.com/2019/11/un-pool-de-connexion.html",
+      "assets": []
+    },
+    {
+      "slug": "code-lab-jax-rs-2-0",
+      "title": "Code lab JAX-RS 2.0",
+      "publishedAt": "2018-02-02",
+      "sourceLang": "en",
+      "canonical": "https://rickenbazolo.blogspot.com/2018/02/code-lab-jax-rs-20.html",
+      "assets": []
+    },
+    {
+      "slug": "integration-mdl-et-jsf",
+      "title": "Intégration MDL et JSF",
+      "publishedAt": "2017-07-17",
+      "sourceLang": "fr",
+      "canonical": "https://rickenbazolo.blogspot.com/2017/07/integration-mdl-et-jsf.html",
+      "assets": []
+    },
+    {
+      "slug": "glassfish-encodage-modifier-la-valeur-par-defaut",
+      "title": "GlassFish Encodage, modifier la valeur par Defaut",
+      "publishedAt": "2017-05-17",
+      "sourceLang": "fr",
+      "canonical": "https://rickenbazolo.blogspot.com/2017/05/glassfish-encodage-modifier-la-valeur.html",
+      "assets": [
+        "/legacy/blogger/glassfish-encodage-modifier-la-valeur-par-defaut/01.png"
+      ]
+    },
+    {
+      "slug": "jsf2-2-configuration-du-repertoire-des-ressources",
+      "title": "JSF2.2: configuration du \"répertoire des ressources\"",
+      "publishedAt": "2017-02-13",
+      "sourceLang": "fr",
+      "canonical": "https://rickenbazolo.blogspot.com/2017/02/jsf22-configuration-du-repertoire-des.html",
+      "assets": [
+        "/legacy/blogger/jsf2-2-configuration-du-repertoire-des-ressources/01.png"
+      ]
+    },
+    {
+      "slug": "a-la-decouverte-de-vraptor4",
+      "title": "A la découverte de Vraptor4",
+      "publishedAt": "2017-01-24",
+      "sourceLang": "fr",
+      "canonical": "https://rickenbazolo.blogspot.com/2017/01/a-la-decouverte-de-vraptor4.html",
+      "assets": [
+        "/legacy/blogger/a-la-decouverte-de-vraptor4/01.png",
+        "/legacy/blogger/a-la-decouverte-de-vraptor4/02.png"
+      ]
+    }
+  ]
+}

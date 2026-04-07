@@ -1,0 +1,124 @@
+---
+title: "Microservices – Shared Libraries, Design and Best Practices"
+slug: "microservices-bibliotheques-partagees-conception-et-bonnes-pratiques"
+language: "en"
+publishedAt: "2023-01-26"
+tags: ["architecture", "microservices"]
+readingTime: 8
+excerpt: "Today's best practices may not be tomorrow's best practices, so you are encouraged to try new approaches"
+status: "published"
+---
+
+We love microservices, don't we? This architecture helps you split the application into small, standalone applications, with significant benefits, such as faster and lower cost scaling, smaller and more readable code base, faster development and feature delivery if planned correctly.
+
+HOWEVER, this also introduces several difficulties, such as
+
+* communication — requires network communication between different microservices,
+* debugging — code and logs are distributed,
+* more complex architecture – typically microservices are used with domain-driven design that requires more effort to design correctly.
+
+## **Why it is important to have shared libraries.**
+
+Shared libraries are the key solution for code duplication between microservices.
+
+*One of the most common examples of the need for shared libraries is logging. Logging can have custom logic, such as formatting or hiding sensitive information, such as customer addresses and phone numbers.*
+
+Now imagine that each microservice has its own implementation, how many development hours will be wasted creating the same implementation? What if it's not exactly the same implementation in the different microservices?
+
+Log aggregation will become an even more difficult task, two similar log records may be labeled differently due to small changes in the implementation.
+
+*An example worth mentioning is the [log4j vulnerability](https://www.fortinet.com/blog/threat-research/critical-apache-log4j-log4shell-vulnerability-what-you-need-to-know) discovery, which requires a lot more effort in a microservices architecture because you need to identify and patch each microservice.*
+
+If you have your own logging library that uses log4j internally, there's only one point you need to protect against this vulnerability.
+
+Logging appears in any microservice you create (hopefully), and it doesn't depend on any of them, ***so this is a great example for a shared library***. Other good examples of shared libraries are *security*, *monitoring*, *asynchronous communication* and *exceptions*.
+
+## **Why it is important to do things right**
+
+A microservices architecture was created to decouple the different parts of the application (among other reasons). Shared libraries do the opposite, they are common code shared by all microservices.
+
+This means that if you don't do it well, it has the potential to negate one of the greatest benefits granted by microservices architecture! *The result is a strange mix of parts, like Frankenstein's monster 🧟‍♂️.*
+
+## **Good practices**
+
+### **Don't create just one library**
+
+There are several ways to manage your shared libraries, the best being to create a different repository for each library needed or a single repository with multiple libraries. The important thing is that one way or another, they are separated.
+
+For example, introduce a single repository that includes a project for ***monitoring***, ***security***, ***logging*** – each of them will be self-contained (unless there are necessary dependencies).
+
+Why (in our case) have a single repository that includes different projects, there are multiple reasons why we like this approach, such as:
+
+* Usually every library (in our case anyway) is pretty thin
+* We can have a single Jenkins pipeline for building and releasing all libraries
+* It is easier to have dependencies (if necessary) between libraries under the same repository
+* When building a new version we create the same version for all the libraries, so when consuming the libraries we can have a single version for all
+
+### **Library structure**
+
+Each library can be structured however you want, but there are 2 possible structures that fit particularly well:
+
+1. A simple src folder containing all your code
+2. Divide the library into 3 separate projects: api, impl (for implementation) and test-kit, impl and the test-kit depending on the api project
+
+Let’s dive deeper into the second structure…
+
+* The **api project** contains all interfaces and classes used by the library client
+* The **implemented project** has all the real logic
+* The **test-kit project** contains simulation and testing support – for example, if your library uses REST calls, you will probably want to *mock* the request and response
+
+The separation into 3 different projects makes it possible to encapsulate the implementation details of the library, with 3 major benefits:
+
+* Avoid breaking the contract with users when changing implementation details
+* You can use the **impl** project and, during testing, depend on the **test-kit**. This presents the library customer with a much better experience when testing
+* Optimization of the build tool, using the **test-kit** project does not require loading the **impl** project. Additionally, some build tools have caching mechanisms (such as **gradle**), so there is no need to rebuild projects that have not been modified
+
+You can have a shared library that uses **LaunchDarkly** internally.
+
+> ***[LaunchDarkly](https://launchdarkly.com/)*** is a platform to manage feature **flags**, using it you can manage features in production, control which users have access to them and when. If you have a problem with a new feature? No problem, you can disable the corresponding feature **flag** and it will be disabled in production until further investigation is conducted, without the need to redeploy.
+
+### **Avoid backwards compatibility breakage**
+
+The last thing you want to do is create a poorly designed library that will introduce potential backward compatibility breaks in the future.
+
+### **Encapsulation**
+
+It is important to encapsulate the user's internal decisions and logic; this is essential for programming in general, and especially for a shared library.
+
+If you are creating a library with vendor specific code, for example a library for uploading images to storage, it is essential to create the interface/classes that are used by the client in a generic way.  
+You should avoid names like "**S3ImageUploader**" (**s3** is an Amazon file storage service).
+
+Indeed, if later you want to move to **Azure Blob** (***equivalent Microsoft service for Amazon S3***), all your clients will have to correct the method signature.
+
+It's best to use names like "**ImageUploader**" for interfaces exposed to the user.
+
+### **Mitigate the damage**
+
+Sometimes you need to break the code, for example, you need to replace an internally used library because of a new vulnerability.
+
+1. Use ***[semantic versioning](https://semver.org/)***, so that your versions follow the MAJOR.MINOR.PATCH pattern, which allows your customers to upgrade versions appropriately. The change in the major version lets people know that this version might introduce a compatibility break, so they can do their research and decide whether or not to upgrade. Semantic versioning can be difficult to manage manually, but don't worry ***[Conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)*** come to the rescue! (we will come back to this later)
+2. Another option is, instead of changing the behavior of the existing interface, to introduce a new interface with the new logic inside; You can also use parts or all of the existing code, mark the old interface as *deprecated* and not support any new functionality in the old interface, only in the new one. This will help push your customers to adopt the new interface (with the new behavior).
+
+### **Clean up** **!**
+
+Remember that many people can work on the shared library, don't make it a monolith! Think carefully before introducing a new library, and when you create one, try to think about how it might evolve and who might use it. Don't be tempted to create it for your own specific needs, making it difficult for others to use or extend.
+
+Don't write domain-specific code inside! Even shared code that is linked to the domain probably isn't supposed to be there!  
+For example, a ***User*** pattern that starts the same for all microservices is still domain-bound logic, and it surely doesn't need to be in the library, even if that means every microservice that uses that pattern has to duplicate it. The reason is that different microservices might need to modify it in the future to meet their business needs. It doesn't make sense that they all work with the same model, it may introduce fields or logic that are not related to other **M.S** or even break them, if they want to rename or change some of the logic.
+
+When using a single repository, we find that ***[conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)*** are very useful for communicating the changes we are introducing to the code.
+
+Use conventions for commits, such as starting each commit with a **fix** – *for a bug fix (patch-related)*, **feat** – *for the introduction of a new feature (related to the minor in versioning)*, and **BREAKING CHANGE** – *for (you guessed it) a breaking change in the API (related to the major in versioning)*.  
+This is very useful when someone else is trying to understand the history of the repository, what was done and where in the code.
+
+There are many great tools to help with automation here, some of them its **[action-semantic-pull-request](https://github.com/amannn/action-semantic-pull-request)** to enforce conventional commits and **[standard version](https://github.com/conventional-changelog/standard-version)** to increase the version and create a changelog based on conventional commits.
+
+### **Well, that’s it!**
+
+After reading this article, you are encouraged to try creating shared libraries that will help your organization avoid code duplication and a lot of time wasted troubleshooting problems introduced by poorly written shared libraries.
+
+Today's best practices may not be tomorrow's best practices, so you are welcome to try new approaches, but only after you understand why and how we design and implement shared libraries.
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our videos **#autourducode** on our YouTube channel:**https://bit.ly/3IwIK04**

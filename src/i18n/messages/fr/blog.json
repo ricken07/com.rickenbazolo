@@ -7,5 +7,12 @@
   "next": "Suivant",
   "pageOf": "Page {current} / {total}",
   "tags": "Tags",
-  "clearFilters": "Réinitialiser"
+  "archives": "Archives",
+  "clearFilters": "Réinitialiser",
+  "home": "Accueil",
+  "articleLabel": "Article",
+  "readingTime": "{minutes} min de lecture",
+  "related": "Articles connexes",
+  "readMore": "Lire l'article",
+  "prevNextLabel": "Navigation entre articles"
 }

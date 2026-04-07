@@ -7,7 +7,6 @@ tags: ["api", "java", "spring-boot"]
 readingTime: 3
 excerpt: "In this article, we will learn how to secure the REST API using Spring Boot Security's Basic Authentication.With security in place, our application will provide the data to the user who is authenticated by basic authentication."
 status: "published"
-canonical: "https://autourducode.net/java/spring-boot-security-api-rest-securisee/"
 ---
 
 In this article, we will learn how to secure the **REST API** ***using Spring Boot Security** Basic Authentication***.With security in place, our application will provide the data to the user who is authenticated by basic authentication.
@@ -18,11 +17,7 @@ In order to access a secure resource, the user must make the request to our API 
 
 #### Project structure
 
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-14.53.08.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-14.53.08.png)
-
 Create your project using the official website: https://start.spring.io/
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-14.59.07-1024x536.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-14.59.07.png)
 
 ### **The pom.xml file**
 
@@ -82,8 +77,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
 The **spring-boot-starter-parent** is a special starter, it provides useful Maven defaults.Since we are developing a web application, we also need to add the **spring-boot-starter-web** dependency, which will add the dependencies such as **Tomcat**, **Jackson**, **Spring boot**, etc.which are necessary for our application.The **spring-boot-starter-security** dependency adds all security-related dependencies.
 
 ### **The dependency diagram**
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/SecurityBasicAuth-Diagram-Dependences-1024x894.png)](https://autourducode.net/wp-content/uploads/2022/07/SecurityBasicAuth-Diagram-Dependences.png)
 
 Project dependency diagram
 
@@ -190,13 +183,7 @@ return "Administrator logged in successfully!!!";
 
 In POSTMAN, select the **GET** method and give the url as “**http://localhost:8080/user**“.In the Authorization tab, select the type “**Basic Auth**” and enter the invalid username/password.You will get the error **401 Unauthorized**
 
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.02.33-1024x968.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.02.33.png)
-
 **Now pass valid username and password [user/password (or) admin/password].**
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.06.12-1024x814.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.06.12.png)
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.17.09-1024x821.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-26-à-01.17.09.png)
 
 ### [**Download source code**](https://github.com/autourducode/SecurityBasicAuth)
 

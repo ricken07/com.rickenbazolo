@@ -1,0 +1,118 @@
+---
+title: "Reactive Spring Boot API – Part I, Controllers"
+slug: "reactive-spring-boot-api-partie-1-controleurs"
+language: "en"
+publishedAt: "2022-10-30"
+tags: ["api", "flux", "java", "mono", "reactive", "spring", "spring-boot", "webflux"]
+readingTime: 3
+excerpt: "Goodbye synchronization, welcome asynchronous, no more code blocking"
+status: "published"
+---
+
+It's 2022, and we should no longer be limited to blocking code. *By blocking code we mean that while a line of code is executing, control will be blocked until the code finishes executing and only then can we proceed to the next line.*
+
+So if requests (requests) are blocked, does that **mean we can only serve one request at a time?** **No**. *For each request, a separate thread is created. However, this takes time when the number of requests increases significantly.*
+
+I'm focusing here on Spring Boot with [WebFlux](https://spring.io/reactive). Spring Boot is a fantastic framework, but given its vast library and verbosity, it can be daunting to move from the traditional thread-based blocking model to the reactive model. So, if you are a Spring Boot developer and want to move to the reactive model, this guide is for you!
+
+### **Blocking vs Non-Blocking Server**
+
+Traditional Spring Boot uses **[Apache Tomcat](https://tomcat.apache.org)** as the underlying server, which is blocking in nature. However, in the reactive framework, Spring introduced **[Netty](https://netty.io)** server which is non-blocking and asynchronous in nature. You will find this very similar to how NodeJS works.
+
+### **Programming style**
+
+The code syntax is very similar to what you're used to in spring, including *controllers*, *exceptions*, *DTO*, etc. The difference comes, fundamentally, in the programming style. Remember, you are no longer writing synchronous code! ***This means that every line of code you write, you must take into account the asynchronous nature of the code***. Whether calling an external API or using a library, you need to make sure you're not blocking the thread.
+
+That being said, it's something you'll get used to once you start writing code.
+
+### **Configure a rest Reactive service**
+
+You can follow this guide https://spring.io/guides/gs/reactive-rest-service from Spring to have a starting configuration.
+
+Our parent in pom.xml would be the starting parent.
+
+```xml
+<parent>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-parent</artifactId>
+   <version>2.7.4</version>
+   <relativePath/>
+</parent>
+```
+
+Next, we will need the main dependencies, namely the **webflux** starter and the test starters.
+
+```xml
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-webflux</artifactId>
+</dependency>
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-test</artifactId>
+   <scope>test</scope>
+</dependency>
+<dependency>
+   <groupId>io.projectreactor</groupId>
+   <artifactId>reactor-test</artifactId>
+   <scope>test</scope>
+</dependency>
+```
+
+This should be enough for a basic setup, and we'll continue to add dependencies as needed.
+
+### **Types** **Mono and Flux**
+
+Before we jump into coding, there are a few concepts you need to know. Spring webflux is built on top of https://projectreactor.io/ which is a responsive framework. Essentially we are dealing with a data stream. In order to receive or manipulate this feed, we need certain types of data.
+
+The first is **Mono**, which is used when we want exactly one result (single value) or zero (optional). For arrays or a list of results, we use **Stream** . Together, these two elements form the core of the request and response data types. This is similar to how we have Observables in RxJs.
+
+If you want more information, you can check the official documents [here](https://projectreactor.io/docs/core/snapshot/reference/#core-features).
+
+### Controllers
+
+```xml
+@RestController
+@RequestMapping("/reactive")
+public class ReativeController {
+
+    @GetMapping("/hello/{nom}")
+    public Mono<String> sayHello(@PathVariable String nom) {
+        return Mono.just("Bonjour " + nom);
+    }
+}
+```
+
+We define controllers the same way as in Spring, i.e. with the **@RestController** annotation. I created a simple endpoint returning a string. The difference to note here is the return type which is **Mono** . It is important to wrap primary or complex return types in **Mono** or **Flux**. *This makes our endpoint responsive*.
+
+**Mono.just()** is used to convert single values ​​to **responsive** values. Again, it’s about summarizing the data. The same can be done with **Flux.just()**.
+
+A more familiar example may be using the **ResponseEntity** class provided by spring.
+
+#### Let's say we have a DTO
+
+```java
+//utilisation de Lombok pour getter et setter
+@Getter
+@Setter
+public class ResponseDTO {
+    private String nom;
+}
+```
+
+and we want to return it as response from our API, we just wrap it in Mono or Flux depending on the value.
+
+```xml
+@GetMapping("/hello/{nom}")
+public Mono<ResponseEntity<ResponseDTO>> sayHello(@PathVariable String nom) {
+    ResponseDTO dto = new ResponseDTO();
+    dto.setNom(nom);
+    return Mono.just(ResponseEntity.status(200).body(dto));
+}
+```
+
+**That’s it for part 1! The next part would cover query validations.**
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel:**https://bit.ly/3IwIK04**

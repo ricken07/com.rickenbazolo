@@ -1,0 +1,218 @@
+---
+title: "Jakarta EE 10 – Mise En Place D’un Serveur WebSocket"
+slug: "jakarta-ee-9-1-mise-en-place-dun-serveur-websocket"
+language: "fr"
+publishedAt: "2022-08-31"
+tags: ["jakarta-ee", "java", "websocket"]
+readingTime: 3
+excerpt: "WebSocket est un protocole de communication bidirectionnel qui permet aux clients d’envoyer et de recevoir des messages par le biais d’une connexion unique à un serveur"
+status: "published"
+---
+
+WebSocket Connection
+
+Dans cet article, je voudrais partager comment mettre en place un serveur **WebSocket**.
+
+WebSocket est un protocole de communication bidirectionnel qui permet aux clients d’envoyer et de recevoir des messages par le biais d’une connexion unique à un serveur ; WebSocket est une norme indépendante des fournisseurs. **L’API Jakarta WebSocket**, qui fait partie de la [plateforme Jakarta EE](https://jakarta.ee/), peut être utilisée pour développer des **serveurs WebSocket** ainsi que des **clients WebSocket**. Cet article fournit un bref aperçu de la spécification **Jakarta WebSocket** en créant un serveur webSocket.
+
+### **Jakarata WebSocket, le projet**
+
+Nous allons utiliser **[intellij IDEA](https://www.jetbrains.com/fr-fr/idea/download/#section=mac)** pour initialiser une nouvelle application **[Java Entreprise](https://jakarta.ee/)**.
+
+Intellij IDEA, création d’une application Java Entrprise
+
+### Ajoutez la dépendance suivante au bloc de dépendances du fichier pom.xml :
+
+```xml
+<dependency>
+   <groupId>jakarta.websocket</groupId>
+   <artifactId>jakarta.websocket-api</artifactId>
+   <version>2.1.1</version>
+   <scope>provided</scope>
+ </dependency>
+```
+
+Définir le nom du fichier « war » en utilisant dans le pom.xml la balise :
+
+```xml
+<build>
+  <finalName>webSocketServer</finalName>
+</build>
+```
+
+### **Le point de terminaison (endpoint) WebSocket**
+
+Pour communiquer avec un serveur WebSocket, vous devez configurer un point de terminaison (**endpoint**) serveur. Le endpoint le plus simple est une classe Java standard qui est annotée avec **@ServerEndpoint**, elle est utilisée pour décorer une classe et la déclarer comme un point de terminaison WebSocket. Vous pouvez *lui fournir un paramètre qui représente le chemin sur lequel le point de terminaison est exposé*.
+
+Les messages WebSocket peuvent être à la fois textuels et binaires. Nous allons créer un point de terminaison qui peut traiter ces deux types de messages.
+
+Créez une nouvelle classe appelée **SimpleEndpoint** et annotez-la avec **@ServerEndpoint(« /simple »)**, L’annotation @ServerEndpoint accepte **l’URI** (**« /simple »**) auquel le serveur WebSocket acceptera les messages qui doivent être envoyés. ***L’URI peut également être utilisé pour enregistrer les clients comme destinataires des messages WebSocket***.
+
+```java
+import jakarta.websocket.server.ServerEndpoint;
+
+/**
+ * @author autourducode
+ */
+@ServerEndpoint("/simple")
+public class SimpleEndpoint {
+
+}
+```
+
+L’annotation **@OnMessage** relie les méthodes Java aux événements binaires ou textuels (la méthode annotée sera appelée lorsque l’événement sera reçu).
+
+À des fins de démonstration, nous allons créer un serveur d’écho qui renverra le message reçu à l’expéditeur.
+
+Afin de tester les messages binaires, nous allons envoyer des images au serveur WebSocket. La taille maximale par défaut dépend du conteneur, mais vous pouvez utiliser le paramètre **maxMessageSize** pour spécifier la taille du message à prendre en charge.
+
+### **Les méthodes :**
+
+```java
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
+import java.util.logging.Logger;
+
+/**
+ * @author autouducode
+ */
+@ServerEndpoint("/simple")
+public class SimpleEndpoint {
+    private static final Logger logger = Logger.getLogger(SimpleEndpoint.class.getName());
+    @OnOpen
+    public void connected(Session session) {
+        System.out.println("***** Message du serveur, client connecté *****");
+    }
+
+    @OnMessage
+    public String textMessage(String message) {
+        logger.info("***** Nouveau message texte reçu *****");
+        logger.info(message);
+        return message + " - Modification du serveur";
+    }
+
+    @OnMessage(maxMessageSize = 1024000)
+    public byte[] binaryMessage(byte[] buffer) {
+        logger.info("***** Nouveau message binaire reçu *****");
+        return buffer;
+    }
+}
+```
+
+Notez que la signature de la méthode détermine ***le type de message que la méthode traitera***. Consultez la documentation de l’annotation **[OnMessage](https://jakarta.ee/specifications/websocket/1.1/apidocs/javax/websocket/onmessage)** pour obtenir une liste des signatures de méthode prises en charge.
+
+### **Un client pour tester l’application**
+
+Un client peut se connecter à l’URI du endpoint du serveur pour ouvrir la connexion, ***qui restera ouverte pour envoyer et recevoir des messages pendant toute la durée de la session***.
+
+```xml
+<html>
+<head>
+  <style>
+    #messages {
+      text-align: left;
+      width: 50%;
+      padding: 1em;
+      border: 1px solid blue;
+    }
+  </style>
+  <title>Exemple de client WebSocket</title>
+</head>
+<body>
+<div class="container">
+  <div id="messages" class="messages"></div>
+  <div class="input-fields">
+    <p>Ecrivez un message et cliquez sur envoyer :</p>
+    <input id="message"/>
+    <button id="envoyer">Envoyer</button>
+
+    <p>Choisir une image et cliquez sur envoyer :</p>
+    <input type="file" id="file" accept="image/*"/>
+    <button id="envoyerImage">Envoyer l'image</button>
+  </div>
+</div>
+</body>
+<script type = "text/javascript">
+  let messageWindow = document.getElementById("messages");
+  let sendButton = document.getElementById("envoyer");
+  let messageInput = document.getElementById("message");
+  let fileInput = document.getElementById("file");
+  let sendImageButton = document.getElementById("envoyerImage");
+  let wsUri = "ws://localhost:8080/webSocketServer/simple";
+  var socket;
+
+  function testWebSocket() {
+    socket = new WebSocket(wsUri);
+    socket.binaryType = "arraybuffer";
+    socket.onopen = function (event) {
+      addMessageToWindow("Client connecté: ");
+    };
+    socket.onmessage = function (event) {
+      if (event.data instanceof ArrayBuffer) {
+        addMessageToWindow(`J'ai reçu une image (message binaires):`);
+        addImageToWindow(event.data);
+      } else {
+        addMessageToWindow(`J'ai reçu un message text: ${event.data}`);
+      }
+    };
+  }
+
+  sendButton.onclick = function (event) {
+    sendMessage(messageInput.value);
+    messageInput.value = "";
+  };
+
+  sendImageButton.onclick = function (event) {
+    let file = fileInput.files[0];
+    sendMessage(file);
+    fileInput.value = null;
+  };
+
+  function sendMessage(message) {
+    socket.send(message);
+    addMessageToWindow("Message : " + message);
+  }
+
+  function addMessageToWindow(message) {
+    messageWindow.innerHTML += `<div>${message}</div>`
+  }
+
+  function addImageToWindow(image) {
+    let url = URL.createObjectURL(new Blob([image]));
+    messageWindow.innerHTML += `<img src="${url}"/>`
+  }
+  
+  window.addEventListener("load", testWebSocket, false);
+</script>
+</html>
+```
+
+### Configurer **[Payara Server](https://www.payara.fish/products/payara-server/)** pour déployer l’application
+
+Payara Server Enterprise
+
+### **Démarrer l’application**
+
+Le serveur WebSocket est maintenant complet. Démarrez votre application et accédez a votre client a l’adresse :
+
+```
+http://localhost:8080/webSocketServer/
+```
+
+Exemple de client JavaScript pour tester le serveur WebSocket
+
+Le message « **Client connecté** » indique que le client JavaScript a pu établir une connexion.
+
+Essayez d’envoyer un *message texte en tapant dans le champ de saisie* et en cliquant sur le bouton d’envoi. *Essayez également de télécharger une image*. Dans les deux cas, vous devriez voir le même message et la même image renvoyés.
+
+Exemple de client JavaScript montrant un message textuel et binaire renvoyé par écho.
+
+Dans ce tutoriel, vous avez appris à créer un serveur WebSocket à l’aide de la norme **[Jakarta WebSocket Specification](https://jakarta.ee/specifications/websocket/2.0/websocket-spec-2.0.html)**, qui peut recevoir des messages binaires et textuels et fonctionner sur n’importe quel conteneur conforme à la norme.
+
+Le code source de ce tutoriel peut être trouvé dans le dépôt **[WebSocket-Serveur](https://github.com/autourducode/WebSocket-Serveur)**.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : **https://bit.ly/3IwIK04**

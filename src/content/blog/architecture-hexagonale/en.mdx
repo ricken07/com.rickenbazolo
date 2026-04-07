@@ -1,0 +1,41 @@
+---
+title: "Hexagonal Architecture – Why?"
+slug: "architecture-hexagonale"
+language: "en"
+publishedAt: "2023-03-03"
+tags: ["architecture"]
+readingTime: 2
+excerpt: "Hexagonal Architecture: Build your application to work without a UI or database, so you can run automated regression tests on the application, work when the database becomes unavailable, and link applications together without any user intervention."
+status: "published"
+---
+
+Software that is not well organized and lacks solid software architecture principles may perform well but develop technical debt over time. As new features are added, software can become more complex to maintain because there is no common basis to guide code changes. Starting from this problem, this article explains how **hexagonal architecture** helps to combat technical debt by establishing a common basis for code changes; an approach where business logic is decoupled from technological code, which allows the first to evolve without depending on the second.
+
+## **Hexagonal Architecture?**
+
+> Build your application to work without a UI or database, so you can run automated regression tests on the application, work when the database becomes unavailable, and link applications together without any user intervention.
+>
+> – Alistair Cockburn.
+
+This quote lays the foundation for understanding hexagonal architecture. We can take *Cockburn*'s thoughts even further and make our application work without any technology; and not just technology related to user interface or databases.
+
+One of the main ideas of **hexagonal architecture** is to separate the business code from the technological code. But that's not all, we must also ensure that the technological side depends on the business aspect so that the latter can evolve without worrying about the technology used to achieve business objectives.
+
+We need to determine a place where the business code will exist, isolated and protected from any technological concerns. This will give rise to the creation of our *first hexagon*: **the Domain hexagon**.
+
+In **the domain hexagon**, we bring together the elements responsible for describing *the fundamental problems we want our software to solve*. *entities* and *valuables* are the main items that are used in the domain hex.
+
+* **Entities represent things to which we can assign an identity**
+* **Value objects are immutable components that we can use to compose our entities**
+
+> The terms used refer to **entities** and **value objects** which come from the **DDD** principles.
+
+*We also need ways to use, process and orchestrate business rules from the domain hex*. This is what **the Application hexagon** does. It sits between the Domain (the profession) and the technology, serving as an intermediary to interact with both parties. **Application hexagon** uses **ports** and **use cases** to perform its functions.
+
+**The Framework hexagon** provides the interface to the outside world. This is where we have the ability to determine how to expose application functionality – this is where we define *REST* or *gRPC* endpoints, for example. And to consume elements from external sources, we use **Framework hex** to specify mechanisms for retrieving data from databases or any other system. In the hexagonal architecture, we materialize technological decisions through **adaptors**. The following diagram provides a high-level view of the architecture:
+
+Hexagonal architecture
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our videos **#autourducode** on our YouTube channel:**https://bit.ly/3IwIK04**

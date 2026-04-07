@@ -1,0 +1,139 @@
+---
+title: "GIT – Commands / Part I"
+slug: "git-les-commandes-git-pull-git-fetch-et-git-merge"
+language: "en"
+publishedAt: "2022-09-04"
+tags: ["devops", "git"]
+readingTime: 3
+excerpt: "In this article, we will share with you the basic GIT commands for a quick start."
+status: "published"
+---
+
+In this article, we will share with you the basic commands of [GIT](https://git-scm.com/) for a quick start.
+
+### **What is GIT?**
+
+**Git** is a version control system that allows you to manage and maintain the history of your source code.
+
+*To host our Git repository, we will use GitHub*
+
+### **To get started**
+
+* Use the **git init** command to initialize a **GIT** repository in a new directory; *A configuration directory**.***
+
+***git init*** command
+
+* The GIT repository exists at the level of a host, in this case the **git clone** command is mainly used to point to the existing repository and make a clone or copy of this repository in a new directory.
+
+**git clone** command
+
+* The GIT repository exists locally, use the **git remote add** command to simply create an entry in your git configuration that specifies a *name* for a *particular URL*
+
+**git remote add** command
+
+### **Let's talk about orders**
+
+```bash
+git pull = git fetch + git merge
+```
+
+* Let's assume that the local branch is in sync with the remote branch at the moment.  
+  the branch ‘**main**‘ (local copy) and ‘**origin/main**‘ (points to remote master) point to the same commit ‘aad0854c….‘
+
+**git log** command
+
+* Now, let's say one of your teammates added/pushed a new file to the remote **main** (***origin/main***) branch. The local **main** branch is not aware of this change.  
+  Let's do a **git fetch** and see what happens.
+
+```bash
+git fetch
+```
+
+**git fetch** command
+
+What happened? Let’s do ‘git log’ and see:
+
+```bash
+git log
+```
+
+**git log** command
+
+We see that the branch ‘**main**‘ points to ‘aad0854c….‘, but where is ‘**origin/main**‘?
+
+After the '**git fetch**' command, '**origin/main**' was updated with what is in the remote file '**main**'. Since your teammate added a new change, it should point to him.
+
+Let's find out where 'origin/main' is.
+
+```bash
+git log origin/main
+```
+
+**git log** command on a branch
+
+* We can see, '**origin/main**' points to the latest commit which is on the remote server '**main**', but the local '**main**' still points to 'aad0854c....' the old commit.  
+  How can we sync them again? We need to do a merge now
+
+```bash
+git merge
+```
+
+**git merge** command
+
+After the *merge*, ‘**origin/main**‘ and ‘**main**‘ now point to the same commit.
+
+**git log** command after a **git merge**
+
+* We can do the full **git fetch** + **git merge** process, just by doing **git pull**.  
+  Let's say your teammate added a new text file on the remote server '**main**' and your local server '**main**' is not aware of this change.
+
+Current log status – ‘git log‘
+
+* Let's do “**git pull**” and see what happens.
+
+```bash
+git pull
+```
+
+**git pull** command
+
+**git log** command after a **git pull**
+
+When we did a '**git pull**', it first performed a '**git fetch**' followed by a '**git merge**'.  
+‘**origin/main**‘ and **‘main’** point to the same commit
+
+### **Creating and publishing a branch**
+
+* Create a local branch **demo1** then position yourself on the newly created branch; we can use the following commands to create a branch and to position ourselves on the created branch.
+
+```bash
+git branch demo1
+```
+
+```bash
+git checkout demo1
+```
+
+Or
+
+```bash
+git checkout -b demo1
+```
+
+Creating a local branch
+
+* The remote server is not aware of this new branch **‘demo1’**
+
+**git pull**
+
+* Let's publish the new branch **‘demo1’** to the remote server
+
+```bash
+git push -u origin demo1
+```
+
+git push -u
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: **https://bit.ly/3IwIK04**

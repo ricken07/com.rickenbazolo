@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { Archive } from "@/lib/blog/types";
 
 interface ArchiveWidgetProps {
@@ -13,14 +13,10 @@ export function ArchiveWidget({ archive, locale }: ArchiveWidgetProps) {
     const years = Object.keys(archive).sort((a, b) => Number(b) - Number(a));
     if (!years.length) return null;
 
-    const currentMonthLabel = useMemo(
-        () => new Intl.DateTimeFormat(locale, { month: "long" }).format(new Date()),
-        [locale],
-    );
-    const currentYear = new Date().getFullYear().toString();
-    const initialOpenKey = `${currentYear}-${currentMonthLabel}`;
-    const [openMonth, setOpenMonth] = useState<string | null>(initialOpenKey);
-    const [openYear, setOpenYear] = useState<string | null>(currentYear);
+    const firstYear = years[0];
+    const firstMonth = Object.keys(archive[firstYear] ?? {})[0] ?? null;
+    const [openMonth, setOpenMonth] = useState<string | null>(firstMonth ? `${firstYear}-${firstMonth}` : null);
+    const [openYear, setOpenYear] = useState<string | null>(firstYear);
 
     return (
         <aside className="rounded-2xl border border-border/70 bg-card/40 p-4">
@@ -41,7 +37,7 @@ export function ArchiveWidget({ archive, locale }: ArchiveWidgetProps) {
                         </button>
                         {openYear === year && (
                             <ul className="space-y-1 border-l border-border/40 pl-3">
-                                {Object.keys(archive[year]).map((month) => {
+                                {Object.entries(archive[year]).map(([month, posts]) => {
                                     const monthKey = `${year}-${month}`;
                                     const isOpen = openMonth === monthKey;
                                     return (
@@ -52,11 +48,14 @@ export function ArchiveWidget({ archive, locale }: ArchiveWidgetProps) {
                                                 className="flex w-full items-center justify-between text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground"
                                             >
                                                 <span>{month}</span>
-                                                <span className="text-[10px] text-muted-foreground">{isOpen ? "−" : "+"}</span>
+                                                <span className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                                                    <span>{posts.length}</span>
+                                                    <span>{isOpen ? "−" : "+"}</span>
+                                                </span>
                                             </button>
                                             {isOpen && (
                                                 <ul className="mt-1 space-y-0.5">
-                                                    {archive[year][month].map((post) => (
+                                                    {posts.map((post) => (
                                                         <li key={post.slug} className="truncate text-xs">
                                                             <Link
                                                                 href={`/${locale}/blog/${post.slug}`}

@@ -1,0 +1,425 @@
+---
+title: "Spring Boot 4: RestClientAutoConfiguration has not disappeared, it has moved!"
+slug: "spring-boot-4-restclient"
+language: "en"
+publishedAt: "2025-11-07"
+tags: ["spring-boot"]
+readingTime: 4
+excerpt: "As part of migrating our Spring Boot 3.x projects to version 4, we noticed frequent confusion regarding the RestClientAutoConfiguration class. Many developers believe that this class has been removed, when in reality it was simply relocated as part of a major architectural overhaul. In this article, we […]"
+status: "published"
+---
+
+As part of migrating our Spring Boot 3.x projects to version 4, we noticed frequent confusion regarding the `RestClientAutoConfiguration` class. Many developers believe that this class has been removed, when in reality it was simply **relocalized** as part of a major architectural overhaul.
+
+In this article, we will clarify this situation and guide you step by step in migrating your Spring Boot projects to version 4. We will see in particular:
+
+*The context of this modification
+* The new package of `RestClientAutoConfiguration`
+* The concrete stages of migration
+* New features brought by Spring Boot 4
+* Special cases to be aware of
+
+## **A- Context: Spring Boot 4 and its modular redesign**
+
+Spring Boot 4 introduces a **complete overhaul of the modular organization** of the framework. The goal is clear: deliver smaller, targeted modules rather than several large, monolithic JAR files.
+
+This overhaul is materialized by a new organization of packages following the pattern `org.springframework.boot.<module>`. Each technology now has its own module with a dedicated package structure.
+
+### The objectives of this modularization
+
+* **Better separation of concerns**: each module is autonomous and well delimited
+* **Reduction in dependency size**: you only import what you need
+* **Facilitation of maintenance**: development teams can work on isolated modules
+* **Improved understanding**: the organization better reflects the functional structure
+
+This approach is part of a broader trend in the Java ecosystem towards modularity, initiated in particular with the module system introduced in Java 9.
+
+## **B- RestClientAutoConfiguration: relocation, not deletion**
+
+Old package (Spring Boot 3.x):
+
+```
+org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
+```
+
+New package (Spring Boot 4):
+
+```
+org.springframework.boot.restclient.autoconfigure.RestClientAutoConfiguration
+```
+
+The class retains **exactly the same responsibilities** as before:
+
+* Auto-configuration of `RestClient.Builder` beans with a prototype scope
+* Customization via `RestClientCustomizer` beans
+* Automatic application of configurations defined in `application.properties`
+
+This relocation is accompanied by the creation of a new dedicated module: `spring-boot-restclient`.
+
+### **Structure of the new module**
+
+The `spring-boot-restclient` and `spring-boot-restclient-test` module now brings together the entire RestClient ecosystem with four distinct packages:
+
+```
+org.springframework.boot.restclient              // Package principal
+org.springframework.boot.restclient.autoconfigure // Auto-configuration
+org.springframework.boot.restclient.observation   // Métriques et observabilité
+org.springframework.boot.restclient.test         // Utilitaires de tests
+```
+
+## C- Practical migration guide
+
+### Step 1: Updating the pom.xml
+
+If you use Spring Boot starters, the migration is **automatic**. The starter `spring-boot-starter-web` becomes `spring-boot-starter-webmvc`
+
+xml
+
+```xml
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.0.0-RC2</version>
+    <relativePath/>
+</parent>
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+</dependencies>
+```
+
+For projects using a **RestClient.Builder** or global customization with `RestClientCustomizer`, explicitly add the dependency:
+
+xml
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-restclient</artifactId>
+</dependency>
+
+<!-- Pour les tests -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-restclient-test</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+It includes auto-configuration, conversion strategies, observability, etc.
+
+### Step 2: Updating imports
+
+If you have **explicit imports** of `RestClientAutoConfiguration` in your code (which is rare), update them:
+
+**Before (Spring Boot 3.x):**
+
+java
+
+```
+import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.client.RestClientSsl;
+```
+
+**After (Spring Boot 4):**
+
+java
+
+```
+import org.springframework.boot.restclient.autoconfigure.RestClientAutoConfiguration;
+import org.springframework.boot.restclient.autoconfigure.RestClientSsl;
+```
+
+### Step 3: Verifying your configuration
+
+The configuration in `application.properties` remains **identical**. No modification is necessary.
+
+properties
+
+```
+# Timeout et configuration HTTP
+spring.http.client.connect-timeout=5s
+spring.http.client.read-timeout=10s
+...
+```
+
+### Step 4: Using the RestClient.Builder
+
+The recommended usage pattern remains **unchanged**:
+
+java
+
+```java
+package net.autourducode.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+@Service
+public class ApiClientService {
+    
+    private final RestClient restClient;
+    
+    // Injection du builder avec configuration automatique
+    public ApiClientService(RestClient.Builder restClientBuilder) {
+        this.restClient = restClientBuilder
+                .baseUrl("https://rickenbazolo.dev")
+                .defaultHeader("User-Agent", "AutourDuCode/1.0")
+                .build();
+    }
+    
+    public String fetchData(String endpoint) {
+        return restClient.get()
+                .uri(endpoint)
+                .retrieve()
+                .body(String.class);
+    }
+}
+```
+
+### Step 5: Global customization (optional)
+
+To apply global configurations to all `RestClient.Builder` in your application, we use a `RestClientCustomizer`:
+
+java
+
+```java
+package net.autourducode.config;
+
+import org.springframework.boot.web.client.RestClientCustomizer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
+import java.time.Duration;
+
+@Configuration
+public class RestClientConfiguration {
+    
+    @Bean
+    public RestClientCustomizer restClientCustomizer() {
+        return restClientBuilder -> restClientBuilder
+                .requestInterceptor((request, body, execution) -> {
+                    // Logging des requêtes
+                    System.out.println("Request: " + request.getURI());
+                    return execution.execute(request, body);
+                })
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+    }
+}
+```
+
+## D- New features of Spring Boot 4
+
+Version 4 not only reorganizes the code, it significantly expands the capabilities of `RestClient`.
+
+### API versioning support
+
+We can now manage multiple API versions simultaneously via configuration properties:
+
+properties
+
+```
+# Configuration pour l'API v1
+spring.http.client.restclient.apiversion.v1.base-url=/en/blog/v1
+spring.http.client.restclient.apiversion.v1.timeout=5s
+
+# Configuration pour l'API v2
+spring.http.client.restclient.apiversion.v2.base-url=/en/blog/v2
+spring.http.client.restclient.apiversion.v2.timeout=10s
+```
+
+### Annotation @ImportHttpServices
+
+This new annotation introduces a declarative approach to registering HTTP clients:
+
+java
+
+```xml
+package net.autourducode.client;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.HttpExchange;
+
+@HttpExchange("/users")
+public interface UserClient {
+    
+    @GetExchange("/{id}")
+    User getUserById(@PathVariable Long id);
+    
+    @GetExchange
+    List<User> getAllUsers();
+}
+```
+
+java
+
+```java
+package net.autourducode.config;
+
+import net.autourducode.client.UserClient;
+import org.springframework.boot.web.client.ImportHttpServices;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ImportHttpServices(UserClient.class)
+public class HttpServicesConfiguration {
+    // Les clients HTTP sont automatiquement enregistrés comme beans
+}
+```
+
+### New dedicated starter
+
+Spring Boot 4 introduces a dedicated starter which explicitly expresses the need for an HTTP client:
+
+xml
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-restclient</artifactId>
+</dependency>
+```
+
+Although not required if you are already using `spring-boot-starter-webmvc`, this starter makes it easier to manage dependencies and clarify the intent of your project.
+
+## E- Migration verification
+
+Once the migration is complete, we can check that everything is working correctly by launching our application with debug mode activated:
+
+bash
+
+```
+mvn spring-boot:run -Dspring-boot.run.arguments="--debug"
+```
+
+In the logs, we should see the following lines confirming the auto-configuration of `RestClient`:
+
+```
+RestClientAutoConfiguration matched:
+   - @ConditionalOnClass found required class 'org.springframework.web.client.RestClient'
+   - RestClientAutoConfiguration.PropertiesRestClientBuilderCustomizerConfiguration matched
+```
+
+We can also create a simple integration test:
+
+java
+
+```
+package net.autourducode.integration;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.client.RestClient;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+class RestClientConfigurationTest {
+    
+    @Autowired
+    private RestClient.Builder restClientBuilder;
+    
+    @Test
+    void shouldInjectRestClientBuilder() {
+        assertThat(restClientBuilder).isNotNull();
+        
+        // Vérifie que nous pouvons créer une instance
+        RestClient client = restClientBuilder.build();
+        assertThat(client).isNotNull();
+    }
+}
+```
+
+## F- Broader context: the future of HTTP clients in Spring
+
+This clarification on `RestClientAutoConfiguration` is part of a broader evolution of the Spring ecosystem regarding HTTP clients.
+
+### Gradual deprecation of RestTemplate
+
+The Spring team announced the following schedule:
+
+* **November 2026**: formal deprecation with annotation `@Deprecated` in Spring Framework 7.1
+* **Spring Framework 8.0**: complete removal
+* **OSS support**: guaranteed until 2029 minimum
+
+### RestClient as recommended replacement
+
+**RestClient is positioned as the recommended replacement for RestTemplate** for imperative and blocking applications. For reactive applications, `WebClient` remains the appropriate solution.
+
+Here is an example of migrating from `RestTemplate` to `RestClient`:
+
+**Before (RestTemplate):**
+
+java
+
+```java
+@Service
+public class UserService {
+    
+    private final RestTemplate restTemplate;
+    
+    public UserService(RestTemplateBuilder builder) {
+        this.restTemplate = builder.build();
+    }
+    
+    public User getUser(Long id) {
+        return restTemplate.getForObject(
+            "/en/blog/users" + id, 
+            User.class
+        );
+    }
+}
+```
+
+**After (RestClient):**
+
+java
+
+```java
+@Service
+public class UserService {
+    
+    private final RestClient restClient;
+    
+    public UserService(RestClient.Builder builder) {
+        this.restClient = builder
+                .baseUrl("https://rickenbazolo.dev")
+                .build();
+    }
+    
+    public User getUser(Long id) {
+        return restClient.get()
+                .uri("/users/{id}", id)
+                .retrieve()
+                .body(User.class);
+    }
+}
+```
+
+### Advantages of RestClient over RestTemplate
+
+* **Modern fluid API**: more intuitive and readable syntax
+* **Native support for recent features**: observability, metrics, distributed tracing
+* **Better error handling**: more flexible error handlers
+* **Improved performance**: internal optimizations to reduce overhead
+* **Active maintenance**: focus of the Spring team for future features
+
+## Conclusion
+
+We saw in this article that `RestClientAutoConfiguration` was not removed in Spring Boot 4, but simply **relocated** from `org.springframework.boot.autoconfigure.web.client` to `org.springframework.boot.restclient.autoconfigure`. This change is part of a broader modular overhaul aimed at improving the structure and maintainability of the framework.
+
+For the majority of developers using Spring Boot starters, **no action is necessary**: the migration is transparent. Only those with explicit imports or direct dependencies will need to update package references.
+
+We also discovered the new features brought by Spring Boot 4, including support for API versioning, the `@ImportHttpServices` annotation, and the new dedicated starter `spring-boot-starter-restclient`. These improvements strengthen `RestClient`'s position as a modern and recommended HTTP client for Spring Boot applications.
+
+I hope this article was helpful in clarifying this common confusion and assisting you in migrating your projects to Spring Boot 4. Thank you for reading.
+
+Find our #autourducode videos on our YouTube channel: https://www.youtube.com/@autourducode

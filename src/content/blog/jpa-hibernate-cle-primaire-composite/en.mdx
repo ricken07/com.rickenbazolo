@@ -7,7 +7,6 @@ tags: ["hibernate", "java", "jpa", "spring-boot"]
 readingTime: 3
 excerpt: "In this example, we will learn how to embed a composite primary key, we will declare the IDs (primary key fields) as a separate class annotated with the @Embeddable annotation.A student is identified by its StudentCompositeId, which is defined by eleveId and class."
 status: "published"
-canonical: "https://autourducode.net/java/jpa-hibernate-cle-primaire-composite/"
 ---
 
 In this example, we will learn how to embed a ***composite primary key***, we will declare the IDs (primary key fields) as a separate class annotated with the annotation ***@Embeddable***.A student is identified by their **StudentCompositeId**, which is defined by **eleveId** and **class**.
@@ -21,8 +20,6 @@ Let’s get into the code…
 ### Create a simple Spring Boot project “TutoHibernatePK”
 
 ### Folder structure:
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-09-à-01.26.16-822x1024.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-09-à-01.26.16.png)
 
 ### The POM.xml file
 
@@ -210,8 +207,6 @@ Hibernate: create table eleve (class varchar(50) not null, eleve_id integer not 
 ```
 
 The combination of the **class** and **eleve_id** column constitutes a composite key, it will be used to uniquely identify each row in the table.
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-10-à-00.51.32.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-10-à-00.51.32.png)
 
 I hope this article was useful to you.Thanks for reading it.
 

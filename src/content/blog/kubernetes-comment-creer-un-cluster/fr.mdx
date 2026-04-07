@@ -1,0 +1,93 @@
+---
+title: "Kubernetes : Comment créer un cluster Kubernetes"
+slug: "kubernetes-comment-creer-un-cluster"
+language: "fr"
+publishedAt: "2022-07-01"
+tags: ["cloud", "devops", "kubernetes"]
+readingTime: 3
+excerpt: "Création d’un cluster Kubernetes"
+status: "published"
+---
+
+Pour commencer à travailler avec Kubernetes, vous devez mettre en place un cluster Kubernetes. Il existe plusieurs façons de créer un cluster Kubernetes, à la fois sur site et dans le cloud. Dans ce tutoriel, je vais principalement me concentrer sur la manière de créer un cluster Kubernetes sur votre machine locale.
+
+Si vous souhaitez configurer votre cluster Kubernetes sur le cloud, voici les liens des fournisseurs de cloud les plus populaires sur la façon de configurer un cluster et les prix :
+
+* **AWS**: https://aws.amazon.com/eks/
+* **GCP**: https://cloud.google.com/kubernetes-engine
+* **Azure**: https://azure.microsoft.com/en-us/services/kubernetes-service/
+
+Avant de créer votre cluster Kubernetes, je vous conseille d’installer **kubectl**. Voici les instructions pour l’installer en fonction de votre système d’exploitation : https://kubernetes.io/docs/tasks/tools/
+
+Une fois le **kubectl** installé, vous pouvez vérifier les nœuds sur votre machine locale (qui ne vous en renverra aucun si vous n’en avez pas défini un auparavant) par la commande suivante :
+
+```
+kubectl get nodes
+```
+
+commande : kubectl get nodes
+
+Comme vous pouvez le voir, cela ne me donne pas encore de résultats, car je n’ai pas encore mis en place un cluster dans ma machine locale.
+
+Maintenant, voyons les différentes manières de créer un cluster k8s.
+
+### Créer un cluster Kubernetes avec [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+
+L’un des moyens les plus populaires de construire un cluster Kubernetes est d’utiliser **minikube**. **Minikube** crée des machines virtuelles pour chaque nœud du cluster, qui communiquent entre elles.
+
+Vous pouvez suivre ici l’installation de **minikube** en fonction de votre système d’exploitation : [https://minikube.sigs.k8s.io/docs/start/.](https://minikube.sigs.k8s.io/docs/start/)
+
+Une fois installé, vous pouvez démarrer votre cluster Kubernetes avec la commande suivante :
+
+```
+minikube start
+```
+
+Une fois que c’est fait, vous pouvez vérifier à nouveau les nœuds :
+
+```
+kubectl get nodes
+```
+
+Comme vous pouvez le voir, minikube vient de faire tourner un seul nœud qui agit en tant que maître puisque nous n’avons pas spécifié d’avoir plus de nœuds. Il agit également comme le seul nœud ouvrier. Les déploiements sont couverts en détail dans les tutoriels suivants, mais vous pouvez essayer d’exécuter un seul pod :
+
+```
+kubectl run nginx --image=nginx
+```
+
+Cela va démarrer un pod qui s’appelle Nginx et exécute l’image Nginx dans l’espace de nom par défaut. Pour le vérifier :
+
+```
+kubectl get pods
+```
+
+Minikube dispose également de son propre tableau de bord. Démarrez-le en tapant :
+
+```
+minikube dashboard
+```
+
+Et vous verrez le tableau de bord fonctionner sur l’URL et le port spécifiques. Vous pouvez également observer votre pod en cours d’exécution sur le tableau de bord :
+
+Vous pouvez supprimer votre cluster en tapant :
+
+```
+minikube delete --all
+```
+
+Pour plus d’informations sur **minikube**, vous pouvez suivre la documentation sur le lien fourni pour l’installation.
+
+C’est tout pour la configuration de votre cluster.
+
+Vous pouvez créer un cluster avec :
+
+* Kind – https://kind.sigs.k8s.io/docs/user/quick-start/#installation
+* K3s – https://k3s.io/
+
+Vous pouvez trouver plus d’informations sur k3s sur la page de documentation https://rancher.com/docs/k3s/latest/en/
+
+* Kubeadm – https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

@@ -1,0 +1,104 @@
+---
+title: "Création d'un conteneur Docker pour une application Spring Boot"
+slug: "creation-d-un-conteneur-docker-pour-une-application-spring-boot"
+language: "fr"
+publishedAt: "2022-02-13"
+tags: ["api", "docker", "java", "spring boot", "spring mvc"]
+readingTime: 3
+excerpt: "Nous allons créer un conteneur Docker pour une simple application hello World ! Spring boot en utilisant Maven Prérequis : JDK 1.8 ou plus récent Docker Maven 3.2+ Un éditeur de texte Une fois que vous avez installé tous"
+status: "published"
+coverImage: "/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/01.png"
+---
+
+Nous allons créer un conteneur Docker pour une simple application hello World ! Spring boot en utilisant Maven
+
+![](/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/01.png)
+
+Prérequis :
+
+* [JDK 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) ou plus récent
+* [Docker](https://docker.com/)
+* [Maven 3.2+](https://maven.apache.org/download.cgi)
+* Un éditeur de texte
+
+Une fois que vous avez installé tous les logiciels requis, il est temps de télécharger le code source à partir de git.
+
+[Téléchargez](https://github.com/ricken07/docker-spring-boot) et décompressez le code source ou clonez le code en utilisant [Git](https://github.com/ricken07/docker-spring-boot.git)  :
+
+git clone https://github.com/ricken07/docker-spring-boot.git
+
+Comprendre le POM.xml qui se trouve dans le repo git cloné.
+
+![](/legacy/blogger/creation-d-un-conteneur-docker-pour-une-application-spring-boot/02.png)
+
+  
+Ici, nous avons l'artefact requis pour construire le Docker avec le groupId et la version. Nous mentionnons ici le préfixe de l'image Docker que nous allons construire à l'étape suivante. Cette configuration spécifie une chose obligatoire, à savoir que l'image sera créée sous le nom de mydocker/docker-spring-boot
+
+Cette partie de POM.xml contient les plugins nécessaires à la construction du projet.
+
+Le plugin Maven de Spring Boot collecte tous les jars sur le classpath et construit un seul jar exécutable "docker-spring-boot-1.0.jar", ce qui rend plus pratique l'exécution et le transport de votre service. Il recherche la méthode public static void main() pour la signaler comme classe exécutable. Il fournit également un résolveur de dépendances intégré qui définit le numéro de version pour correspondre aux dépendances de Spring Boot.
+
+La configuration spécifie également les éléments suivants :
+
+* une tâche pour décompresser le fichier jar
+* le nom de l'image (ou balise) est défini à partir des propriétés du fichier jar, qui se retrouvera ici sous la forme suivante **mydocker/docker-spring-boot**
+* l'emplacement du fichier Jarfile décompressé, que nous aurions pu coder en dur dans le fichier **Dockerfile**
+* un argument de construction pour docker pointant vers le fichier jar (le fichier jar peut être renommé dans le pom.xml avec la balise ``<finalName>hello</finalName>``)
+
+**Configuration de l'application Spring Boot**
+
+Comprendre la classe MainApplication.java qui se trouve dans le dossier src du répertoire cloné.
+
+La classe est marquée comme @SpringBootApplication et comme @RestController, ce qui signifie qu'elle est prête à être utilisée par Spring MVC pour gérer les requêtes web. @RequestMapping fait correspondre / à la méthode hello() qui envoie simplement une réponse " Hello Docker World ". La méthode main() utilise la méthode SpringApplication.run() de Spring Boot pour lancer une application.
+
+Exécutez l'application sans le conteneur Docker (c'est-à-dire dans l'OS hôte).
+
+Avec Maven, exécutez le cmd ci-dessous pour construire le jar et lancer l'application sur le port 8080
+
+```bash
+./mvnw package && java -jar target/hello.jar
+```
+
+et allez sur localhost:8080 pour voir votre message "Hello Docker World".
+
+Si vous pouvez voir le message "Hello Docker World", l'application Spring Boot est en place et fonctionne dans Tomcat. Mais elle n'est pas encore conteneurisée.
+
+Conteneurisons-le
+
+Comprendre le Dockerfile simplifié qui est là dans le repo cloné.
+
+Ce Dockerfile possède un paramètre **JAR_FILE**pointant vers un répertoire dans lequel nous avons les jar de l'application. Avant de construire l'image Docker, vérifions que Docker est en cours d'exécution en exécutant la commande ci-dessous
+
+```bash
+docker ps
+```
+
+Si vous obtenez un message d'erreur, quelque chose ne va pas. Revoyez la configuration de Docker
+
+Construction de l'image Docker avec le plugin maven
+
+```bash
+./mvnw spring-boot:build-image
+```
+
+Exécuter l'image Docker
+
+```
+$ docker run -p 8081:8080 -t docker-spring-boot:1.0
+```
+
+L'application est alors disponible sur http://localhost:8081 (visitez-la et elle dit "Hello Docker World"). Ici, 8081 est le port du Docker et 8080 est le port de Tomcat. Cela signifie que l'application fonctionnant sur le port 8080 de Tomcat sera disponible sur le port 8081 de Docker.
+
+Lorsque le Docker est en cours d'exécution, vous pouvez voir dans la liste des conteneurs, par ex :
+
+```
+$ docker ps
+```
+
+Pour arrêter le Docker, vous pouvez faire docker stop avec l'id du conteneur.
+
+```
+$  docker stop 9606259fb494
+```
+
+**C'est fait ! Nous avons créé un conteneur Docker pour l'application Spring Boot.**

@@ -1,113 +1,287 @@
 import { getTranslations } from "next-intl/server";
 import { Container } from "@/components/layout/Container";
-import { Prose } from "@/components/ui/Prose";
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type Highlight = {
+  name: string;
+  role: { fr: string; en: string };
+  period: string;
+  logo: string | null;
+  initials: string;
+};
+
+type SkillCategory = {
+  labelFr: string;
+  labelEn: string;
+  pills: string[];
+};
+
+type Project = {
+  name: string;
+  description: { fr: string; en: string };
+  url: string;
+  type: { fr: string; en: string };
+  linkIcon: "github" | "external";
+};
+
+type ProjectZone = {
+  title: { fr: string; en: string };
+  projects: Project[];
+};
+
+// ─── Static data ─────────────────────────────────────────────────────────────
 
 const heroSocials = [
-  { name: "GitHub", href: "https://github.com/rickenbazolo", icon: GitHubIcon },
-  { name: "LinkedIn", href: "https://www.linkedin.com/in/rickenbazolo", icon: LinkedinIcon },
-  { name: "X", href: "https://x.com/rickenbazolo", icon: XIcon },
-  { name: "Bluesky", href: "https://bsky.app/profile/rickenbazolo.dev", icon: BlueskyIcon },
-  { name: "YouTube", href: "https://www.youtube.com/@rickenbazolo", icon: YoutubeIcon },
+  { name: "GitHub", href: "https://github.com/ricken07", icon: GitHubIcon },
+  { name: "LinkedIn", href: "https://www.linkedin.com/in/rickenbazolo/", icon: LinkedinIcon },
+  { name: "X", href: "https://x.com/RickenBrice", icon: XIcon },
+  { name: "Bluesky", href: "https://bsky.app/profile/ricken07.bsky.social", icon: BlueskyIcon },
+  { name: "YouTube", href: "https://www.youtube.com/@autourducode", icon: YoutubeIcon },
 ];
 
-const heroHighlights = [
-  { name: "Gad Digital", role: "Founder & CTO", year: "2021", logo: "https://logo.clearbit.com/gad.digital" },
-  { name: "LangChain4j", role: "OSS contributor", year: "2023", logo: "https://avatars.githubusercontent.com/u/121501861?s=200&v=4" },
-  { name: "Java / Spring", role: "Engineer & trainer", year: "2014", logo: null },
-];
-
-const aboutProjects = [
+const highlights: Highlight[] = [
+  {
+    name: "FDJ United",
+    role: { fr: "Software Engineer", en: "Software Engineer" },
+    period: "2025-26",
+    logo: null,
+    initials: "FDJ",
+  },
+  {
+    name: "Société Générale",
+    role: { fr: "Lead technique & ingénieur en IA générative", en: "Technical Lead & Generative AI Engineer" },
+    period: "2024-25",
+    logo: null,
+    initials: "SG",
+  },
+  {
+    name: "BNP Paribas",
+    role: { fr: "Lead technique", en: "Technical Lead" },
+    period: "2023-24",
+    logo: null,
+    initials: "BNP",
+  },
+  {
+    name: "INETUM",
+    role: { fr: "Lead technique", en: "Technical Lead" },
+    period: "2021-23",
+    logo: null,
+    initials: "IN",
+  },
   {
     name: "Gad Digital",
-    description: {
-      fr: "Studio produit qui conçoit des workflows IA-first, des plateformes et des outils éducatifs.",
-      en: "Product studio building AI-first workflows, platforms, and learning tools.",
-    },
-    url: "https://gad.digital",
-    type: { fr: "Startup", en: "Startup" },
+    role: { fr: "Fondateur & architecte logiciel", en: "Founder & Software Architect" },
+    period: "2020",
+    logo: null,
+    initials: "GD",
   },
   {
-    name: "Platform Starter",
-    description: {
-      fr: "Kit de démarrage avec auth, audit, jobs et observabilité pour livrer vite.",
-      en: "Starter kit with auth, audit, jobs, and observability to ship faster.",
-    },
-    url: "https://gad.digital/platform-starter",
-    type: { fr: "Plateforme Web", en: "Web platform" },
+    name: "FONGWAMA",
+    role: { fr: "Développeur & chef de projet technique", en: "Developer & Technical Project Lead" },
+    period: "2016-20",
+    logo: null,
+    initials: "FG",
   },
   {
-    name: "LangChain4j",
-    description: {
-      fr: "Contributions OSS sur le tooling, les tests et l’industrialisation des assistants.",
-      en: "OSS contributions on tooling, testing, and productionizing assistants.",
-    },
-    url: "https://github.com/langchain4j/langchain4j",
-    type: { fr: "Projet OSS", en: "OSS project" },
+    name: "YEKOLAB",
+    role: { fr: "Lead développeur & formateur", en: "Lead Developer & Trainer" },
+    period: "2016-18",
+    logo: null,
+    initials: "YK",
+  },
+  {
+    name: "NET-TECHNOLOGY",
+    role: { fr: "Développeur web & mobile senior", en: "Senior Web & Mobile Developer" },
+    period: "2015-17",
+    logo: null,
+    initials: "NT",
   },
 ];
 
-export default async function AboutPage({ params }: { params: { locale: string } }) {
+const skillCategories: SkillCategory[] = [
+  {
+    labelFr: "Architecture",
+    labelEn: "Architecture",
+    pills: ["Clean Architecture", "Hexagonal", "Microservices", "Architectures modulaires"],
+  },
+  {
+    labelFr: "Cloud & DevOps",
+    labelEn: "Cloud & DevOps",
+    pills: ["Azure", "AWS", "Docker", "CI/CD", "Git", "JIRA"],
+  },
+  {
+    labelFr: "IA générative",
+    labelEn: "Generative AI",
+    pills: ["LLM", "Spring AI", "LangChain", "RAG", "Vector DB", "Azure AI Foundry"],
+  },
+  {
+    labelFr: "Systèmes agentiques",
+    labelEn: "Agentic Systems",
+    pills: ["Multi-agents", "Orchestration", "Tool calling", "Intégration métier"],
+  },
+  {
+    labelFr: "Back-end",
+    labelEn: "Back-end",
+    pills: ["Java", "Jakarta EE", "Spring Boot", "Quarkus", "Python", "PostgreSQL", "MongoDB"],
+  },
+  {
+    labelFr: "Front-end",
+    labelEn: "Front-end",
+    pills: ["React / Next.js", "Vue / Nuxt", "Angular", "JSF", "Flutter / Dart"],
+  },
+  {
+    labelFr: "Soft skills",
+    labelEn: "Soft skills",
+    pills: ["Leadership technique", "Coordination d'équipe", "Collaboration transverse", "Résolution de problèmes"],
+  },
+];
+
+const aboutProjectZones: ProjectZone[] = [
+  {
+    title: {
+      fr: "IA appliquée (Projets Gad Digital)",
+      en: "Applied AI (Gad Digital Projects)",
+    },
+    projects: [
+      {
+        name: "EMI AI",
+        description: {
+          fr: "Assistante virtuelle éducative propulsée par l'IA pour offrir un accompagnement scolaire personnalisé, aider aux devoirs, préparer les examens et proposer une orientation adaptée à chaque apprenant.",
+          en: "AI-powered virtual educational assistant delivering personalized learning support, homework help, exam preparation, and guidance tailored to each learner.",
+        },
+        url: "https://emi-ai.com",
+        type: { fr: "IA appliquée", en: "Applied AI" },
+        linkIcon: "external",
+      },
+      {
+        name: "Digi Resto",
+        description: {
+          fr: "Plateforme pour restaurateurs qui digitalise les menus, simplifie les paiements via QR code et exploite l'IA Écho pour analyser les avis clients et optimiser en continu l'offre et les opérations.",
+          en: "Restaurant platform that digitizes menus, streamlines QR-code payments, and uses Echo AI to analyze customer feedback and continuously optimize offerings and operations.",
+        },
+        url: "https://digi-resto.com",
+        type: { fr: "IA appliquée", en: "Applied AI" },
+        linkIcon: "external",
+      },
+    ],
+  },
+  {
+    title: {
+      fr: "Projets open source",
+      en: "Open source projects",
+    },
+    projects: [
+      {
+        name: "Toon4j",
+        description: {
+          fr: "Implémentation Java de TOON, un format de sérialisation compact conçu pour réduire de 30 à 60 % l'usage de tokens par rapport à JSON lors des interactions avec les LLM.",
+          en: "Java implementation of TOON, a compact serialization format designed to reduce token usage by 30 to 60% compared to JSON when interacting with LLMs.",
+        },
+        url: "https://github.com/ricken07/Toon4j",
+        type: { fr: "Librairie Java", en: "Java Library" },
+        linkIcon: "github",
+      },
+      {
+        name: "PayMux",
+        description: {
+          fr: "SDK Java unifié et modulaire qui simplifie l'intégration des API Mobile Money avec une interface cohérente pour plusieurs opérateurs.",
+          en: "Unified and modular Java SDK that simplifies Mobile Money API integration through a consistent interface across multiple operators.",
+        },
+        url: "https://github.com/ricken07/paymux-java",
+        type: { fr: "Librairie Java", en: "Java Library" },
+        linkIcon: "github",
+      },
+    ],
+  },
+  {
+    title: {
+      fr: "Tech entreprenariat",
+      en: "Tech entrepreneurship",
+    },
+    projects: [
+      {
+        name: "Gad Digital",
+        description: {
+          fr: "Entreprise spécialisée dans la conception de solutions numériques, de produits et de services qui simplifient la complexité, améliorent l'efficacité et favorisent la croissance.",
+          en: "Company focused on building digital solutions, products, and services that simplify complexity, improve efficiency, and drive growth.",
+        },
+        url: "http://gaddigital.io",
+        type: { fr: "Startup", en: "Startup" },
+        linkIcon: "external",
+      },
+    ],
+  },
+];
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
 
   return (
     <main className="py-16">
       <Container className="space-y-8">
+
+        {/* ── Hero grid ─────────────────────────────────────────────────── */}
         <section className="grid gap-10 md:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.95fr)] md:items-start">
+
+          {/* Left column */}
           <div className="space-y-6">
             <p className="text-xs uppercase tracking-[0.35em] text-muted">
               {locale === "fr"
-                ? "Ingénieur logiciel & IA • Fondateur de Gad Digital"
-                : "Software & AI Engineer • Founder of Gad Digital"}
+                ? "Ingénieur logiciel & IA générative • Tech Entrepreneur"
+                : "Software & Generative AI Engineer • Tech Entrepreneur"}
             </p>
 
             <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-              {locale === "fr" ? "Ricken Bazolo" : "Ricken Bazolo"}
+              Ricken Bazolo
             </h1>
 
-            <p className="max-w-xl text-sm text-muted">
-              {locale === "fr"
-                ? "Je m'appelle Ricken BAZOLO, technologue Java sénior, développeur full stack, blogueur, formateur, et conférencier avec plus de 10 ans d'expérience dans la conception et le développement de solutions informatiques. Passionné par l'open source, le partage de connaissances, et l'apprentissage continu, je suis aussi mentor et tech leader engagé à faire évoluer la communauté technologique par la transmission de savoir et le soutien aux autres."
-                : "I’m Ricken BAZOLO, a senior Java technologist, full‑stack developer, blogger, trainer, and speaker with 10+ years building software solutions. Passionate about open source, knowledge sharing, and lifelong learning, I also mentor and lead teams to grow the tech community through teaching and supporting others."}
-            </p>
+            <div className="max-w-xl space-y-3 text-sm text-muted">
+              {locale === "fr" ? (
+                <>
+                  <p>Ricken BAZOLO (@rickenbazolo) est technologue Java senior, blogueur, formateur et speaker, avec plus de dix ans d'expérience dans la conception et le développement de solutions logicielles.</p>
+                  <p>Tech entrepreneur, il s'intéresse particulièrement aux architectures modernes et à l'intégration des LLM dans les applications métier. Il contribue également de temps en temps à des projets open source dans l'écosystème Java.</p>
+                  <p>Passionné par le partage de connaissances, il intervient aussi comme mentor et leader technique.</p>
+                </>
+              ) : (
+                <>
+                  <p>Ricken BAZOLO (@rickenbazolo) is a senior Java technologist, blogger, trainer and speaker, with over ten years of experience designing and building software solutions.</p>
+                  <p>A tech entrepreneur, he is particularly interested in modern architectures and the integration of LLMs into business applications. He also occasionally contributes to open source projects in the Java ecosystem.</p>
+                  <p>Passionate about knowledge sharing, he also acts as a mentor and technical leader.</p>
+                </>
+              )}
+            </div>
 
+            {/* ── Skills card (pill badges) ─────────────────────────────── */}
             <div className="space-y-3 rounded-2xl border border-border/70 bg-card/60 p-4">
               <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
                 {locale === "fr" ? "Mes compétences" : "Skills"}
               </p>
-              <div className="grid gap-3 sm:grid-cols-2 text-xs text-muted-foreground">
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground text-sm">{locale === "fr" ? "Back-end" : "Back-end"}</p>
-                  <p>Java, Spring, Spring AI, LangChain4j</p>
-                  <p>REST/GraphQL, messaging, jobs</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground text-sm">{locale === "fr" ? "Front-end" : "Front-end"}</p>
-                  <p>React/Next.js, TypeScript, Tailwind</p>
-                  <p>Design systems, documentation</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground text-sm">{locale === "fr" ? "Plateforme" : "Platform"}</p>
-                  <p>CI/CD, observabilité, sécurité</p>
-                  <p>Testing, feature flags, rollback</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="font-semibold text-foreground text-sm">{locale === "fr" ? "Transmission" : "Teaching"}</p>
-                  <p>{locale === "fr" ? "Formations, mentoring, conférences" : "Training, mentoring, speaking"}</p>
-                  <p>OSS, blog, pédagogie</p>
-                </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {skillCategories.map((cat) => (
+                  <div key={cat.labelEn} className="space-y-2">
+                    <p className="text-sm font-semibold text-foreground">
+                      {locale === "fr" ? cat.labelFr : cat.labelEn}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {cat.pills.map((pill) => (
+                        <span
+                          key={pill}
+                          className="rounded-full border border-border/60 bg-background/60 px-2 py-0.5 text-[11px] text-muted-foreground"
+                        >
+                          {pill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/*<div className="flex flex-wrap gap-3">
-              <a
-                href={`/${locale}/gad-digital`}
-                className="inline-flex items-center justify-center rounded-full border border-border px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:border-accent hover:text-accent"
-              >
-                {locale === "fr" ? "Découvrir le projet Gad Digital" : "Discover Gad Digital"}
-              </a>
-            </div>*/}
-
+            {/* ── Social links ─────────────────────────────────────────── */}
             <div className="flex items-center gap-2 text-muted-foreground">
               {heroSocials.map(({ name, href, icon: Icon }) => (
                 <a
@@ -123,92 +297,153 @@ export default async function AboutPage({ params }: { params: { locale: string }
               ))}
             </div>
 
+            {/* ── Email ────────────────────────────────────────────────── */}
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <EmailIcon className="h-4 w-4" />
               <a
-                href="mailto:hello@rickenbazolo.dev"
+                href="mailto:ricken.bazolo@gaddigital.io"
                 className="underline-offset-4 hover:text-accent hover:underline"
               >
-                hello@rickenbazolo.dev
+                ricken.bazolo@gaddigital.io
               </a>
             </div>
-
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <EmailIcon className="h-4 w-4" />
+              <a
+                  href="mailto:contact@rickenbazolo.com"
+                  className="underline-offset-4 hover:text-accent hover:underline"
+              >
+                contact@rickenbazolo.com
+              </a>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <EmailIcon className="h-4 w-4" />
+              <a
+                  href="mailto:ricken.bazolo@gmail.com"
+                  className="underline-offset-4 hover:text-accent hover:underline"
+              >
+                ricken.bazolo@gmail.com
+              </a>
+            </div>
           </div>
 
+          {/* Right column */}
           <div className="flex flex-col gap-4">
+            {/* Avatar */}
             <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card text-sm shadow-lg shadow-accent/10">
               <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-accent/10 blur-3xl" />
               <div className="relative h-full w-full min-h-[240px]">
                 <img
-                  src="https://rickenbazolo.com/images/me/avatar.jpeg"
+                  src="/avatar.jpeg"
                   alt="Portrait professionnel de Ricken Bazolo - Ingénieur logiciel et IA, Fondateur de Gad Digital"
                   className="h-full w-full object-cover"
                 />
               </div>
             </div>
 
+            {/* ── Timeline / Parcours ───────────────────────────────────── */}
             <div className="rounded-2xl border border-border/70 bg-background/70 p-4 text-sm shadow-inner">
-              <p className="mb-3 text-xs uppercase tracking-[0.22em] text-muted">{locale === "fr" ? "Parcours" : "Highlights"}</p>
-              <div className="space-y-3">
-                {heroHighlights.map((item) => (
-                  <div key={item.name} className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-card/80">
-                      {item.logo ? (
-                        <img
-                          src={item.logo}
-                          alt={item.name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : null}
+              <p className="mb-4 text-xs uppercase tracking-[0.22em] text-muted">
+                {locale === "fr" ? "Parcours" : "Highlights"}
+              </p>
+              {/* Vertical timeline */}
+              <ol className="relative border-l border-border/40">
+                {highlights.map((item, idx) => (
+                  <li
+                    key={item.name + item.period + item.role.en}
+                    className={`relative pl-5 ${idx < highlights.length - 1 ? "pb-10" : "pb-0"} pt-1`}
+                  >
+                    {/* Dot on the timeline line */}
+                    <span className="absolute -left-[5px] top-[14px] h-2.5 w-2.5 rounded-full border border-border/60 bg-card" />
+
+                    <div className="flex items-start gap-3">
+                      {/* Logo / SVG icon avatar */}
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-card/80 text-muted-foreground">
+                        {item.logo ? (
+                          <img
+                            src={item.logo}
+                            alt={item.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : null}
+                        {!item.logo ? (
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground">
+                            {item.initials}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-foreground">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {locale === "fr" ? item.role.fr : item.role.en}
+                        </p>
+                      </div>
+
+                      <span className="mt-0.5 shrink-0 whitespace-nowrap text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                        {item.period}
+                      </span>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.role}</p>
-                    </div>
-                    <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{item.year}</span>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ol>
             </div>
           </div>
         </section>
 
+        {/* ── Projects section ──────────────────────────────────────────────── */}
         <section className="space-y-4">
           <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
             {locale === "fr" ? "Mes projets" : "My projects"}
           </p>
-          <div className="grid gap-4 md:grid-cols-3">
-            {aboutProjects.map((project) => (
-              <article
-                key={project.name}
-                className="rounded-2xl border border-border/70 bg-card/60 p-4 shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-semibold text-foreground">{project.name}</h3>
-                  <span className="rounded-full border border-border/70 bg-background/70 px-2 py-0.5 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                    {locale === "fr" ? project.type.fr : project.type.en}
-                  </span>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {locale === "fr" ? project.description.fr : project.description.en}
+          <div className="space-y-6">
+            {aboutProjectZones.map((zone) => (
+              <div key={zone.title.en} className="space-y-3">
+                <p className="text-sm font-semibold text-foreground">
+                  {locale === "fr" ? zone.title.fr : zone.title.en}
                 </p>
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground transition hover:text-accent"
-                >
-                  {locale === "fr" ? "Voir le projet" : "View project"}
-                  <span aria-hidden>→</span>
-                </a>
-              </article>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {zone.projects.map((project) => (
+                    <article
+                      key={zone.title.en + project.name}
+                      className="rounded-2xl border border-border/70 bg-card/60 p-4 shadow-sm"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-base font-semibold text-foreground">{project.name}</h3>
+                        <span className="shrink-0 rounded-full border border-border/70 bg-background/70 px-2 py-0.5 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                          {locale === "fr" ? project.type.fr : project.type.en}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        {locale === "fr" ? project.description.fr : project.description.en}
+                      </p>
+                      <a
+                        href={project.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground transition hover:text-accent"
+                      >
+                        {project.linkIcon === "github" ? (
+                          <GitHubIcon className="h-3.5 w-3.5" />
+                        ) : (
+                          <ExternalLinkIcon className="h-3.5 w-3.5" />
+                        )}
+                        {locale === "fr" ? "Voir le projet" : "View project"}
+                      </a>
+                    </article>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </section>
+
       </Container>
     </main>
   );
 }
+
+// ─── SVG Icons ────────────────────────────────────────────────────────────────
 
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -271,6 +506,17 @@ function EmailIcon({ className }: { className?: string }) {
       <path
         fill="currentColor"
         d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.22l8 5.33 8-5.33V6H4Zm16 2.78-8 5.34-8-5.34V18h16V8.78Z"
+      />
+    </svg>
+  );
+}
+
+function ExternalLinkIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={className}>
+      <path
+        fill="currentColor"
+        d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"
       />
     </svg>
   );

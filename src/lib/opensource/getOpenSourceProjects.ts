@@ -1,14 +1,8 @@
 import path from "node:path";
 import { promises as fs } from "node:fs";
+import type { OpenSourceProject } from "@/lib/types";
 
-export interface OpenSourceProject {
-  slug: string;
-  name: string;
-  description: Record<string, string>;
-  tags: string[];
-  repoUrl: string;
-  latestVersion?: string;
-}
+export type { OpenSourceProject };
 
 const PROJECTS_PATH = path.join(process.cwd(), "src", "content", "opensource", "projects.json");
 

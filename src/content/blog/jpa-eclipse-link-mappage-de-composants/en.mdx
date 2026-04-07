@@ -7,22 +7,15 @@ tags: ["eclipselink", "hibernate", "java", "jpa", "persistence"]
 readingTime: 3
 excerpt: "In this example, we will learn Component Mapping using JPA annotations.Component Mapping represents the has-a relationship, composition is a stronger association where the contained object has no existence of its own.For example, a student has an address, an address cannot exist"
 status: "published"
-canonical: "https://autourducode.net/java/jpa-eclipse-link-mappage-de-composants/"
 ---
 
 In this example, we will learn ***Component Mapping*** using **JPA** annotations.***Component Mapping*** represents the ***has-a*** relationship, composition is a stronger association where the contained object has no existence of its own.For example, a student has an address, an address cannot exist separately without a student.As the **Student** and **Address** entities are strongly related, it is best to store them in a **single table**.
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-10-à-01.43.11-1024x348.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-10-à-01.43.11.png)
 
 ### **Create a Java project “JpaComponentMapping”**
 
 ### **Folder structure:**
 
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-21.46.57.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-21.46.57.png)
-
 ### Bookstores
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-21.00.54.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-21.00.54.png)
 
 ### Create Java classes:
 
@@ -191,8 +184,6 @@ Thread(Thread[main,5,main])--CREATE TABLE high (ID BIGINT AUTO_INCREMENT NOT NUL
 ```
 
 The **POSTAL_CODE** and **STREET** columns of the **EleveAdresse** class used as a **component** have been integrated into the “**eleve**” table.
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-22.20.27.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-17-à-22.20.27.png)
 
 I hope this article was useful to you.Thanks for reading it.
 

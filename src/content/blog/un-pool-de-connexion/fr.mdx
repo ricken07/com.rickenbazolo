@@ -1,0 +1,34 @@
+---
+title: "Un Pool de connexion ?"
+slug: "un-pool-de-connexion"
+language: "fr"
+publishedAt: "2019-11-20"
+tags: ["databases", "java", "jdbc"]
+readingTime: 2
+excerpt: "Qu'est ce qu'un pool de connexion? Un pool de connexions est un magasin de connexions à une base de données qui peut être utilisé et (plus important encore) réutilisé pour se connecter à une base de données. Pourquoi a t"
+status: "published"
+---
+
+Qu'est-ce qu'un pool de connexion?  
+  
+Un pool de connexions est un magasin de connexions à une base de données qui peut être utilisé et (plus important encore) réutilisé pour se connecter à une base de données.  
+Pourquoi a-t-on besoin de pools de connexion?  
+  
+Les connexions aux bases de données sont coûteuses à créer et à maintenir. Les raisons en sont nombreuses, notamment:  
+  
+    Établissement d'une connexion réseau au serveur de base de données  
+    Analyser les informations de la chaîne de connexion  
+    Authentification de l'utilisateur  
+    Initialisation de la connexion à la base de données dans la base de données  
+    Établissement de contextes transactionnels  
+  
+Désormais, si vous avez une application Web avec un seul utilisateur, vous pouvez simplement créer une connexion à une base de données au début de la session utilisateur, puis la fermer à la fin. Cependant, ce scénario est hautement improbable!  
+  
+Imaginez maintenant un scénario plus réaliste dans lequel des centaines, voire des milliers d’utilisateurs, accéderont à votre application Web. Si la session de chaque utilisateur crée une connexion à une base de données, vos utilisateurs subiront un retard pendant l'installation de cette connexion et, deuxièmement, les performances globales de votre système se détérioreront.  
+  
+Alors, en réponse à la question de savoir pourquoi ils sont nécessaires, ils améliorent à la fois les performances et l'évolutivité de votre système.  
+Comment fonctionnent les pools de connexion?  
+  
+Plutôt que de créer une nouvelle connexion chaque fois que nécessaire, un pool de connexions est créé au démarrage de votre serveur d'applications. Ces connexions peuvent ensuite être utilisées et réutilisées. Lorsqu'une nouvelle connexion est requise, le pool recherche une connexion disponible. S'il en existe un, il est renvoyé au demandeur. Si aucune n'est disponible, la demande est mise en file d'attente ou une nouvelle connexion est établie en fonction du nombre de connexions déjà présentes dans le pool et de la configuration de celui-ci. Une fois la connexion établie, au lieu de la fermer, la connexion est renvoyée au pool de connexions pour être utilisée par le demandeur suivant.  
+  
+OK.

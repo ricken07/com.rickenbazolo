@@ -9,11 +9,11 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   const socials = [
-    { name: "GitHub", href: "https://github.com/rickenbazolo", icon: GitHubIcon },
-    { name: "LinkedIn", href: "https://www.linkedin.com/in/rickenbazolo", icon: LinkedinIcon },
-    { name: "X", href: "https://x.com/rickenbazolo", icon: XIcon },
-    { name: "Bluesky", href: "https://bsky.app/profile/rickenbazolo.dev", icon: BlueskyIcon },
-    { name: "YouTube", href: "https://www.youtube.com/@rickenbazolo", icon: YoutubeIcon },
+      { name: "GitHub", href: "https://github.com/ricken07", icon: GitHubIcon },
+      { name: "LinkedIn", href: "https://www.linkedin.com/in/rickenbazolo/", icon: LinkedinIcon },
+      { name: "X", href: "https://x.com/RickenBrice", icon: XIcon },
+      { name: "Bluesky", href: "https://bsky.app/profile/ricken07.bsky.social", icon: BlueskyIcon },
+      { name: "YouTube", href: "https://www.youtube.com/@autourducode", icon: YoutubeIcon },
   ];
 
   return (

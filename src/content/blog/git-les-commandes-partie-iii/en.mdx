@@ -1,0 +1,104 @@
+---
+title: "GIT – Commands / Part III"
+slug: "git-les-commandes-partie-iii"
+language: "en"
+publishedAt: "2022-10-04"
+tags: ["devops", "git"]
+readingTime: 2
+excerpt: "In this third part, we will continue to explore the basic commands for quickly getting started with GIT."
+status: "published"
+---
+
+In this third part, we will continue to explore the basic commands for quickly getting started with GIT.
+
+### **Let's talk about GIT commands**
+
+#### **1- Set your username and email address**
+
+Username and email address are required to link commits to your name. You can set or update your username and email address using any name with the **git config** command. The new name will be automatically reflected in all future commits you send to GitHub/GITLAB/BITBUCKET from the command line.
+
+```bash
+git config --global user.name "autourducode"
+```
+
+```bash
+git config --global user.email "dev@example.com"
+```
+
+#### **2- Cache your credentials**
+
+You can simply cache your login credentials using the config parameter and the -global option. This helps to avoid retyping the username and password every time you make a commit, in another way this option also saves time.
+
+```bash
+git config --global credential.helper cache
+```
+
+#### **3- Initialize a repository**
+
+You can create an empty **Git** repository or reset an existing repository using the init parameter. It will create a hidden directory called .git during initialization. This directory contains all the objects and references that Git uses and creates as part of your project history.
+
+```bash
+git init
+```
+
+#### **4- Add a file**
+
+You can add a file using the **add** parameter and the file name. You can also add all files and directories with ‘**.**‘ in place of the file name.
+
+```bash
+git add mon_fichier.txt
+```
+
+```bash
+git add .
+```
+
+#### **5- Check the status of a repository**
+
+You can see the status of the current repository by using the *status* keyword, which includes **staged**, **unstaged**, and **untracked** files.
+
+```bash
+git status
+```
+
+#### 6- Validate the changes
+
+You can add a single line message during a commit to your repository using the **commit** flag with **-m**
+
+```bash
+git commit -m "Votre bref résumé"
+```
+
+You can also open a text editor in Terminal to write a complete message. This message can contain multi-line text to allow you to explain changes to a repository in detail.
+
+```bash
+git commit
+```
+
+#### **7- Show commit history with changes**
+
+Sometimes we need to check the changes made and commit details, for this GIT will help you track with **log** parameter and you can add some additional flags, like below **-p** which will provide the detailed changes.
+
+```bash
+git log -p
+```
+
+#### **8- Revert changes**
+
+You can restore non-updated working tree files by using the **checkout** parameter. You must provide a file path to update it. If the file path is not set, then ***git checkout*** will update the **HEAD** to set the specified branch as the current branch.
+
+```bash
+git checkout mon_fichier.txt
+```
+
+```bash
+git reset HEAD mon_fichier.txt
+```
+
+```bash
+git reset HEAD
+```
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel:**https://bit.ly/3IwIK04**

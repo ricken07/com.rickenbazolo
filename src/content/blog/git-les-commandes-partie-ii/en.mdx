@@ -1,0 +1,98 @@
+---
+title: "GIT – Commands / Part II"
+slug: "git-les-commandes-partie-ii"
+language: "en"
+publishedAt: "2022-09-08"
+tags: ["devops", "git"]
+readingTime: 2
+excerpt: "In this second part, we will continue to explore the basic commands for quickly getting started with GIT."
+status: "published"
+---
+
+In this second part, we will continue to explore the basic commands for quickly getting started with GIT.
+
+### **Let's talk about GIT commands**
+
+#### Exploring the **git log** command to view commit logs
+
+```bash
+git log
+```
+
+* Visualization of the **last n** commits (here 2 commits)
+
+```bash
+git log -n2
+```
+
+* Visualization of information **in one line** of each commit
+
+```bash
+git log --oneline
+```
+
+* Skip the last n commits (in this case 2 commits)
+
+```bash
+git log --skip=2
+```
+
+* Easily search for a string or regular expression in a validated tree or in the working directory
+
+```xml
+git log --grep=<pattern>
+```
+
+#### git cherry-pick is cool 😎
+
+```xml
+git cherry-pick <commit id>
+```
+
+* As the name suggests, it allows you to retrieve changes from an existing commit and apply them by creating a new commit. Let's see a simple example; We are currently on the '**demo1**' branch and we added a new change with commit id '****6013975a02495**…**'. – *Added newFile.txt*
+
+* We notice that the '**main**' branch is one commit behind '**demo1**'. We know that one way to update '**main**' is to do a **merge** with the '**demo1**' branch. But here we are going to see how the **cherry-pick** works. We can choose a commit and apply it. So let’s choose commit ‘**6013975a02495…**‘ and apply it to ‘**main**‘. Let's position ourselves on the '**main**' branch and do **cherry pick**.
+
+After the cherry-pick, the same changes from this commit are applied to the ‘**main**‘ branch. But this creates a new commit with a different **sha1** (commit id).
+
+*Let's see the difference between the 2 commits
+
+```bash
+git diff commit1 commit2
+```
+
+a/… for commit1 ‘**6013975…**‘ and b/… is for commit2 ‘**58cebda…**‘ we can see a file (**newFile.txt**) was added in commit2
+
+* In the same way, you can see the difference between two branches.
+
+```bash
+git diff branchA branchB
+```
+
+* To see the difference between **unindexed** and **indexed** local changes.
+
+```bash
+git diff
+```
+
+* To see the difference between **indexed** changes and those that have been **committed** to the local repository
+
+```bash
+git diff --staged
+```
+
+or
+
+```bash
+git diff --cached
+```
+
+* To see changes in a commit
+
+```xml
+git show <commit-sha>
+```
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: **https://bit.ly/3IwIK04**

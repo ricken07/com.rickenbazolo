@@ -1,0 +1,34 @@
+---
+title: "A Connection Pool?"
+slug: "un-pool-de-connexion"
+language: "en"
+publishedAt: "2019-11-20"
+tags: ["databases", "java", "jdbc"]
+readingTime: 1
+excerpt: "What is a connection pool? A connection pool is a store of database connections that can be used and (more importantly) reused to connect to a database. Why did you"
+status: "published"
+---
+
+What is a connection pool?  
+  
+A connection pool is a store of database connections that can be used and (more importantly) reused to connect to a database.  
+Why do we need connection pools?  
+  
+Database connections are expensive to create and maintain. There are many reasons for this, including:  
+  
+    Establishing a Network Connection to the Database Server  
+    Parse connection string information  
+    User Authentication  
+    Initializing the database connection in the database  
+    Establishing transactional contexts  
+  
+Now, if you have a web application with a single user, you can simply create a database connection at the start of the user session and then close it at the end. However, this scenario is highly unlikely!  
+  
+Now imagine a more realistic scenario where hundreds or even thousands of users will access your web application. If each user's session creates a database connection, your users will experience a delay while that connection is setup, and secondly, your overall system performance will deteriorate.  
+  
+So, in answer to the question of why they are necessary, they improve both the performance and scalability of your system.  
+How do connection pools work?  
+  
+Rather than creating a new connection each time needed, a pool of connections is created when your application server starts. These connections can then be used and reused. When a new connection is required, the pool searches for an available connection. If one exists, it is returned to the requester. If none are available, the request is queued or a new connection is established based on the number of connections already in the pool and its configuration. After the connection is established, instead of closing it, the connection is returned to the connection pool for use by the next requester.  
+  
+Okay.

@@ -1,0 +1,179 @@
+---
+title: "Dependency Injection VS Inversion of Control"
+slug: "injection-de-dependance-vs-inversion-de-controle"
+language: "en"
+publishedAt: "2023-02-09"
+tags: ["architecture", "java"]
+readingTime: 6
+excerpt: "Dependency Injection (DI) and Inversion of Control (IoC) are two most important and popular architectural patterns. There is a common misunderstanding regarding the distinction between dependency injection and inversion of control. These two ideas are often misunderstood."
+status: "published"
+---
+
+**Dependency Injection (DI)** and **Inversion of Control (IoC)** are two most important and popular architectural patterns. There is a common misunderstanding regarding the distinction between dependency injection and inversion of control. These two ideas are often misunderstood.
+
+**Inversion of control** is a design concept that allows you to reverse the creation of dependent objects. Conversely, **dependency injection**, a software architectural pattern, is an implementation of the principle of inversion of control.
+
+***This article discusses both models with sample code to illustrate the concepts covered.***
+
+## **What is coupling in Java?**
+
+Generally speaking, object coupling is of two types:
+
+* **Weak coupling;** When an object is weakly coupled to another object, the coupling can be easily modified
+* **Strong coupling**; When coupling is strong, objects are not independently reusable and, therefore, difficult to use.
+
+When the components of an application are tightly coupled, it is extremely difficult to modify them. Additionally, extensibility, code reuse, and testability of such applications pose a challenge.
+
+In the sections that follow, we'll look at how we can leverage **dependency injection** and ***inversion of control*** to build loosely coupled, extensible, and testable systems.
+
+## **What is dependency injection (DI)?**
+
+Dependency injection removes the strong coupling between objects, allowing objects and the applications that use them to be more flexible, reusable, and testable. It facilitates the creation of loosely coupled objects and their dependencies.
+
+***The basic principle behind dependency injection is to separate the implementation of an object from the creation of the objects it relies on.***
+
+The different ways **DI** can be implemented are:
+
+* Injection by **Manufacturer**,
+* Injection by **Setter/Getter**,
+* **Interface** injection,
+* The **service locator**
+
+### **Advantages and disadvantages of dependency injection**
+
+The dependency injection model facilitates the design and implementation of **frameworks**, loosely coupled **components**. Because it abstracts and isolates class dependencies, the source code becomes more testable.
+
+*The main disadvantage of dependency injection is that interconnecting instances can become a real headache if there are too many instances and dependencies to manage.*
+
+## **What is Inversion of Control (IoC)?**
+
+Inversion of control promotes loose coupling between application components. If your application's components are loosely coupled, you have greater reusability, easier maintainability, and you can easily have mock objects.
+
+Dependency injection is a widely used design pattern for designing and implementing loosely coupled components, frameworks, and software. ***Note that if IoC is an architectural principle or pattern, DI is a way to implement IoC.***
+
+We can inject dependencies into our classes by simply providing them at creation time. *When we have many classes, each with their own set of dependencies, this can become cumbersome. **This is precisely where an inversion of control container can help us.***
+
+### **Benefits of IoC**
+
+The main advantage of **IoC** is that classes are no longer dependent on each other. For example, the class of the **consumer** will no longer depend on the class of the **consumed** and changes in one will not affect the other. Thus, **IoC** will make your design adaptable to changes. Another advantage is that you can isolate your code when creating unit tests. Basically, **IoC** promotes loose coupling and allows your classes to be more easily testable.
+
+## **Implementing Inversion of Control in Java**
+
+Consider the following classes:
+
+**User.java**
+
+```java
+public class Utilisateur {
+    private String nom;
+    private Adresse adresse;
+    // code
+}
+```
+
+**Address.java**
+
+```java
+public class Adresse {
+    private String pays;
+    private String ville;
+    // code
+}
+```
+
+As you can see in the code example above, the **User** class contains an instance of the **Address** class. Now, if the **Address** class changes, the **User** class must also be recompiled, because it contains a reference to the **Address** class. The **User** class here controls the creation of the **Address** class and knows its type. ***This is an example of strong coupling between classes.***
+
+The solution to this problem is **IoC**. We need to *invert control*, just move the instance creation of the **Address** class to another class. Let's say we have a **Factory** that creates instances and returns them.
+
+```java
+public class ObjectFactory {
+    public static Adresse adresse() {
+        // code
+        return new Adresse();
+    }
+}
+```
+
+The main principles that guide **IoC** are that *classes aggregating other classes should not depend on the direct implementation of the aggregated classes*. *They must rather depend on abstraction*. In the code example we just discussed, the **User** class should not depend on the **Address** class, but rather an abstraction using an interface or abstract class to obtain the instance of the **Address** class.
+
+Another key point to keep in mind is that abstraction should not depend on details; rather, details should depend on abstractions. Note that we can implement **IoC** in different ways.
+
+### **Use a constructor**
+
+If we need to inject the dependency using the constructor, we can simply have a constructor that takes a reference of the **Address** class as a parameter, as shown in the code example below:
+
+```java
+public class Utilisateur {
+    private String nom;
+    private Adresse adresse;
+
+    public Utilisateur(Adresse adresse) {
+        this.adresse = adresse;
+    }
+    // code
+}
+```
+
+### **Use an interface**
+
+When implementing interface-based Dependency Injection for our example, we need an interface instead of the **Address** class that would be used in the parameter of the **setAddress** method. This interface will be implemented by the **Address** class. We can name this interface **IContact** because all addresses are contacts, that is, in our example we are processing the contact details of a user.
+
+**IContact.java**
+
+```
+public interface IContact{
+    // code
+}
+```
+
+```java
+public class Adresse implements IContact{
+    // code
+}
+```
+
+```java
+public class Utilisateur {
+    private String nom;
+    private IContact adresse;
+
+    public void setAdresse(IContact adresse) {
+        this.adresse = adresse;
+    }
+}
+```
+
+### **Using a service locator**
+
+You can also implement **IoC** using a service locator. The service locator pattern relies on a strong abstraction layer to encapsulate the mechanism for acquiring a service instance. In the service locator pattern, you typically have an object that knows how to retrieve all the services your application may need.
+
+We will now have a **ContactsService** which has a method called **objectAddress**.
+
+```java
+public class ContactsService {
+    private static IContact adresse = null;
+    public static IContact objectAdresse () {
+        // Un peu de code pour localiser le bon objet Adresse
+        return adresse;
+    }
+}
+```
+
+```java
+public class Utilisateur {
+    private IContact address = ContactsService.objectAdresse();
+    // code
+}
+```
+
+**You can leverage inversion of control to improve code modularity, reduce code duplication, and simplify testing. Although it is useful for creating reusable libraries, it is not appropriate in all scenarios.**
+
+#### **Summary**
+
+***Inversion of control is a generic term. Instead of the application calling a framework's methods, the framework calls the implementations provided by the application. Dependency injection is a form of inversion of control, in which implementations are passed to an object through constructors, parameters, or service lookups, on which the object will "depend" to behave correctly. Dependency injection frameworks are designed to use dependency injection and can define interfaces to make it easier to pass through implementations.***
+
+> *Inversion of control (**IoC**) and dependency injection (**DI**) are used to remove dependencies from an application. This makes the system more decoupled and easier to maintain. Dependency Injection (**DI**) is a design pattern that shows how to create loosely coupled classes. The Dependency Injection (**DI**) model uses a constructor object to initialize objects and provide required dependencies to the object, which means it allows developers to inject a dependency from outside the class*.
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our videos **#autourducode** on our YouTube channel:**https://bit.ly/3IwIK04**

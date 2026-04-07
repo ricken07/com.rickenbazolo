@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
-import { PostCard } from "@/components/blog/PostCard";
 import { getAllPosts } from "@/lib/blog/getAllPosts";
 import type { BlogPost } from "@/lib/blog/types";
 import { BubbleGallery } from "@/components/gallery/BubbleGallery";
 import { NewsletterInlineForm } from "@/components/newsletter/NewsletterInlineForm";
+import youtubeVideos from "@/content/videos/youtube-videos.json";
+import { PostCard } from "@/components/blog/PostCard";
 
 const heroSocials = [
   { name: "GitHub", href: "https://github.com/rickenbazolo", icon: GitHubIcon },
@@ -26,15 +27,15 @@ const galleryImages = [
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const posts = await getAllPosts(locale);
-  const latestPosts = posts.slice(0, 4);
+  const latestPosts = posts.slice(0, 3);
 
   return (
     <main className="py-8 md:py-16">
       <Container className="space-y-16 md:space-y-24">
         {/* HERO - Redesign avec impact visuel (adaptatif light/dark) */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0693e3]/5 via-card to-[#0693e3]/10 px-8 py-16 dark:from-[#273171] dark:via-[#3d4a8f] dark:to-[#0693e3]/20 md:py-24">
+        <section className="relative overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-br from-background via-card to-card px-8 py-16 shadow-sm md:py-24 dark:from-background dark:via-card dark:to-card">
           {/* Background Pattern */}
-          <div className="pointer-events-none absolute inset-0 opacity-5 dark:opacity-10">
+          <div className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.05]">
             <div className="absolute inset-0" style={{
               backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
               backgroundSize: '32px 32px'
@@ -42,36 +43,32 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
 
           {/* Animated Blobs */}
-          <div className="blob absolute -left-20 top-10 h-64 w-64 rounded-full bg-[#0693e3]/20 dark:bg-[#0693e3]/30" />
-          <div className="blob blob-delayed absolute -right-16 -top-20 h-80 w-80 rounded-full bg-[#273171]/5 dark:bg-white/10" />
+          <div className="blob absolute -left-24 top-12 h-64 w-64 rounded-full bg-[#0693e3]/8 dark:bg-[#0693e3]/10" />
+          <div className="blob blob-delayed absolute -right-20 -top-24 h-80 w-80 rounded-full bg-[#1a1d2e]/[0.04] dark:bg-white/[0.05]" />
 
           {/* Content */}
           <div className="relative z-10 mx-auto max-w-4xl space-y-8 text-center">
             <div className="fade-in-up space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#0693e3]/30 bg-[#0693e3]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#0693e3] backdrop-blur-sm dark:border-white/20 dark:bg-white/10 dark:text-white/90">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#0693e3] opacity-75"></span>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#0693e3]"></span>
-                </span>
-                {locale === "fr" ? "Disponible pour freelance" : "Available for freelance"}
-              </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground">
+                {locale === "fr" ? "Java, IA, plateforme" : "Java, AI, platform"}
+              </p>
 
               <h1 className="font-heading text-5xl font-bold leading-tight text-foreground md:text-7xl">
                 {locale === "fr" ? (
                   <>
-                    Technologue <span className="bg-gradient-to-r from-[#0693e3] to-[#273171] bg-clip-text text-transparent dark:from-[#0693e3] dark:to-white">Java & IA</span>
+                    Technologue <span className="text-accent">Java & IA</span>
                   </>
                 ) : (
                   <>
-                    Java & AI <span className="bg-gradient-to-r from-[#0693e3] to-[#273171] bg-clip-text text-transparent dark:from-[#0693e3] dark:to-white">Technologist</span>
+                    Java & AI <span className="text-accent">Technologist</span>
                   </>
                 )}
               </h1>
 
               <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
                 {locale === "fr"
-                  ? "Développeur full stack, mentor et conférencier avec 10+ ans d'expérience. Je construis des solutions IA et accompagne les équipes tech."
-                  : "Full-stack developer, mentor, and speaker with 10+ years of experience. I build AI solutions and help tech teams grow."}
+                  ? "Technologue Java senior, développeur full-stack et tech entrepreneur. Je conçois des architectures modernes, intègre des LLM dans les applications métier et accompagne les développeurs à travers la formation et le mentoring."
+                  : "Senior Java technologist, full-stack developer and tech entrepreneur. I design modern architectures, integrate LLMs into business applications, and support developers through training and mentoring."}
               </p>
             </div>
 
@@ -79,7 +76,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href={`/${locale}/blog`}
-                className="group inline-flex items-center gap-2 rounded-full bg-[#0693e3] px-8 py-3.5 font-semibold text-white shadow-lg shadow-[#0693e3]/30 transition hover:scale-105 hover:bg-[#0576c2] hover:shadow-xl hover:shadow-[#0693e3]/40"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#0693e3] px-8 py-3.5 font-semibold text-white shadow-md shadow-[#0693e3]/25 transition hover:scale-[1.01] hover:bg-[#0576c2] hover:shadow-lg hover:shadow-[#0693e3]/30"
               >
                 {locale === "fr" ? "Lire le blog" : "Read the blog"}
                 <svg className="h-4 w-4 transition group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,7 +86,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
               <Link
                 href={`/${locale}/about`}
-                className="inline-flex items-center gap-2 rounded-full border-2 border-[#0693e3]/30 bg-[#0693e3]/10 px-8 py-3 font-semibold text-foreground backdrop-blur-sm transition hover:border-[#0693e3]/50 hover:bg-[#0693e3]/20 dark:border-white/30 dark:bg-white/10 dark:text-white dark:hover:border-white/50 dark:hover:bg-white/20"
+                className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/70 px-8 py-3 font-semibold text-foreground backdrop-blur-sm transition hover:border-accent/40 hover:bg-card"
               >
                 {locale === "fr" ? "En savoir plus" : "Learn more"}
               </Link>
@@ -104,7 +101,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   target="_blank"
                   rel="noreferrer"
                   aria-label={name}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card/50 text-muted-foreground backdrop-blur-sm transition hover:-translate-y-1 hover:border-accent hover:bg-accent/20 hover:text-accent hover:shadow-lg hover:shadow-accent/20 dark:border-white/20 dark:bg-white/5 dark:text-white/70"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border/80 bg-background/65 text-muted-foreground backdrop-blur-sm transition hover:-translate-y-1 hover:border-accent/40 hover:bg-card hover:text-accent"
                 >
                   <Icon className="h-5 w-5" />
                 </a>
@@ -113,89 +110,86 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
         </section>
 
-        {/* LATEST ARTICLES - Grille asymétrique */}
+        {/* LATEST ARTICLES ─────────────────────────────────────────── */}
         <section className="space-y-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-accent">{locale === "fr" ? "Blog" : "Blog"}</p>
-              <h2 className="font-heading text-3xl font-bold md:text-4xl">{locale === "fr" ? "Derniers articles" : "Latest articles"}</h2>
+              <p className="text-sm font-semibold uppercase tracking-wider text-accent">
+                Blog
+              </p>
+              <h2 className="font-heading text-3xl font-bold md:text-4xl">
+                {locale === "fr" ? "Derniers articles" : "Latest articles"}
+              </h2>
             </div>
             <Link
               href={`/${locale}/blog`}
               className="group inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-accent"
             >
               {locale === "fr" ? "Tout voir" : "View all"}
-              <svg className="h-4 w-4 transition group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <svg
+                className="h-4 w-4 transition group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
               </svg>
             </Link>
           </div>
-          {latestPosts.length ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {/* Featured Post - Large */}
-              {latestPosts[0] && (
-                <article className="hover-lift group relative col-span-full overflow-hidden rounded-2xl border border-border bg-card transition lg:col-span-2 lg:row-span-2">
-                  <Link href={`/${locale}/blog/${latestPosts[0].slug}`} className="block p-8">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <time>{new Date(latestPosts[0].publishedAt).toLocaleDateString(locale)}</time>
-                        {latestPosts[0].readingTime && <span>• {latestPosts[0].readingTime} min</span>}
-                      </div>
-                      <h3 className="font-heading text-3xl font-bold leading-tight transition group-hover:text-accent md:text-4xl">
-                        {latestPosts[0].title}
-                      </h3>
-                      {latestPosts[0].excerpt && (
-                        <p className="text-lg leading-relaxed text-muted-foreground">{latestPosts[0].excerpt}</p>
-                      )}
-                      {latestPosts[0].tags && latestPosts[0].tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2 pt-2">
-                          {latestPosts[0].tags.slice(0, 3).map((tag) => (
-                            <span
-                              key={tag}
-                              className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                </article>
-              )}
 
-              {/* Regular Posts - Smaller */}
-              {latestPosts.slice(1).map((post: BlogPost) => (
-                <article key={post.slug} className="hover-lift group relative overflow-hidden rounded-2xl border border-border bg-card transition">
-                  <Link href={`/${locale}/blog/${post.slug}`} className="block p-6">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <time>{new Date(post.publishedAt).toLocaleDateString(locale)}</time>
-                        {post.readingTime && <span>• {post.readingTime} min</span>}
-                      </div>
-                      <h3 className="font-heading text-xl font-bold leading-tight transition group-hover:text-accent">
-                        {post.title}
-                      </h3>
-                      {post.excerpt && (
-                        <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">{post.excerpt}</p>
-                      )}
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {post.tags.slice(0, 2).map((tag) => (
-                            <span key={tag} className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                </article>
+          {latestPosts.length ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latestPosts.map((post: BlogPost) => (
+                <PostCard key={post.slug} post={post} locale={locale} />
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">{locale === "fr" ? "Aucun article pour le moment." : "No articles yet."}</p>
+            <p className="text-sm text-muted-foreground">
+              {locale === "fr"
+                ? "Aucun article pour le moment."
+                : "No articles yet."}
+            </p>
           )}
+        </section>
+
+        {/* VIDEOS - Section éditoriale YouTube */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wider text-accent">
+                YouTube
+              </p>
+              <h2 className="font-heading text-3xl font-bold md:text-4xl">
+                {locale === "fr" ? "Vidéos récentes" : "Recent videos"}
+              </h2>
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {youtubeVideos.map((video) => (
+              <div
+                key={video.id}
+                className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm"
+              >
+                <div className="aspect-video">
+                  <iframe
+                    className="h-full w-full"
+                    src={`https://www.youtube.com/embed/${video.id}`}
+                    title={video.title}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* NEWSLETTER - Redesign moderne */}
@@ -205,7 +199,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
           <div className="relative z-10 mx-auto max-w-2xl space-y-6 text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#0693e3]/20 bg-[#0693e3]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#0693e3]">
-              📬 Newsletter
+              Newsletter
             </div>
 
             <h3 className="font-heading text-3xl font-bold md:text-4xl">
@@ -231,7 +225,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </section>
 
         {/* GALLERY - Redesign moderne */}
-        <section className="space-y-6">
+        <section className="space-y-6 hidden">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-wider text-accent">

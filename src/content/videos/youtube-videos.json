@@ -1,0 +1,26 @@
+[
+  {
+    "id": "BqcQpj-WC2w",
+    "title": "Sécuriser une application Spring Boot 3 avec Spring Security 6 | Authentification et Autorisations",
+    "url": "https://youtu.be/BqcQpj-WC2w",
+    "thumbnailUrl": "https://i.ytimg.com/vi/BqcQpj-WC2w/hqdefault.jpg"
+  },
+  {
+    "id": "eXGEputG9Bc",
+    "title": "Comprendre le @ControllerAdvice de Spring | Intercepter les exceptions de vos contrôleurs | API",
+    "url": "https://www.youtube.com/watch?v=eXGEputG9Bc",
+    "thumbnailUrl": "https://i.ytimg.com/vi/eXGEputG9Bc/hqdefault.jpg"
+  },
+  {
+    "id": "Zzjn_Jz-A2E",
+    "title": "Création d'une API REST avec Spring Boot | Projet CRUD Spring Boot, Spring Data/Hibernate, MySQL",
+    "url": "https://youtu.be/Zzjn_Jz-A2E",
+    "thumbnailUrl": "https://i.ytimg.com/vi/Zzjn_Jz-A2E/hqdefault.jpg"
+  },
+  {
+    "id": "XlhPUMgzdnY",
+    "title": "Réessayer l'appel à une méthode | Résilience | API | Spring Retry",
+    "url": "https://www.youtube.com/watch?v=XlhPUMgzdnY",
+    "thumbnailUrl": "https://i.ytimg.com/vi/XlhPUMgzdnY/hqdefault.jpg"
+  }
+]

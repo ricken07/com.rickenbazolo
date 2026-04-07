@@ -1,0 +1,53 @@
+---
+title: "Différence entre Hibernate et JPA"
+slug: "difference-entre-hibernate-et-jpa"
+language: "fr"
+publishedAt: "2023-02-28"
+tags: ["hibernate", "java", "jpa"]
+readingTime: 3
+excerpt: "Parlons d’Hibernate et de la JPA."
+status: "published"
+---
+
+Aujourd’hui, nous allons parler d’**Hibernat**e et de la **JPA**.
+
+## **C’est quoi Hibernate ?**
+
+**Hibernate** est un framework connu sous le nom de **Hibernate ORM framework**. Hibernate, connu sous le nom de **Hibernate ORM**, est un framework conçu par Red Hat. Sa sortie initiale a eu lieu le 23 mai 2007 ; il s’agit d’un **outil de mappage objet-relationnel** pour le langage Java. Il est écrit en Java et prend en charge une JVM multiplateforme. *Sa licence est sous GNU Lesser General Public*.
+
+Les principales fonctionnalités d’Hibernate consistent à mapper les classes Java aux tables de la base de données. Certaines fonctionnalités clés d’Hibernate sont données ci-dessous :
+
+* Il s’agit d’une mise en œuvre des directives de la JPA (ou encore une implémentation de la JPA)
+* Il aide à mapper les classes Java aux tables de base de données et les types de données Java aux types de données SQL.
+* Hibernate est le fournisseur de la JPA.
+
+## C’est quoi JPA ?
+
+**JPA** pour **Java Persistence API**, est en fait connu sous le nom de **Java Persistence Application Programming Interface** OU **Java Application Programming Interface**, est utilisé pour gérer les données relationnelles. JPA est essentiellement une spécification. Elle traite des métadonnées objet ou relationnelles. Le langage du JPA est le JPQL (Java Persistence Query Language).
+
+La version initiale de JPA a eu lieu le 11 mai 2006. Certaines fonctionnalités clés de JPA sont indiquées ci-dessous :
+
+* **JPA** n’est pas une implémentation ; ce n’est qu’une spécification (un cahier des charges)
+* Il s’agit d’un ensemble de règles et de lignes directrices (guidelines) pour la définition d’interfaces, pour l’implémentation du mappage objet-relationnel.
+* Il nécessite un petit nombre de classes et d’interfaces.
+* Il prend en charge un mappage objet-relationnel plus simple, plus propre et standardisé.
+* Il prend en charge le polymorphisme et l’héritage.
+* Dans ce cas, des requêtes dynamiques et nommées peuvent être ajoutées.
+
+> En une ligne, si nous voulons définir Hibernate et JPA, nous pouvons dire qu’Hibernate implémente toutes les directives (guidelines JPA.
+
+### **Comparaison directe entre Hibernate et JPA**
+
+Vous trouverez ci-dessous le top des différences entre Hibernate et JPA :
+
+| Hibernate | JPA |
+| --- | --- |
+| Hibernate est un framework de mappage objet-relationnel qui aide à gérer la persistance des données. | C’est la spécification Java pour gérer l’application Java avec des données relationnelles. |
+| C’est l’un des meilleurs fournisseurs JPA. | C’est la seule spécification qui ne traite d’aucune implémentation. |
+| En cela, nous utilisons Session pour gérer la persistance dans une application. | En cela, nous utilisons le gestionnaire d’entités. |
+| Il est utilisé pour mapper les types de données Java avec les tables de base de données et les types de données SQL. | C’est l’API standard qui permet aux développeurs d’effectuer des opérations de base de données. |
+| Le langage de requête dans ce cas est Hibernate Query Language. | Le langage de requête de JPA est JPQL (Java Persistence Query Language) |
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos **#autourducode** sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

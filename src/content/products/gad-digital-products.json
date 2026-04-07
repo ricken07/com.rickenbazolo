@@ -1,23 +1,51 @@
 [
   {
-    "slug": "spring-ai-paris",
-    "title": "Industrialiser Spring AI",
-    "event": "Spring I/O Paris",
-    "location": "Paris, France",
-    "date": "2024-10-12",
-    "language": "fr",
-    "tags": ["Spring", "AI"],
-    "slidesUrl": "https://speakerdeck.com/rickenbazolo/spring-ai",
-    "videoUrl": "https://youtube.com/watch?v=dummy"
+    "slug": "emi-ai",
+    "name": "EMI AI",
+    "tagline": "AI-first educational platform",
+    "description": {
+      "fr": "Plateforme éducative IA-first qui personnalise les parcours d'apprentissage grâce à l'intelligence artificielle. Conçue pour les organisations souhaitant former leurs équipes à l'ère de l'IA.",
+      "en": "AI-first educational platform that personalizes learning journeys through artificial intelligence. Designed for organizations looking to train their teams in the AI era."
+    },
+    "techStack": ["Java", "Spring AI", "LangChain4j", "React", "PostgreSQL"],
+    "websiteUrl": "https://emi.gad.digital",
+    "featured": true
   },
   {
-    "slug": "ai-governance-london",
-    "title": "AI Governance for Builders",
-    "event": "GraphQL Conf",
-    "location": "London, UK",
-    "date": "2024-06-18",
-    "language": "en",
-    "tags": ["AI", "Governance"],
-    "slidesUrl": "https://speakerdeck.com/rickenbazolo/ai-governance"
+    "slug": "oukaley",
+    "name": "Oukaley",
+    "tagline": "Smart workflow automation",
+    "description": {
+      "fr": "Outil d'automatisation des workflows métier avec une approche IA-first. Oukaley permet aux équipes de modéliser, exécuter et optimiser leurs processus sans code complexe.",
+      "en": "Business workflow automation tool with an AI-first approach. Oukaley enables teams to model, run, and optimize their processes without complex code."
+    },
+    "techStack": ["Java", "Spring Boot", "Kubernetes", "React"],
+    "websiteUrl": "https://oukaley.gad.digital",
+    "featured": false
+  },
+  {
+    "slug": "haraka-payment",
+    "name": "Haraka Payment",
+    "tagline": "Fast & secure payment infrastructure",
+    "description": {
+      "fr": "Infrastructure de paiement rapide et sécurisée conçue pour les marchés émergents. Haraka Payment offre une API simple pour intégrer les paiements mobile money et carte.",
+      "en": "Fast and secure payment infrastructure designed for emerging markets. Haraka Payment provides a simple API to integrate mobile money and card payments."
+    },
+    "techStack": ["Java", "Spring Boot", "Kafka", "PostgreSQL", "Redis"],
+    "websiteUrl": "https://haraka.gad.digital",
+    "featured": true
+  },
+  {
+    "slug": "digi-resto",
+    "name": "Digi-Resto",
+    "tagline": "Digital menu & ordering for restaurants",
+    "description": {
+      "fr": "Solution de menu digital et de commande en ligne pour les restaurants. Digi-Resto propose un QR code intelligent, une gestion des commandes en temps réel et une intégration caisse.",
+      "en": "Digital menu and online ordering solution for restaurants. Digi-Resto offers a smart QR code, real-time order management, and POS integration."
+    },
+    "techStack": ["Next.js", "TypeScript", "Spring Boot", "PostgreSQL"],
+    "websiteUrl": "https://digi-resto.gad.digital",
+    "featured": false
   }
 ]
+

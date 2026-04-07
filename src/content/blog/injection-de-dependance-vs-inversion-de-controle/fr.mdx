@@ -1,0 +1,179 @@
+---
+title: "Injection de dépendance VS Inversion de contrôle"
+slug: "injection-de-dependance-vs-inversion-de-controle"
+language: "fr"
+publishedAt: "2023-02-09"
+tags: ["architecture", "java"]
+readingTime: 6
+excerpt: "L’injection de dépendance (DI) et l’inversion de contrôle (IoC) sont deux modèles d’architecture les plus importants et les plus populaires. Il existe un malentendu très répandu concernant la distinction entre l’injection de dépendances et l’inversion de contrôle. Ces deux idées sont souvent mal comprises."
+status: "published"
+---
+
+**L’injection de dépendance (DI)** et **l’inversion de contrôle (IoC)** sont deux modèles d’architecture les plus importants et les plus populaires. Il existe un malentendu très répandu concernant la distinction entre l’injection de dépendances et l’inversion de contrôle. Ces deux idées sont souvent mal comprises.
+
+**L’inversion de contrôle** est un concept de conception qui permet d’inverser la création d’objets dépendants. À l’inverse, **l’injection de dépendances**, un modèle architectural logiciel, est une implémentation du principe d’inversion de contrôle.
+
+***Cet article parle des deux modèles avec un exemple de code pour illustrer les concepts abordés.***
+
+## **Qu’est-ce que le couplage en Java ?**
+
+De manière générale, le couplage d’objets est de deux types :
+
+* **Le couplage faible ;** Lorsqu’un objet est faiblement couplé à un autre objet, le couplage peut être facilement modifié
+* **Le couplage fort** ; Lorsque le couplage est fort, les objets ne sont pas réutilisables indépendamment et, par conséquent, difficiles à utiliser.
+
+Lorsque les composants d’une application sont fortement couplés, il est extrêmement difficile de les modifier. En outre, l’extensibilité, la réutilisation du code et la testabilité de telles applications constituent un défi.
+
+Dans les sections qui suivent, nous examinerons comment nous pouvons tirer parti de *l**‘injection de dépendance*** et de ***l’inversion de contrôle*** pour construire des systèmes faiblement couplés, extensibles et testables.
+
+## **Qu’est-ce que l’injection de dépendance (DI) ?**
+
+L’injection de dépendances supprime le couplage fort entre les objets, ce qui permet aux objets et aux applications qui les utilisent d’être plus flexibles, réutilisables et testables. Elle facilite la création d’objets faiblement couplés et de leurs dépendances.
+
+***Le principe de base sous-jacent à l’injection de dépendance est de séparer l’implémentation d’un objet de la création des objets sur lesquels il repose.***
+
+Les différentes façons dont le **DI** peut être implémenté sont :
+
+* L’injection par **Constructeur**,
+* L’injection par **Setter/Getter**,
+* L’injection **d’Interface**,
+* Le **localisateur de service**
+
+### **Avantages et inconvénients de l’injection de dépendances**
+
+Le modèle d’injection de dépendance facilite la conception et l’implémentation de **frameworks**, de **composants** faiblement couplés. Parce qu’il abstrait et isole les dépendances de classe, le code source devient plus testable.
+
+*Le principal inconvénient de l’injection de dépendances est que l’interconnexion des instances peut devenir un véritable casse-tête s’il y a trop d’instances et de dépendances à gérer.*
+
+## **Qu’est-ce que l’inversion de contrôle (IoC) ?**
+
+L’inversion de contrôle favorise un couplage faible entre les composants de l’application. Si les composants de votre application sont faiblement couplés, vous avez une plus grande réutilisabilité, une maintenabilité plus facile et vous pouvez facilement avoir des objets fictifs.
+
+L’injection de dépendance est un modèle de conception largement utilisé pour concevoir et implémenter des composants, des frameworks et des logiciels faiblement couplés. ***Notez que si IoC est un principe ou un modèle architectural, DI est un moyen d’implémenter IoC.***
+
+Nous pouvons injecter des dépendances dans nos classes en les fournissant simplement au moment de la création. *Lorsque nous avons de nombreuses classes, chacune avec son propre ensemble de dépendances, cela peut devenir encombrant. **C’est précisément là qu’un conteneur d’inversion de contrôle peut nous aider.***
+
+### **Avantages de IoC**
+
+Le principal avantage de l’**IoC** est que les classes ne sont plus dépendantes les unes des autres. Par exemple, la classe du **consommateur** ne dépendra plus de la classe du **consommé** et les changements dans l’une n’affecteront pas l’autre. Ainsi, l’**IoC** rendra votre conception adaptable aux changements. Un autre avantage est que vous pouvez isoler votre code lors de la création de tests unitaires. En gros, l’**IoC** favorise le couplage faible et permet à vos classes d’être plus facilement testables.
+
+## **Implémentation de l’inversion de contrôle en Java**
+
+Considérez les classes suivantes :
+
+**Utilisateur.java**
+
+```java
+public class Utilisateur {
+    private String nom;
+    private Adresse adresse;
+    // code
+}
+```
+
+**Adresse.java**
+
+```java
+public class Adresse {
+    private String pays;
+    private String ville;
+    // code
+}
+```
+
+Comme vous pouvez le voir dans l’exemple de code ci-dessus, la classe **Utilisateur** contient une instance de la classe **Adresse**. Maintenant, si la classe **Adresse** change, la classe **Utilisateur** doit également être recompilée, car elle contient une référence à la classe **Adresse**. La classe **Utilisateur** contrôle ici la création de la classe **Adresse** et en connaît le type. ***C’est un exemple de couplage fort entre les classes.***
+
+La solution à ce problème est **IoC**. Nous devons *inverser le contrôle*, il suffit de déplacer la création de l’instance de la classe **Adresse** vers une autre classe. Disons que nous avons une **Factory** qui crée des instances et les renvoie.
+
+```java
+public class ObjectFactory {
+    public static Adresse adresse() {
+        // code
+        return new Adresse();
+    }
+}
+```
+
+Les grands principes qui guident l’**IoC** sont que *les classes agrégeant d’autres classes ne doivent pas dépendre de l’implémentation directe des classes agrégées*. *Elles doivent plutôt dépendre de l’abstraction*. Dans l’exemple de code dont nous venons de parler, la classe **Utilisateur** ne devrait pas dépendre de la classe **Adresse**, mais plutôt d’une abstraction utilisant une interface ou une classe abstraite pour obtenir l’instance de la classe **Adresse**.
+
+Un autre point clé à garder à l’esprit est que l’abstraction ne doit pas dépendre des détails ; les détails devraient plutôt dépendre d’abstractions. Notez que nous pouvons implémenter **IoC** de différentes manières.
+
+### **Utiliser un constructeur**
+
+Si nous devons injecter la dépendance à l’aide du constructeur, nous pouvons simplement avoir un constructeur qui prend une référence de la classe **Adresse** comme paramètre, comme indiqué dans l’exemple de code ci-dessous :
+
+```java
+public class Utilisateur {
+    private String nom;
+    private Adresse adresse;
+
+    public Utilisateur(Adresse adresse) {
+        this.adresse = adresse;
+    }
+    // code
+}
+```
+
+### **Utiliser une interface**
+
+Lors de l’implémentation de l**‘Injection de dépendances** basée sur l’interface pour notre exemple, nous avons besoin d’une interface à la place de la classe **Adresse** qui serait utilisée dans le paramètre de la méthode **setAdresse**. Cette interface sera implémentée par la classe **Adresse**. Nous pouvons nommer cette interface **IContact** car toutes les adresses sont des contacts, c’est-à-dire que dans notre exemple, nous traitons les coordonnées d’un utilisateur.
+
+**IContact.java**
+
+```
+public interface IContact{
+    // code
+}
+```
+
+```java
+public class Adresse implements IContact{
+    // code
+}
+```
+
+```java
+public class Utilisateur {
+    private String nom;
+    private IContact adresse;
+
+    public void setAdresse(IContact adresse) {
+        this.adresse = adresse;
+    }
+}
+```
+
+### **Utilisation d’un localisateur de service**
+
+Vous pouvez également mettre en œuvre l’**IoC** en utilisant un localisateur de services. Le modèle de localisateur de services s’appuie sur une couche d’abstraction solide pour encapsuler le mécanisme d’acquisition d’une instance de service. Dans le modèle de localisateur de services, vous avez généralement un objet qui sait comment récupérer tous les services dont votre application peut avoir besoin.
+
+Nous aurons maintenant un **ContactsService** qui a une méthode appelée **objectAdresse**.
+
+```java
+public class ContactsService {
+    private static IContact adresse = null;
+    public static IContact objectAdresse () {
+        // Un peu de code pour localiser le bon objet Adresse
+        return adresse;
+    }
+}
+```
+
+```java
+public class Utilisateur {
+    private IContact address = ContactsService.objectAdresse();
+    // code
+}
+```
+
+**Vous pouvez tirer parti de l’inversion de contrôle pour améliorer la modularité du code, réduire la duplication de code et simplifier les tests. Même s’il est utile pour créer des bibliothèques réutilisables, il n’est pas approprié dans tous les scénarios.**
+
+#### **Résumé**
+
+***L’inversion de contrôle est un terme générique. Au lieu que l’application appelle les méthodes d’un framework, le framework appelle les implémentations fournies par l’application. L’injection de dépendances est une forme d’inversion de contrôle, dans laquelle des implémentations sont transmises à un objet par le biais de constructeurs, de paramètres ou de recherches de services, dont l’objet « dépendra » pour se comporter correctement. Les frameworks d’injection de dépendances sont conçus pour utiliser l’injection de dépendances et peuvent définir des interfaces pour faciliter le passage des implémentations.***
+
+> *L’inversion de contrôle (**IoC**) et l’injection de dépendances (**DI**) sont utilisées pour supprimer les dépendances d’une application. Cela rend le système plus découplé et plus facile à maintenir. L’injection de dépendances (**DI**) est un modèle de conception qui montre comment créer des classes faiblement couplées. Le modèle d’injection de dépendances (**DI**) utilise un objet constructeur pour initialiser les objets et fournir les dépendances requises à l’objet, ce qui signifie qu’il permet aux développeurs d’injecter une dépendance depuis l’extérieur de la classe*.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos **#autourducode** sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

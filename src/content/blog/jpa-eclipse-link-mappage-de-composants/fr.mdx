@@ -7,22 +7,15 @@ tags: ["eclipselink", "hibernate", "java", "jpa", "persistence"]
 readingTime: 4
 excerpt: "Dans cet exemple, nous allons apprendre le Component Mapping en utilisant les annotations JPA . Component Mapping représente la relation has-a , la composition est une association plus forte où l’objet contenu n’a pas d’existence propre. Par exemple, un élève a une adresse, une adresse ne peut exist"
 status: "published"
-canonical: "https://autourducode.net/java/jpa-eclipse-link-mappage-de-composants/"
 ---
 
 Dans cet exemple, nous allons apprendre le ***Component Mapping*** en utilisant les annotations **JPA**. ***Component Mapping*** représente la relation ***has-a***, la composition est une association plus forte où l’objet contenu n’a pas d’existence propre. Par exemple, un élève a une adresse, une adresse ne peut exister séparément sans élève. Comme les entités **Eleve** et **Adresse** sont fortement liées, il est préférable de les stocker dans une **seule table**.
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-10-à-01.43.11-1024x348.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-10-à-01.43.11.png)
 
 ### **Créez un projet Java « JpaComponentMapping »**
 
 ### **Structure des dossiers :**
 
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-21.46.57.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-21.46.57.png)
-
 ### Librairies
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-21.00.54.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-21.00.54.png)
 
 ### Créer les classes Java :
 
@@ -191,8 +184,6 @@ Thread(Thread[main,5,main])--CREATE TABLE eleve (ID BIGINT AUTO_INCREMENT NOT NU
 ```
 
 Les colonnes **CODE_POSTAL** et **RUE** de la classe **EleveAdresse** utilisée comme un **composant** ont été intégrés dans la table « **eleve**«
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-22.20.27.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décran-2022-07-17-à-22.20.27.png)
 
 J’espère que cet article vous a été utile. Merci de l’avoir lu.
 

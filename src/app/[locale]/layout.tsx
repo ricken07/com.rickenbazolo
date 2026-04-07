@@ -11,8 +11,8 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 const siteName = "Ricken Bazolo";
 const baseUrl = "https://rickenbazolo.dev";
 const localeDescriptions: Record<string, string> = {
-    fr: "Blog personnel bilingue (FR/EN) de Ricken Bazolo : Java, IA, open source, produits Gad Digital et conférences.",
-    en: "Ricken Bazolo's bilingual (FR/EN) blog: Java, AI, open source, Gad Digital products, and speaking.",
+    fr: "Blog personnel bilingue (FR/EN) de Ricken Bazolo : Java, IA, open source et produits Gad Digital.",
+    en: "Ricken Bazolo's bilingual (FR/EN) blog: Java, AI, open source, and Gad Digital products.",
 };
 
 export async function generateMetadata({

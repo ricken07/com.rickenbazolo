@@ -7,7 +7,6 @@ tags: ["java", "jpa", "spring", "spring-boot"]
 readingTime: 3
 excerpt: "In this article, I would like to share how to get rid of the warning saying “WebSecurityConfigurerAdapter is deprecated” in a Spring based application with Spring Security."
 status: "published"
-canonical: "https://autourducode.net/spring/spring-security-websecurityconfigureradapter-deprecated/"
 ---
 
 In this article, I would like to share how to get rid of the warning saying "**WebSecurityConfigurerAdapter is deprecated**" in a **Spring** based application with **Spring Security**.
@@ -36,8 +35,6 @@ public void configure(WebSecurity web) throws Exception {
 ```
 
 This works well with ***Spring Security version 5.6.5 or earlier***, or with ***Spring Boot version 2.6.8 or earlier***.However, if your project uses ***Spring Security 5.7.1 or newer***, or ***Spring Boot 2.7.0 or newer***, you will get this warning in your IDE:
-
-[![](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-22.15.24-1024x47.png)](https://autourducode.net/wp-content/uploads/2022/07/Capture-décr-2022-07-25-à-22.15.24.png)
 
 Warning
 

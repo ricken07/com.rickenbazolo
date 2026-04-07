@@ -1,0 +1,619 @@
+---
+title: "Toon4j: Reduce your LLM token costs by 30 to 70% with Java"
+slug: "toon4j-reduisez-vos-couts-de-token"
+language: "en"
+publishedAt: "2025-11-28"
+tags: ["ia", "llm"]
+readingTime: 7
+excerpt: "In the era of language models (LLMs), every token counts. Whether we're building AI applications, optimizing our API costs, or managing context windows, the way we structure our data can have a significant impact on performance and cost. It is in this context that we discover Toon4j, a library […]"
+status: "published"
+---
+
+In the era of language models (LLMs), every token counts. Whether we're building AI applications, optimizing our API costs, or managing context windows, the way we structure our data can have a significant impact on performance and cost. It is in this context that we discover **Toon4j**, a Java library which implements the TOON (Token-Oriented Object Notation) format to drastically reduce the use of tokens during interactions with LLMs.
+
+In this article, we will explore:
+
+* The TOON format and its advantages
+* toon4j features
+* Installation and configuration
+* Practical use cases
+* Evolution between versions 0.1.0 and 0.2.0
+
+## A- Understanding TOON: a format designed for LLMs
+
+### What is TOON?
+
+TOON (Token-Oriented Object Notation) is a compact serialization format designed specifically to reduce token consumption when passing structured data to language models. Unlike JSON which was designed for machine-to-machine communication, TOON is optimized for machine-to-AI communication.
+
+The TOON format combines the indentation-based structure of YAML with a CSV-inspired tabular layout for uniform tables. This approach achieves a reduction of **30 to 60% of tokens** compared to JSON, while maintaining excellent readability.
+
+### The problem with JSON for LLMs
+
+JSON, although universal and readable, has significant verbosity:
+
+* Multiple braces, quotation marks and commas
+* Repeating key names in tables
+*Wordy syntax that doesn't really help understand the model
+
+Let's take a concrete example:
+
+**Classic JSON:**
+
+json
+
+```json
+{
+  "users": [
+    { "id": 1, "name": "Alice", "role": "admin" },
+    { "id": 2, "name": "Bob", "role": "user" }
+  ]
+}
+```
+
+**TOON equivalent:**
+
+```
+users[2]{id,name,role}:
+1,Alice,admin
+2,Bob,user
+```
+
+The difference is striking: no quotes, no braces, and keys are only declared once. For 100 users with 5 fields each, this saving translates to **over 6,000 fewer tokens**.
+
+### When to use TOON?
+
+TOON excels in these situations:
+
+* **Uniform arrays of objects**: identical structures, primitive values
+* **Large tabular data**: many rows with consistent structure
+* **Integration with LLMs**: sending context, RAG, analytics
+
+On the other hand, JSON remains preferable for:
+
+* **Non-uniform data**: objects with varying sets of fields
+* **Deeply nested structures**: complex hierarchies
+* **Non-LLM use**: traditional APIs, storage
+
+## B- Toon4j: the Java implementation of the TOON format
+
+### Overview
+
+toon4j is a Java library that provides a robust, production-ready implementation of the TOON format. Developed with Java 17+, it offers a simple and intuitive API for encoding and decoding data in TOON format.
+
+### Main Features
+
+* **Full support for TOON v1.4 specification**
+* **Three table formats**: tabular, primitive and list
+* **Bidirectional JSON ↔ TOON conversion**
+* **XML support since version 0.2.0**
+* **Automatic selection of optimal format**
+* **Flexible configuration via ToonOptions**
+* **Integration with Jackson for serialization**
+
+### Architecture
+
+The library is organized around several key classes:
+
+* `Toon`: Facade class providing the main API
+* `ToonEncoder`: Intelligent serialization engine
+* `ToonDecoder`: Deserialization engine
+* `ToonOptions`: Configuring encoding/decoding options
+* `StringUtils`: Utility functions for chains
+
+This architecture respects the SOLID principles and promotes extensibility.
+
+## C- Installation and configuration
+
+### Prerequisites
+
+* **Java**: 17 or higher
+* **Maven**: 3.8+ (for building)
+
+### Maven configuration
+
+To integrate toon4j into your project, add the following dependency in your `pom.xml`:
+
+xml
+
+```xml
+<dependency>
+    <groupId>com.rickenbazolo</groupId>
+    <artifactId>toon4j</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
+### Gradle setup
+
+For Gradle users:
+
+gradle
+
+```
+implementation 'com.rickenbazolo:toon4j:0.2.0'
+```
+
+### Dependencies
+
+The library introduces only one external dependency:
+
+* **Jackson Databind 2.17.2**: for JSON management
+
+All other features use the standard JDK APIs.
+
+## D- Basic Usage
+
+### Simple encoding and decoding
+
+Using toon4j starts with the `Toon` class which offers a simple static API:
+
+java
+
+```xml
+import com.rickenbazolo.Toon;
+import java.util.Map;
+
+// Encoder un objet simple
+Map<String, Object> user = Map.of(
+    "id", 123,
+    "name", "Ada Lovelace",
+    "role", "engineer"
+);
+
+String toon = Toon.encode(user);
+// Résultat :
+// id: 123
+// name: Ada Lovelace
+// role: engineer
+
+// Décoder vers un objet
+JsonNode decoded = Toon.decode(toon);
+```
+
+### JSON to TOON conversion
+
+The `fromJson()` method allows you to directly convert an existing JSON string:
+
+java
+
+```
+String jsonString = """
+{
+  "users": [
+    {"id": 1, "name": "Alice"},
+    {"id": 2, "name": "Bob"}
+  ]
+}
+""";
+
+String toonString = Toon.fromJson(jsonString);
+// users[2]{id,name}:
+// 1,Alice
+// 2,Bob
+```
+
+### Custom configuration
+
+For specific needs we can configure the behavior via `ToonOptions`:
+
+java
+
+```
+import com.rickenbazolo.ToonOptions;
+
+ToonOptions options = ToonOptions.builder()
+    .indent(4)                              // Indentation de 4 espaces
+    .delimiter(ToonOptions.Delimiter.TAB)   // Utiliser TAB comme délimiteur
+    .lengthMarker(true)                     // Inclure les marqueurs de longueur
+    .strict(false)                          // Mode non strict
+    .build();
+
+String toon = Toon.encode(data, options);
+```
+
+### Estimated savings
+
+Toon4j provides a method to estimate token earnings:
+
+java
+
+```xml
+Map<String, Integer> savings = Toon.estimateSavings(data);
+System.out.println("Tokens économisés : " + savings.get("saved"));
+System.out.println("Pourcentage : " + savings.get("percentage") + "%");
+```
+
+## E- XML support (version 0.2.0)
+
+toon4j version 0.2.0 introduces full support for XML, providing savings of **40 to 70% tokens** when converting XML documents.
+
+### XML to TOON conversion
+
+java
+
+```xml
+// Conversion basique
+String xml = """
+<users>
+    <user id="1">
+        <name>Alice</name>
+        <role>admin</role>
+    </user>
+</users>
+""";
+
+String toon = Toon.fromXml(xml);
+
+// Depuis un fichier
+String toonFromFile = Toon.fromXml(new File("data.xml"));
+
+// Depuis un stream
+try (InputStream stream = new FileInputStream("data.xml")) {
+    String toonFromStream = Toon.fromXml(stream);
+}
+```
+
+### XML conversion options
+
+The `XmlToToonOptions` class provides fine-grained control over behavior:
+
+java
+
+```
+import com.rickenbazolo.toon.converter.xml.XmlToToonOptions;
+import com.rickenbazolo.toon.converter.xml.ArrayDetection;
+
+XmlToToonOptions options = XmlToToonOptions.builder()
+    .includeAttributes(true)                    // Inclure les attributs XML
+    .attributePrefix("@")                       // Préfixe pour les attributs
+    .textNodeKey("#text")                       // Clé pour le contenu texte
+    .arrayDetection(ArrayDetection.AUTO)        // Détection automatique
+    .build();
+
+String toon = Toon.fromXml(xml, options);
+```
+
+The available table detection modes are:
+
+* `AUTO`: Automatic detection of repeated elements (default)
+* `NEVER`: Never treat repeated elements as arrays
+* `ALWAYS`: Always treat multiple elements as arrays
+
+### TOON to XML conversion
+
+The reverse conversion is just as simple:
+
+java
+
+```
+String xml = Toon.toXml(toonString);
+
+// Avec options personnalisées
+ToonToXmlOptions options = ToonToXmlOptions.builder()
+    .rootElementName("data")                    // Nom de l'élément racine
+    .prettyPrint(true)                          // Formater la sortie
+    .xmlDeclaration(true)                       // Inclure <?xml...?>
+    .indent(2)                                  // Indentation de 2 espaces
+    .build();
+
+String customXml = Toon.toXml(toonString, options);
+```
+
+## F- Practical use cases
+
+### Integration with Spring AI
+
+toon4j integrates naturally into a Spring application to optimize interactions with LLMs:
+
+java
+
+```xml
+package net.autourducode.service;
+
+import com.rickenbazolo.Toon;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+@Service
+public class AnalyticsService {
+    
+    private final ChatClient chatClient;
+    
+    public AnalyticsService(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
+    }
+    
+    public String analyzeData(List<Map<String, Object>> data) {
+        // Convertir les données en TOON pour économiser des tokens
+        String toonData = Toon.encode(data);
+        
+        String prompt = """
+            Analyse les données suivantes au format TOON et génère un résumé :
+            
+            %s
+            """.formatted(toonData);
+        
+        return chatClient.prompt()
+                .user(prompt)
+                .call()
+                .content();
+    }
+}
+```
+
+### RSS feed processing
+
+For large RSS feeds, converting to TOON provides substantial savings:
+
+java
+
+```java
+package net.autourducode.service;
+
+import com.rickenbazolo.Toon;
+import com.rickenbazolo.toon.converter.xml.XmlToToonOptions;
+import org.springframework.stereotype.Service;
+
+@Service
+public class RssFeedService {
+    
+    public String convertRssToToon(String rssFeedUrl) {
+        String rssContent = fetchRssFeed(rssFeedUrl);
+        
+        XmlToToonOptions options = XmlToToonOptions.builder()
+            .includeAttributes(false)           // Ignorer les attributs pour RSS
+            .arrayDetection(ArrayDetection.AUTO)
+            .build();
+        
+        // Économie moyenne de 42.9% sur les flux RSS
+        return Toon.fromXml(rssContent, options);
+    }
+    
+    private String fetchRssFeed(String url) {
+        // Implémentation de récupération du flux RSS
+        return "";
+    }
+}
+```
+
+### Configuration management
+
+For large XML configuration files:
+
+java
+
+```java
+import com.rickenbazolo.Toon;
+import java.io.File;
+
+public class ConfigurationManager {
+    
+    public String loadCompactConfig(String configPath) {
+        File configFile = new File(configPath);
+        // Convertir la configuration XML en TOON pour stockage/transmission
+        return Toon.fromXml(configFile);
+    }
+    
+    public void saveConfig(String toonConfig, String outputPath) {
+        String xml = Toon.toXml(toonConfig);
+        // Écrire le XML dans le fichier
+    }
+}
+```
+
+## G- Performance and efficiency
+
+### Measured savings
+
+Real-world benchmarks show impressive results:
+
+| Data type | JSON (chars) | TOON (characters) | Discount |
+| --- | --- | --- | --- |
+| 100 users (5 fields) | 15,234 | 8,912 | 41.5% |
+| Book catalog | 355 | 190 | 46.5% |
+| RSS feed (3 items) | 1,064 | 608 | 42.9% |
+| User data | 1,151 | ~600 | 47.8% |
+| SOAP Response | 400 | 180 | 55.0% |
+
+### Financial impact
+
+Let's take a concrete example with an LLM call analyzing repository data:
+
+* **Data**: 100 repositories with 8-10 fields each
+* **Savings**: 6,400 tokens per call
+* **Cost per 1K tokens**: $0.03
+* **Savings per call**: $0.19
+* **For 1,000 monthly calls**: $190 saved
+
+These savings multiply quickly in applications with many daily LLM calls.
+
+## H- Error handling
+
+toon4j provides dedicated exceptions to make error handling easier:
+
+java
+
+```
+import com.rickenbazolo.toon.exception.XmlParseException;
+import com.rickenbazolo.toon.exception.XmlException;
+
+try {
+    String toon = Toon.fromXml(xmlString);
+} catch (XmlParseException e) {
+    System.err.println("Erreur de parsing XML : " + e.getMessage());
+    // Traitement de l'erreur
+} catch (XmlException e) {
+    System.err.println("Erreur XML générale : " + e.getMessage());
+}
+```
+
+For TOON analysis, we have control via strict mode:
+
+java
+
+```
+ToonOptions options = ToonOptions.builder()
+    .strict(false)  // Mode tolérant, retourne null en cas d'erreur
+    .build();
+
+try {
+    JsonNode result = Toon.decode(toonString, options);
+    if (result == null) {
+        // Gestion du cas d'erreur en mode non strict
+    }
+} catch (IllegalArgumentException e) {
+    // En mode strict (true), une exception est levée
+    System.err.println("Format TOON invalide : " + e.getMessage());
+}
+```
+
+## I- Evolution between versions
+
+### Version 0.1.0 – Foundations
+
+The initial version (November 9, 2025) laid the solid foundations:
+
+* Full implementation of the TOON v1.4 specification
+* Support for three table formats (tabular, primitive, list)
+* Intuitive API with the `Toon` class
+* Bidirectional JSON ↔ TOON conversion
+* Flexible configuration via `ToonOptions`
+* 49 unit tests
+
+This first version demonstrated the viability of the concept with savings of 30-60% on JSON data.
+
+### Version 0.2.0 – XML Expansion
+
+Version 0.2.0 (November 14, 2025) expanded the capabilities:
+
+* **Full XML support**: bidirectional XML ↔ TOON conversion
+* **New architecture**: packages `converter.xml` and `converter.json`
+* **34 new tests**: bringing the total to 83 tests
+* **XML Savings**: 40-70% token reduction
+* **Total compatibility**: no break with version 0.1.0
+
+This development shows that toon4j is not limited to JSON and can optimize different data formats for LLMs.
+
+### Migrating to 0.2.0
+
+The migration is **totally transparent**. Just update the dependency version:
+
+xml
+
+```xml
+<dependency>
+    <groupId>com.rickenbazolo</groupId>
+    <artifactId>toon4j</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
+All existing code continues to work without modification. The new XML features are available immediately via the `fromXml()` and `toXml()` methods.
+
+## J- Tests and quality
+
+### Test coverage
+
+toon4j maintains exhaustive test coverage:
+
+* **Encoding/decoding tests**: 27 tests for the complete cycle
+* **XML conversion tests**: 34 tests for all variations
+* **Optimization tests**: 11 tests for format selection
+* **Error tests**: 11 tests for robust management
+
+### Test files
+
+The tests include real resources:
+
+* `src/test/resources/xml/sample-users.xml`: User data with nested structures
+* `src/test/resources/xml/sample-catalog.xml`: Catalog with metadata
+
+This approach ensures that the library properly handles real-world data.
+
+## K- Good usage practices
+
+### Hybrid strategy
+
+The best approach is often to use JSON in the application code and TOON only for LLMs:
+
+java
+
+```
+// Dans l'application : utiliser JSON normalement
+String jsonData = objectMapper.writeValueAsString(data);
+
+// Pour l'envoi au LLM : convertir en TOON
+String toonData = Toon.fromJson(jsonData);
+
+// Envoyer au LLM
+String response = llmClient.query(toonData);
+
+// Traiter la réponse en JSON
+JsonNode result = objectMapper.readTree(response);
+```
+
+### Data validation
+
+Use the `estimateSavings()` method to verify that TOON actually provides a benefit:
+
+java
+
+```xml
+Map<String, Integer> savings = Toon.estimateSavings(data);
+int percentage = savings.get("percentage");
+
+if (percentage > 20) {
+    // TOON apporte un réel bénéfice
+    String toon = Toon.encode(data);
+} else {
+    // JSON peut être préférable
+    String json = objectMapper.writeValueAsString(data);
+}
+```
+
+### Adapted configuration
+
+Adjust the options according to your specific needs:
+
+java
+
+```
+// Pour des données très structurées
+ToonOptions structuredOptions = ToonOptions.builder()
+    .lengthMarker(true)     // Aide le LLM à valider
+    .strict(true)           // Validation stricte
+    .build();
+
+// Pour des données moins critiques
+ToonOptions relaxedOptions = ToonOptions.builder()
+    .lengthMarker(false)    // Économie de tokens
+    .strict(false)          // Tolérance aux erreurs
+    .build();
+```
+
+## Conclusion
+
+toon4j represents an elegant solution for optimizing interactions with language models in Java. By reducing token usage by 30-70%, this library provides substantial cost savings while maintaining excellent readability and ease of use.
+
+We have seen how toon4j implements the TOON format in a robust and production-ready way, offering:
+
+* A simple and intuitive API via the facade class `Toon`
+* Full support for JSON and XML
+* Flexible configuration to adapt to different contexts
+* An extensible architecture following SOLID principles
+* Full compatibility between versions
+
+The measured performances confirm the interest of this approach, particularly for applications making numerous LLM calls with structured data. The rapid evolution of the library (two major versions in one week) demonstrates its dynamism and commitment to excellence.
+
+Whether you're building RAG systems, AI analytics tools, or simply looking to reduce your OpenAI API bills, toon4j deserves a place in your Java toolbox.
+
+To find out more:
+
+* **GitHub Repository**: [Toon4j](https://github.com/ricken07/Toon4j)
+* **TOON Spec**: [Toon Spec](https://github.com/toon-format/spec)
+* **TOON Ecosystem**: [Toon Format](https://github.com/toon-format/toon)
+
+I hope this article was useful for you in discovering Toon4j and the TOON format. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: https://www.youtube.com/@autourducode

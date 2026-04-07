@@ -1,0 +1,244 @@
+[
+  {
+    "slug": "toon4j-reduisez-vos-couts-de-token",
+    "publishedAt": "2025-11-28",
+    "canonical": "https://autourducode.net/non-classe/toon4j-reduisez-vos-couts-de-token/",
+    "sourceLanguage": "fr",
+    "tags": []
+  },
+  {
+    "slug": "spring-boot-4-restclient",
+    "publishedAt": "2025-11-07",
+    "canonical": "https://autourducode.net/spring-boot/spring-boot-4-restclient/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "spring-boot"
+    ]
+  },
+  {
+    "slug": "les-secrets-de-linference-llm-plongee-strategique-dans-les-parametres-de-requete",
+    "publishedAt": "2024-02-21",
+    "canonical": "https://autourducode.net/llm/les-secrets-de-linference-llm-plongee-strategique-dans-les-parametres-de-requete/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "ia",
+      "llm"
+    ]
+  },
+  {
+    "slug": "jpa-hibernate-utiliser-une-map-comme-association",
+    "publishedAt": "2023-04-05",
+    "canonical": "https://autourducode.net/java/jpa-hibernate-utiliser-une-map-comme-association/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "hibernate",
+      "java",
+      "jpa"
+    ]
+  },
+  {
+    "slug": "architecture-hexagonale",
+    "publishedAt": "2023-03-03",
+    "canonical": "https://autourducode.net/architecture/architecture-hexagonale/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "architecture"
+    ]
+  },
+  {
+    "slug": "difference-entre-hibernate-et-jpa",
+    "publishedAt": "2023-02-28",
+    "canonical": "https://autourducode.net/java/difference-entre-hibernate-et-jpa/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "hibernate",
+      "java",
+      "jpa"
+    ]
+  },
+  {
+    "slug": "injection-de-dependance-vs-inversion-de-controle",
+    "publishedAt": "2023-02-09",
+    "canonical": "https://autourducode.net/java/injection-de-dependance-vs-inversion-de-controle/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "architecture",
+      "java"
+    ]
+  },
+  {
+    "slug": "spring-mvc-overview",
+    "publishedAt": "2023-01-28",
+    "canonical": "https://autourducode.net/java/spring-mvc-overview/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "java",
+      "spring"
+    ]
+  },
+  {
+    "slug": "microservices-bibliotheques-partagees-conception-et-bonnes-pratiques",
+    "publishedAt": "2023-01-26",
+    "canonical": "https://autourducode.net/architecture/microservices-bibliotheques-partagees-conception-et-bonnes-pratiques/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "architecture",
+      "microservices"
+    ]
+  },
+  {
+    "slug": "spring-boot-vs-quarkus-quel-framework-choisir-en-2023",
+    "publishedAt": "2023-01-07",
+    "canonical": "https://autourducode.net/java/spring-boot-vs-quarkus-quel-framework-choisir-en-2023/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "java",
+      "quarkus",
+      "spring-boot"
+    ]
+  },
+  {
+    "slug": "reactive-spring-boot-api-partie-2-validations",
+    "publishedAt": "2022-11-05",
+    "canonical": "https://autourducode.net/java/reactive-spring-boot-api-partie-2-validations/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "api",
+      "java",
+      "spring",
+      "spring-boot",
+      "validations"
+    ]
+  },
+  {
+    "slug": "reactive-spring-boot-api-partie-1-controleurs",
+    "publishedAt": "2022-10-30",
+    "canonical": "https://autourducode.net/java/reactive-spring-boot-api-partie-1-controleurs/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "api",
+      "flux",
+      "java",
+      "mono",
+      "reactive",
+      "spring",
+      "spring-boot",
+      "webflux"
+    ]
+  },
+  {
+    "slug": "git-les-commandes-partie-iii",
+    "publishedAt": "2022-10-04",
+    "canonical": "https://autourducode.net/git/git-les-commandes-partie-iii/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "devops",
+      "git"
+    ]
+  },
+  {
+    "slug": "spring-boot-creation-dun-service-web",
+    "publishedAt": "2022-09-24",
+    "canonical": "https://autourducode.net/java/spring-boot-creation-dun-service-web/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "api",
+      "java",
+      "spring",
+      "spring-boot"
+    ]
+  },
+  {
+    "slug": "git-les-commandes-partie-ii",
+    "publishedAt": "2022-09-08",
+    "canonical": "https://autourducode.net/git/git-les-commandes-partie-ii/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "devops",
+      "git"
+    ]
+  },
+  {
+    "slug": "git-les-commandes-git-pull-git-fetch-et-git-merge",
+    "publishedAt": "2022-09-04",
+    "canonical": "https://autourducode.net/git/git-les-commandes-git-pull-git-fetch-et-git-merge/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "devops",
+      "git"
+    ]
+  },
+  {
+    "slug": "jakarta-ee-9-1-mise-en-place-dun-serveur-websocket",
+    "publishedAt": "2022-08-31",
+    "canonical": "https://autourducode.net/java/jakarta-ee-9-1-mise-en-place-dun-serveur-websocket/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "jakarta-ee",
+      "java",
+      "websocket"
+    ]
+  },
+  {
+    "slug": "kubernetes-utilisation-de-kubectl",
+    "publishedAt": "2022-07-20",
+    "canonical": "https://autourducode.net/cloud/kubernetes-utilisation-de-kubectl/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "cloud",
+      "container",
+      "devops",
+      "k8s",
+      "kubernetes",
+      "pods"
+    ]
+  },
+  {
+    "slug": "kubernetes-comment-creer-un-cluster",
+    "publishedAt": "2022-07-01",
+    "canonical": "https://autourducode.net/cloud/kubernetes-comment-creer-un-cluster/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "cloud",
+      "devops",
+      "kubernetes"
+    ]
+  },
+  {
+    "slug": "hilla-framework-frontend-springboot-vaadin",
+    "publishedAt": "2022-05-29",
+    "canonical": "https://autourducode.net/spring/hilla-framework-frontend-springboot-vaadin/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "framework",
+      "spring",
+      "spring-boot"
+    ]
+  },
+  {
+    "slug": "securite-spring-cloud-gateway-json-web-token",
+    "publishedAt": "2022-05-19",
+    "canonical": "https://autourducode.net/java/securite-spring-cloud-gateway-json-web-token/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "api",
+      "cloud",
+      "java",
+      "spring",
+      "spring-boot"
+    ]
+  },
+  {
+    "slug": "docker-application-spring-boot",
+    "publishedAt": "2022-05-16",
+    "canonical": "https://autourducode.net/java/docker-application-spring-boot/",
+    "sourceLanguage": "fr",
+    "tags": [
+      "devops",
+      "docker",
+      "java",
+      "spring",
+      "spring-boot"
+    ]
+  }
+]

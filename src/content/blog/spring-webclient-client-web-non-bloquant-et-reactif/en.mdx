@@ -7,10 +7,7 @@ tags: ["java", "spring", "spring-boot"]
 readingTime: 5
 excerpt: "In this article, we will see how to configure Spring WebClient and how to use it to make GET, POST or any other HTTP requests.We will also learn how to configure the client to handle timeout and other HTTP related configurations."
 status: "published"
-canonical: "https://autourducode.net/java/spring-webclient-client-web-non-bloquant-et-reactif/"
 ---
-
-[![](https://autourducode.net/wp-content/uploads/2022/10/reactor-header-1024x536.png)](https://autourducode.net/wp-content/uploads/2022/10/reactor-header.png)
 
 In this article, we will see how to configure **Spring WebClient** and how to use it to make **GET**, **POST** or any other HTTP requests.We will also learn how to configure the client to handle **timeout** and other HTTP related configurations.
 
@@ -35,53 +32,53 @@ We will set up a spring boot application to configure and use Spring WebClient
 
 ### **1- Added Spring WebClient in pom.xml**
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion>4.0.0</modelVersion>
-<parent>
-<groupId>org.springframework.boot</groupId>
-<artifactId>spring-boot-starter-parent</artifactId>
-<version>2.7.4</version>
-<relativePath/> <!-- lookup parent from repository -->
-</parent>
-<groupId>net.autourducode</groupId>
-<artifactId>spring-WebClient</artifactId>
-<version>0.0.1-SNAPSHOT</version>
-<name>spring-WebClient</name>
-<description>spring-WebClient</description>
-<properties>
-<java.version>17</java.version>
-</properties>
-<dependencies>
-<!-- Build a responsive web application with spring webflux and netty -->
-<dependency>
-<groupId>org.springframework.boot</groupId>
-<artifactId>spring-boot-starter-webflux</artifactId>
-</dependency>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>net.autourducode</groupId>
+    <artifactId>spring-WebClient</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>spring-WebClient</name>
+    <description>spring-WebClient</description>
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+    <dependencies>
+        <!-- Build a responsive web application with spring webflux and netty -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
 
-<!-- Useful for unit testing -->
-<dependency>
-<groupId>org.springframework.boot</groupId>
-<artifactId>spring-boot-starter-test</artifactId>
-<scope>test</scope>
-</dependency>
-<dependency>
-<groupId>io.projectreactor</groupId>
-<artifactId>reactor-test</artifactId>
-<scope>test</scope>
-</dependency>
-</dependencies>
+        <!-- Useful for unit testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-<build>
-<plugins>
-<plugin>
-<groupId>org.springframework.boot</groupId>
-<artifactId>spring-boot-maven-plugin</artifactId>
-</plugin>
-</plugins>
-</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
 ```
@@ -96,23 +93,23 @@ I'm using **https://reqres.in** to simulate our HTTP REST call.
 *Configuration of cookies;
 * Configuring HTTP headers.
 
-```
+```java
 @Configuration
 public class WebClientConfig {
-// Configuring WebClient
-@Bean
-public WebClient webClient(WebClient.Builder webClientBuilder) {
-return webClientBuilder
-.baseUrl("https://reqres.in/api")
-.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-.build();
-}
+    // Configuring WebClient
+    @Bean
+    public WebClient webClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder
+                .baseUrl("https://reqres.in/api")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
 }
 ```
 
 Spring Boot makes it very easy by injecting **WebClient.Builder**.This is part of the **DefaultWebClientBuilder** class.We can use the constructor to customize client behavior.Another option is to create the **WebClient** using **WebClient.create()** and configure it accordingly.
 
-```
+```java
 WebClient client = WebClient.create("https://reqres.in/api");
 ```
 
@@ -127,17 +124,17 @@ Sending requests using **Spring WebClient** is similar to what we did with RestT
 5. **Call the *retrieve()* or *exchange()* method.**
 6. **Manage API response.**
 
-```
+```java
 WebClient webClient = webClientBuilder
-.clientConnector(new ReactorClientHttpConnector(getHttpClient()))
-.baseUrl("https://reqres.in/api")
-.build();
+    .clientConnector(new ReactorClientHttpConnector(getHttpClient()))
+    .baseUrl("https://reqres.in/api")
+    .build();
 
-Single<User> user = webClient.get()
-.uri("/users/{id}", id)
-.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-.retrieve()
-.bodyToMono(User.class);
+Mono<User> user = webClient.get()
+    .uri("/users/{id}", id)
+    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+    .retrieve()
+    .bodyToMono(User.class);
 ```
 
 ### **4- Receive a response**
@@ -150,39 +147,39 @@ We can use the **exhange()** method if we need more details in the response.
 
 Let's look at the HTTP GET call using the WebClient.We use GET method whenever we want to get/fetch resources.
 
-```
+```java
 @Resource
 private WebClient webClient;
 
 @Test
 public void getUsers() {
-String str = webClient.get()
-.uri("/users/")
-.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-.retrieve()
-.bodyToMono(String.class)
-.block();
-System.out.println(str);
+    String str = webClient.get()
+        .uri("/users/")
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .retrieve()
+        .bodyToMono(String.class)
+        .block();
+    System.out.println(str);
 }
 ```
 
 ### **6-** **Web Client – POST Request**
 
-```
+```java
 @Resource
 private WebClient webClient;
 
 @Test
 public void postUser() {
-User user = new User();
-String str = webClient.post()
-.uri("/users/")
-.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-.body(Mono.just(user), User.class)
-.retrieve()
-.bodyToMono(String.class)
-.block();
-System.out.println(str);
+    User user = new User();
+    String str = webClient.post()
+        .uri("/users/")
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .body(Mono.just(user), User.class)
+        .retrieve()
+        .bodyToMono(String.class)
+        .block();
+    System.out.println(str);
 }
 ```
 
@@ -201,26 +198,26 @@ Using the Spring WebClient, we have the option to use the **retrieve()** or **ex
 
 Similar to Spring RestTemplate, we can configure the connection timeout for the WebClient.Use the **HttpClient** class to configure the timeout for the client.Let's see how to do it:
 
-```
+```java
 @Configuration
 public class WebClientConfig {
-// Configuring WebClient
-@Bean
-public WebClient webClient(WebClient.Builder webClientBuilder) {
-return webClientBuilder
-.clientConnector(new ReactorClientHttpConnector(getHttpClient()))
-.baseUrl("https://reqres.in/api")
-.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-.build();
-}
+    // Configuring WebClient
+    @Bean
+    public WebClient webClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder
+                .clientConnector(new ReactorClientHttpConnector(getHttpClient()))
+                .baseUrl("https://reqres.in/api")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
 
-private HttpClient getHttpClient() {
-return HttpClient.create()
-.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
-.doOnConnected(connect -> connect
-.addHandlerLast(new ReadTimeoutHandler(10))
-.addHandlerLast(new WriteTimeoutHandler(10)));
-}
+    private HttpClient getHttpClient() {
+        return HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+                .doOnConnected(connect -> connect
+                        .addHandlerLast(new ReadTimeoutHandler(10))
+                        .addHandlerLast(new WriteTimeoutHandler(10)));
+    }
 }
 ```
 
@@ -234,7 +231,7 @@ Let's look at some important points:
 
 The default memory limit for in-memory buffer data is **256 KB**.If this limit is exceeded, Spring will throw the **DataBufferLimitException** error.Spring provides the ability to increase the buffer data limit using the **max-in-memory-size** property.We can set this property in our application.properties file.
 
-```
+```properties
 spring.codec.max-in-memory-size=5MB
 ```
 

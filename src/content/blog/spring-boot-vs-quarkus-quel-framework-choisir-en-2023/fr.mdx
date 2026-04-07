@@ -1,0 +1,146 @@
+---
+title: "Spring Boot vs Quarkus : Quel Framework choisir en 2023"
+slug: "spring-boot-vs-quarkus-quel-framework-choisir-en-2023"
+language: "fr"
+publishedAt: "2023-01-07"
+tags: ["java", "quarkus", "spring-boot"]
+readingTime: 12
+excerpt: "Aujourd’hui, nous allons parler de deux frameworks, Spring Boot et Quarkus, et plus précisément, pourquoi ils sont nécessaires et qui en a besoin. Comparons Spring Boot et Quarkus en termes de fonctionnalités, de mesures de performance, de coût moyen de développement, de popularité sur le marché et d’autres aspects importants. Cet article promet de vous […]"
+status: "published"
+---
+
+Aujourd’hui, nous allons parler de deux frameworks, **Spring Boot** et **Quarkus**, et plus précisément, pourquoi ils sont nécessaires et qui en a besoin. Comparons Spring Boot et Quarkus en termes de fonctionnalités, de mesures de performance, de coût moyen de développement, de popularité sur le marché et d’autres aspects importants. Cet article promet de vous aider à comprendre si Spring Boot ou Quarkus est meilleur pour vos applications ou s’il vaut mieux l’apprendre.
+
+## **Spring Boot ?**
+
+Rendons hommage à nos aînés. [Spring Boot](https://spring.io/projects/spring-boot) est un framework Java open source, prenant en charge Java, Kotlin et Groovy, ainsi que la [compilation JIT](https://en.wikipedia.org/wiki/Just-in-time_compilation), ce qui facilite grandement la création, la configuration et l’exécution d’applications web d’entreprise micro-services.
+
+Sa première version a été publiée en 2002 sous la licence Apache 2.0. Depuis lors, il a réussi à développer un grand nombre d’extensions qui simplifient, améliorent ou étendent les solutions standard pour la conception, l’écriture et la maintenance des applications d’entreprise.
+
+### **Spring Boot, les fonctionnalités**
+
+Spring Boot est une partie du Spring Framework qui permet d’utiliser toutes les fonctionnalités de ce dernier, facilite le déploiement et la configuration des applications Spring, et réduit la quantité de code et la vitesse de mise en production. Ceci est possible grâce à la configuration automatique de l’application construite sur les annotations Java.
+
+Fonctionnalités de base, mais pas toutes, de Spring Framework que vous pouvez utiliser dans votre application Spring Boot
+
+* **Le conteneur d’inversion de contrôle** offre une solution pour configurer et contrôler les objets Java en les reliant entre eux. Le principal avantage est que ces objets gérés par le conteneur, appelés « *beans*« , évitent de créer des fichiers XML contenant les configurations prescrites pour eux. Il est toutefois possible de tout faire manuellement et de les ajouter.
+* **La programmation orienté aspect** ajoute la possibilité de programmer dans un paradigme orienté aspect, en faisant des choses qui, dans un paradigme orienté objet, sont soit trop coûteuses en performances, soit impossibles du tout.
+* **Le Model-view-controller**, utilisant *l’API Serverlet* permet de développer dans un modèle *MVC*, simplifiant la création d’applications de *micro-services*.
+* **Le framework d’accès aux données** utilisant [JDBC](https://ru.wikipedia.org/wiki/Java_Database_Connectivity) et [ORM](https://en.wikipedia.org/wiki/Object%E2%80%93relational_mapping) fournit une solution pour un travail facile, et surtout standard, avec les bases de données relationnelles et [NoSQL](https://en.wikipedia.org/wiki/NoSQL). Il vous permet de créer une interface objet vers la base de données sans écrire de code et en créant l’objet lui-même, ce qui en fait l’un des frameworks préférés et les plus puissants de cette liste.
+* **Spring Batch**, offre un grand nombre de fonctionnalités prêtes à l’emploi pour gérer plus efficacement les lots, en répartissant le développement de grandes quantités de données dans des volumes plus petits qui peuvent également être enchaînés. Ces fonctionnalités sont la journalisation/le traçage, la gestion des transactions, les statistiques de traitement des tâches et le redémarrage des tâches.
+* **Le cadre d’authentification et d’autorisation** fournit de nombreux protocoles et normes et utilise le sous-projet Spring Security pour les options d’autorisation et d’authentification.
+* **Le framework d’intégration** offre un ensemble de fonctions réutilisables prêtes à l’emploi pour la messagerie, la compatibilité de l’architecture et la gestion des événements. Il propose des routeurs, des transformateurs et des adaptateurs comme AMQP, JMS, XMPP, SMTP, IMAP, FTP/FTPS/SFTP, des filtres, des activateurs de services, etc.
+* **Le framework de tests** propose des fonctions et des modules pour les tests unitaires et les tests d’intégration.
+
+Comme vous l’avez peut-être remarqué, l’équipe de Spring Boot n’a pas perdu une minute au cours de ces 20 années, à en juger par l’ensemble des modules de base. C’est pourquoi de nombreuses solutions universelles font appel à ce framework. Cependant, puisque nous le comparons à **Quarkus**, nous sommes plus intéressés par ses fonctionnalités liées à la conteneurisation et à la gestion des micro-services. Voyons ce que la solution la plus récente a à offrir à cet égard.
+
+## **Quarkus ?**
+
+[Quarkus](https://quarkus.io/) est un framework Java open-source prenant en charge Java, Kotlin et Scala qui fournit une [compilation AOT](https://en.wikipedia.org/wiki/Ahead-of-time_compilation) et a été créé pour simplifier le développement et le déploiement d’applications Java dans des conteneurs tels que [Docker](https://www.docker.com/) et [Kubernetes](https://kubernetes.io/), ainsi que pour créer des applications Java microservices avec une consommation minimale de ressources.
+
+Quarkus est très jeune puisqu’il a été fondé en 2019, mais il se développe activement avec la même licence Apache 2.0 et est très apprécié par beaucoup, car il gère très bien les tâches pour lesquelles il a été créé. Il est facile à utiliser et nettement moins exigeant sur les ressources matérielles pour exécuter et faire fonctionner les applications.
+
+### **Quarkus, les fonctionnalités**
+
+L’accent initial mis sur le travail avec les conteneurs, notamment Kubernetes, est salué par un très grand nombre de développeurs et d’entreprises. De plus, Quarkus n’a pas pour objectif initial de développer son propre framework pour tout, comme l’a fait Spring. Au lieu de cela, ils travaillent activement pour maximiser les intégrations et le support de qualité pour d’autres frameworks et services déjà réputés.
+
+* **Programmation impérative et réactive** est devenue capable d’utiliser pleinement.
+* **Prend en charge OpenJDK HotSpot et GraalVM**, qui vous permet de compiler du code de manière native pour les conteneurs et de ne pas exécuter de JVM à l’intérieur de ceux-ci, ce qui réduit considérablement le nombre de ressources consommées. Et dans le cas des conteneurs Linux et Kubernetes, l’application Quarkus s’exécute comme un exécutable Linux natif.
+* Le codage en direct (Live coding) offre le concept et la mise en œuvre du déploiement automatique du code dans un conteneur, éliminant plusieurs processus traditionnels qui rendent le développement plus long et peuvent causer des problèmes.
+* **Aucune configuration avec les services de développement.** Quarkus fournit des services de développement qui démarrent et configurent automatiquement la base de données lorsque vous développez ou testez vos applications.
+* **DEV UI** de Quarkus est une interface de développement interactive pilotée par ligne de commande où les développeurs peuvent rapidement et facilement obtenir des mises à jour de dépendances, mettre à jour des configurations et les synchroniser.
+* **Les tests continus** dans Quarkus sont mis en œuvre sur la ligne de commande et à l’aide de l’outil DEV, le faisant correctement pendant le développement, éliminant de nombreux outils et processus tiers pour cela.
+* **Basé sur les meilleurs standards** comme JAX-RS, Java Persistence API (JPA), Java Transaction API (JTA), Apache Camel et Hibernate, et plusieurs autres.
+
+Il est important de comprendre que Quarkus n’en est encore qu’au début de son parcours, mais qu’il fait déjà de grands progrès et, surtout, qu’il répond aux attentes. Mais, après avoir appris les principaux aspects techniques, regardons les chiffres.
+
+## **Comparaison de Quarkus et de Spring Boot**
+
+La comparaison de ces frameworks n’est peut-être pas tout à fait pertinente, mais elle est nécessaire. D’une part, ils se situent dans des catégories de poids complètement différentes. On pourrait dire que Spring a gagné le titre de standard Java alternatif, redéfinissant tous les standards jusqu’aux ***JavaBeans***. Il a sa propre solution pour tous les cas, qui sont incroyablement bonnes et fonctionnent très bien ensemble. Quarkus, quant à lui, n’en est qu’à ses débuts. Mais d’un autre côté, l’utilisation de la programmation réactive, de la compilation AOT et de l’approche « ***container first*** » a déjà donné des résultats étonnants, c’est pourquoi il a suscité des discussions autour de lui en tant qu’héritier du trône.
+
+Nous ne pensons pas que l’un doit remplacer l’autre, du moins pas à court terme. Il s’agit d’une approche différente pour résoudre les problèmes, et chacune a mérité sa place. Évidemment, si vous voyez un élément essentiel à votre activité dans la liste des principales caractéristiques techniques proposées, vous savez déjà à peu près quel choix faire.
+
+Mais prenez votre temps. En plus de la théorie, vous devez examiner les aspects pratiques de chaque solution, qui sont mieux exprimés en chiffres.
+
+### **Spring Boot vs Quarkus : Performances**
+
+Généralement, on peut immédiatement déclarer gagnant en parlant de performances et de consommation de mémoire. Pourtant, tout n’est pas tout à fait clair, selon que l’on compare **Spring Boot** et **Quarkus** en utilisant JVM ou Native.
+
+Selon les [données de test](https://www.baeldung.com/spring-boot-vs-quarkus), **Quarkus** est souvent meilleur que Spring Boot, non seulement dans le cas de Native, où il devrait être meilleur, car il a été initialement conçu pour cette approche, mais même lors de l’utilisation de JVM, à quelques points près.
+
+Comme nous l’avons dit, tout n’est pas aussi clair que nous le souhaiterions, mais nous pouvons dégager une tendance. **Quarkus** consomme moins de ressources pour l’exécution d’une application dans presque tous les cas lorsque nous parlons de Native et parfois en JVM. En retour, Spring Boot peut être plus performant après le démarrage de l’application, notamment avec la JVM. Il convient également de noter que le support du code natif a été intégré à l’origine dans l’architecture **Quarkus**, alors que **Spring** est dans une version expérimentale. Cela explique pleinement la séparation de **Quarkus** lorsqu’on travaille comme une application native.
+
+### **Spring Boot vs Quarkus : Popularité**
+
+Bien sûr, Spring Boot reste beaucoup plus populaire que Quarkus. Nous pouvons dire que la plupart des développeurs et des entreprises pensent à Spring Boot lorsqu’ils développent des applications Java d’entreprise. Et il est fort probable que cela se poursuive encore longtemps dans l’environnement de l’entreprise, où l’on a besoin de solutions stables, testées et complexes, dont Spring Boot est le parfait exemple.
+
+Toutefois, Quarkus gagne rapidement en popularité, notamment dans les cas où il est associé à Kubernetes, en offrant une consommation de ressources beaucoup plus faible. Tout cela est également important pour les entreprises, car la consommation de ressources doit être payée ; les gens veulent donc la réduire, ce que Quarkus fait très bien. En outre, de nombreux développeurs et entreprises commencent à le considérer comme l’avenir, parce qu’il facilite grandement le développement et reste basé sur les normes de l’industrie, contrairement à Spring Boot, qui a redéfini toutes les normes.
+
+Nous pouvons conclure ici que Spring Boot jouit d’une popularité bien méritée dans la recherche d’une solution complète et universelle pour n’importe quelle tâche dès le départ et pour l’utiliser dans des environnements d’entreprise très vastes et très chargés. Quarkus la gagne activement dans les solutions d’entreprise, où une solution autonome, une réduction des ressources et une excellente gestion des conteneurs sont importantes. Quarkus s’en sort bien parce qu’il a été conçu à l’origine comme une solution native et qu’une attention particulière a été portée à Doker et Kubernetes.
+
+### **Spring Boot vs Quarkus: Avantages et inconvénients**
+
+Mettons en évidence les principaux avantages et inconvénients de chaque framework afin de simplifier le choix (On ne va pas se plonger dans les chiffres.)
+
+#### **Avantages de Spring Boot**
+
+* Offre de nombreuses solutions pour automatiser la configuration des dépendances, des objets et des conteneurs, ainsi que des solutions de configuration prêtes à l’emploi pour une simple exécution.
+* Spring Boot peut mieux fonctionner avec JVM, où la compilation JIT est plus pratique.
+* Fournit une capacité de programmation orientée aspect.
+* Un framework éprouvé, à juste titre aimé et respecté pour les développeurs et l’ensemble du secteur de l’entreprise.
+* Une immense communauté connaît la réponse à toute question et est prête à la fournir.
+* Le développement peut être beaucoup plus rapide et moins cher dans la plupart des cas.
+
+#### **Inconvénients de Spring Boot**
+
+* Avec une abondance de leurs propres solutions, moins de contrôle et des options d’intégration
+* Plus exigeant en ressources lors de l’exécution ou de la construction.
+* De nombreuses dépendances internes entre les modules peuvent également créer de la complexité et nécessiter plus de ressources à gérer.
+
+#### **Avantages de Quarkus**
+
+* Simplifie et favorise considérablement le travail avec les conteneurs, en particulier Kubernetes, permettant aux développeurs d’éviter les processus redondants lors de la configuration et du déploiement.
+* Réduit l’utilisation des ressources en utilisant **Graal** ou Substrat **VM** pour les constructions natives autonomes.
+* Offre à la fois des capacités de programmation impératives et réactives.
+* S’appuie sur la compilation AOT et peut s’exécuter et fonctionner plus rapidement, en utilisant moins de ressources.
+* Moins d’espace requis pour les images natives.
+* Une excellente documentation complète, toujours à jour, et un soutien croissant de la part de la communauté et des principales entreprises technologiques.
+* Se concentre sur un support de qualité pour les intégrations tierces.
+
+#### ****Inconvénients** de Quarkus**
+
+* L’installation initiale de Graal VM peut être complexe pour certains développeurs.
+* Une base de développeurs spécialisés moins importante, moins de choix et éventuellement des recherches plus longues de candidats appropriés.
+* Le développement peut être plus coûteux et plus lent par rapport à Spring Boot.
+
+Bien sûr, la plupart des tâches peuvent être réalisées avec succès à l’aide de n’importe lequel de ces frameworks, mais chaque solution présente des avantages et des inconvénients indéniables qui méritent d’être soulignés. Vous devez donc décider lesquelles d’entre elles sont les plus importantes pour votre projet. Vous pouvez également examiner d’autres frameworks dont les principaux avantages pourraient vous convenir mieux que les deux solutions précédentes.
+
+## **Alternatives à Spring Boot et Quarkus**
+
+Si vous n’êtes pas satisfait de Spring Boot ou de Quark, vous pouvez envisager d’autres alternatives telles que :
+
+* Micronaut
+* Knative
+* Dropwizard
+
+Si vous souhaitez un article détaillé à ce sujet, faites-le nous savoir dans les commentaires, mais décomposons ses principaux points pour le moment.
+
+### [Micronaut](https://micronaut.io/)
+
+Micronaut est un framework basé sur Java prenant en charge des langages tels que la compilation Java, Kotlin, Groovy et AOT, dans le but principal de fournir de meilleures performances et une consommation de ressources réduite.
+
+Il est également encore jeune, fondé en 2018 et publié sous la licence Apache 2.0, rendant sa communauté active, mais pas encore très importante.
+
+### [Knative](https://knative.dev/docs/)
+
+Knative est un PaaS open source pour le développement d’applications sans serveur au niveau de l’entreprise, ainsi que le déploiement et la mise à l’échelle automatisée dans Kubernetes.
+
+### [Dropwizard](https://www.dropwizard.io/en/latest/)
+
+Dropwizard est un framework basé sur Java pour un démarrage rapide des services Java REST. Il fournit plusieurs autres frameworks et un support pour les bibliothèques Java qui faciliteront la création, l’exécution et le déploiement de votre application.
+
+> *En conclusion, les deux frameworks « Spring boot et Quarkus » sont géniaux. En choisissant parmi eux, vous serez certainement en mesure de réaliser vos tâches avec la meilleure qualité. La seule différence réside dans le degré d’exhaustivité ou de spécialisation de votre solution et dans la priorité que vous accordez à la vitesse de l’application ou au développement lui-même. Et, bien sûr, les solutions techniques clés que chaque framework offre et qui sont essentielles à votre projet.*
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

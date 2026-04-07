@@ -1,0 +1,40 @@
+---
+title: "Discovering Vraptor4"
+slug: "a-la-decouverte-de-vraptor4"
+language: "en"
+publishedAt: "2017-01-24"
+tags: ["framework", "java", "mvc", "vraptor"]
+readingTime: 1
+excerpt: "When working with Java for the web, there are many possible action-based MVC frameworks. VRaptor is one of those and it is opensource. Its 4th version is based on CDI 1.1 and offers high pr"
+status: "published"
+coverImage: "/legacy/blogger/a-la-decouverte-de-vraptor4/01.png"
+---
+
+When working with Java for the web, there are many possible action-based MVC frameworks. VRaptor is one of those and it is opensource. Its 4th version is based on CDI 1.1 and offers high productivity to your Web applications. This article will give you a brief overview of its integration.  
+  
+1. Create a maven web project;  
+2. Edited your pom.xml file, to add Vraptor dependencies:  
+  
+```xml
+<dependency>
+    <groupId>br.com.caelum</groupId>
+    <artifactId>vraptor</artifactId>
+    <version>4.2.0-RC3</version>
+</dependency>
+```
+  
+3. Set up your controller.  
+  
+All you need to do to get started with your first controller on VRaptor is annotate your class with @Controller, and the framework relies on its URL and JSP conventions to let you use as little configuration as possible. This is an example:  
+  
+HelloController.java
+
+![](/legacy/blogger/a-la-decouverte-de-vraptor4/01.png)
+
+index.jsp, your view located at: WEB-INF/jsp/hello/index.jsp
+
+![](/legacy/blogger/a-la-decouverte-de-vraptor4/02.png)
+
+the Vraptor4 documentation, here [docs](http://www.vraptor.org/en/docs/one-minute-guide/)
+
+the source code of the helloVraptor project, here [source](https://github.com/ricken07/helloVraptor)

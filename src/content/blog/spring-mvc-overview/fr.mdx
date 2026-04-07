@@ -1,0 +1,258 @@
+---
+title: "Spring MVC : Overview"
+slug: "spring-mvc-overview"
+language: "fr"
+publishedAt: "2023-01-28"
+tags: ["java", "spring"]
+readingTime: 8
+excerpt: "Dans cet article, nous aborderons les sujets suivants : – Une introduction à l’architecture – Spring MVC – Comment configurer votre environnement de développement pour travailler avec Spring MVC"
+status: "published"
+---
+
+Dans cette première partie sur **Spring MVC**, nous aborderons les sujets suivants :
+
+* Une introduction à l’architecture **[Spring MVC](https://spring.io/guides/gs/serving-web-content/)**
+* Comment configurer votre environnement de développement pour travailler avec **Spring MVC**
+
+Nous commencerons par donner un aperçu de l’architecture **Spring MVC**, y compris ses principales caractéristiques et ses avantages. Nous verrons ensuite comment configurer votre environnement de développement, notamment les outils et les dépendances dont vous aurez besoin pour travailler avec **Spring MVC**. À la fin de cet article, vous aurez une meilleure compréhension de **Spring MVC** et vous saurez comment commencer à l’utiliser dans vos propres projets de développement Web.
+
+## **Introduction à l’architecture Spring MVC**
+
+### **Introduction**
+
+***Spring MVC suit le modèle de conception MVC, qui sépare l’application en trois composants principaux : le modèle, la vue et le contrôleur.***
+
+* **Le modèle** est un objet qui contient les données qui seront affichées dans la vue. Le modèle est généralement utilisé pour stocker des données provenant d’une base de données, d’un service ou d’une autre source de données. Le modèle est ensuite transmis à la vue, qui utilise les données du modèle pour générer le ***HTML***, le ***JSON*** ou toute autre sortie envoyée au client.
+* **La vue** est responsable du rendu de l’interface utilisateur de l’application. Elle présente les données du modèle à l’utilisateur et lui permet d’interagir avec l’application. La vue peut être implémentée en utilisant différentes technologies, telles que [JSP](https://jakarta.ee/specifications/pages/), [Thymeleaf](https://www.thymeleaf.org/).
+* **Le contrôleur** est le composant central de l’architecture. Il est chargé de traiter les demandes entrantes des clients et de renvoyer la réponse appropriée. Le contrôleur contient des méthodes, qui sont habituellement des méthodes simples exécutées en réponse aux requêtes entrantes pour renvoyer ***un nom de vue***. Dans Spring MVC, les méthodes du contrôleur sont mappées à des URL et des méthodes HTTP spécifiques, de sorte que lorsqu’une demande est reçue d’un client, la méthode appropriée du contrôleur est appelée pour traiter la demande. Le nom de la vue renvoyée par la méthode du contrôleur est ensuite utilisé pour rendre la réponse au client.
+
+### **Workflow (à partir de la réception d’une requête pour générer une réponse).**
+
+spring mvc workflow basic
+
+* Lorsqu’un client envoie une requête HTTP côté serveur, le conteneur Web (tel que Tomcat) reçoit la requête et la traite.
+
+> Qu’est-ce qu’un **conteneur web** ?
+>
+> Un conteneur web gère le cycle de vie des servlets. Si vous ne venez pas du monde **[Jakarta EE](https://jakarta.ee/)** (ancien JEE pour Java Entreprise Edition), une **[Servlet](https://jakarta.ee/specifications/servlet/)** est une simple classe capable de gérer des requêtes HTTP. Notre **DispatcherServlet** est toujours une simple Servlet, et nous allons utiliser un conteneur web pour maintenir son cycle de vie.
+
+* Le conteneur Web, tel que Tomcat, a transmis la requête **http** au **DispatcherServlet** pour un traitement ultérieur.
+
+> Qu’est-ce qu’un **DispatcherServlet** ?
+>
+> Le DispatcherServlet est un composant clé de l’architecture Spring MVC, qui est un framework modèle-vue-contrôleur (MVC) permettant de créer des applications Web en Java. Le **DispatcherServlet** joue le rôle du contrôleur front-end, qui est un modèle de conception définissant un mécanisme centralisé de traitement des demandes pour traiter toutes les demandes entrantes et les répartir vers les composants de traitement appropriés.
+
+Lorsqu’une requête **HTTP** est envoyée à une application **Spring MVC**, le **DispatcherServlet** reçoit la requête et examine **l’URL**, la méthode HTTP et les autres paramètres de la requête. Il utilise ensuite les mappages configurés pour affecter/mapper la requête à la méthode appropriée, qui est généralement une méthode du contrôleur qui traite la requête et génère la réponse. Le **DispatcherServlet** utilise également les résolveurs de vue configurés pour identifier le nom de la vue renvoyée par la méthode du contrôleur en un composant de vue concret, tel qu’une page **JSP** ou un modèle **Thymeleaf**, qui fournit la réponse.
+
+## **Configuration de l’environnement de développement**
+
+Pour la suite, j’utilise la version Ultimate de IntelliJ (vous pouvez utiliser votre IDE préféré) et Tomcat comme conteneur Web.
+
+Dans cette section, nous n’utiliserons pas **Spring Boot** car il configure automatiquement beaucoup d’aspects pour nous.
+
+* Étape 1 : créez un projet maven (choisissez l’archetype de l’application Web pour générer un projet d’application Web maven simple)
+
+> Archetype est une boîte à outils de modélisation d’un projet Maven
+
+* Étape 2 : allez sur **[maven repository](https://mvnrepository.com/)** et recherchez **Spring Web MVC ;** ajoutez la dépendance à votre fichier pom.xml
+
+```xml
+<dependency>
+   <groupId>org.springframework</groupId>
+   <artifactId>spring-webmvc</artifactId>
+   <version>6.0.4</version>
+</dependency>
+```
+
+* Étape 3 : Configurez votre serveur (ex : Tomcat).
+
+Pour configurer votre serveur, veuillez consulter ce lien : [cliquer ici](https://www.jetbrains.com/idea/guide/tutorials/working-with-apache-tomcat/using-existing-application/)
+
+* Étape 4 : Configuration du **DispatcherServlet**
+
+Il existe de nombreuses façons de configurer notre **DispatcherServlet**, mais ne vous inquiétez pas, nous allons toutes les couvrir.
+
+#### **Approche XML**
+
+**DispatcherServlet** agit en tant que contrôleur front-end dans les applications basées sur **Spring MVC**. Il accepte toute requête qui arrive à notre application et décide (en utilisant des mappings internes) du bon endpoint à exécuter. Ainsi, dans votre fichier **web.xml** (dossier **WEB-INF**), ajoutez cette configuration.
+
+```xml
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+
+  <display-name>Archetype Created Web Application</display-name>
+
+  <servlet>
+    <servlet-name>dispatcher-controller</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet
+    </servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>dispatcher-controller</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+</web-app>
+```
+
+lorsque nous déployons notre application sur notre serveur (ex : **Tomcat**) le conteneur web lira le fichier **web.xml** pour instancier la classe **DispatcherServlet** et configurer son mapping. (*Le cycle de vie du servlet sera géré par le conteneur Web*)
+
+**NB** : *Lorsqu’une application web est déployée sur Tomcat, Tomcat lit le descripteur de déploiement web une fois, pour obtenir la configuration et les paramètres de l’application. Ensuite, Tomcat stocke la configuration et les paramètres en mémoire, afin de pouvoir y accéder rapidement et efficacement pour chaque requête entrante.*
+
+Le **DispatcherServlet** effectue son travail en utilisant divers objets, tels que les gestionnaires de mappages, les résolveurs de vues et les contrôleurs. Par défaut, le **DispatcherServlet** recherche un fichier nommé WEB-INF/[votre nom de dispatcher-servlet dans web.xml]-servlet.xml. Toutefois, si ce fichier n’est pas trouvé, une exception FileNotFoundException est levée.
+
+Créez un fichier nommé [nom de votre dispatcher-servlet dans web.xml]-servlet.xml dans le dossier WEB-INF.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- component scanning -->
+    <context:component-scan base-package="net.autourducode" />
+
+    <!-- Define Spring MVC view resolver -->
+    <bean        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+</beans>
+```
+
+Le **DispatcherServlet** crée un **WebApplicationContext**, qui est un conteneur **IOC** (***WebApplicationContext** étend* ‘extends’ ***ApplicationContext** qui est utilisé avec les applications standalone*). Le **WebApplicationContext** gère tous les **beans** de l’application. Le fichier que nous venons de créer est un fichier de configuration pour le **WebApplicationContext**. Lorsque nous activons l’analyse des composants, le **WebApplicationContext** crée automatiquement un **bean** pour chaque classe annotée avec ***@Component*** ou l’une de ses annotations enfant, comme ***@Repository***, ***@Controller***, ***@RestController***, et ***@Service*** …
+
+Comme vous pouvez le voir, nous configurons explicitement un **bean** nommé **InternalResourceViewResolver** dans notre fichier **XML**. C’est l’une des implémentations du **view resolver pattern** de Spring.
+
+> **Qu’est-ce que le view resolver pattern ?**
+>
+> View resolver pattern est un modèle de conception utilisé dans le développement d’applications Web pour résoudre le nom de la vue logique renvoyée par un contrôleur à la vue physique (ex : un fichier **JSP** ou **HTML**) qui doit être rendue au client.
+
+Créez maintenant un contrôleur pour tester la configuration de **dispatcherServlet**
+
+```java
+@Controller
+public class SampleController {
+
+    @GetMapping("/")
+    public String page1(){
+        return "page1";
+    }
+}
+```
+
+Pour créer une nouvelle page JSP dans Spring MVC, vous pouvez suivre ces étapes :
+
+1. Dans le répertoire **WEB-INF** de votre application **Web**, créez un nouveau répertoire nommé **pages**.
+2. Dans le répertoire ‘**pages**‘, créez un nouveau fichier **JSP** appelé page1.jsp.
+3. Dans le fichier page1.jsp, ajoutez le code HTML de votre page.
+4. Si vous voulez utiliser une extension de fichier différente pour vos fichiers JSP (par exemple, .html), vous pouvez aller dans le fichier de configuration du dispatcher-servlet (situé dans WEB-INF/[nom du dispatcher-servlet dans web.xml]-servlet.xml) et changer le suffixe du bean **viewResolver**. Par exemple, si vous voulez utiliser .html comme extension de fichier, vous devez changer le suffixe de .jsp à .html.
+5. Si vous souhaitez stocker vos fichiers JSP dans un emplacement différent, vous pouvez modifier le préfixe du bean **viewResolver** dans le fichier de configuration du dispatcher-servlet. Cela indiquera à Spring MVC où chercher vos fichiers JSP.
+
+Structure du projet avec les configurations xml
+
+page jsp exécutée avec succès
+
+#### **Configuration Java avec l’interface WebApplicationInitializer**
+
+Supprimez le fichier **web.xml** dans votre application Spring MVC.
+
+Il est important de noter que sans un fichier web.xml ou un fichier de configuration du contexte, votre application Web ne disposera pas d’un DispatcherServlet pour traiter les demandes entrantes. Cela signifie que vous ne serez pas en mesure de répondre aux demandes des clients et que votre application Web ne fonctionnera pas correctement. Pour résoudre ce problème, vous devez créer une classe qui implémente l’interface WebApplicationInitializer et l’utiliser pour configurer et initialiser le DispatcherServlet de votre application Web.
+
+*Tomcat, s’il ne trouve pas de web.xml, recherchera automatiquement les classes qui implémentent l’interface **WebApplicationInitializer** lorsqu’il déploie une application web. S’il trouve une telle classe, il l’utilisera pour configurer et initialiser l’application web, au lieu d’utiliser le fichier web.xml.*
+
+```java
+public class MyWebApplicationInitializer implements WebApplicationInitializer {
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        // Charger le fichier de configuration XML
+        XmlWebApplicationContext appContext = new XmlWebApplicationContext();
+        appContext.setConfigLocation("/WEB-INF/my-config.xml");
+
+        // Créer et enregistrer le DispatcherServlet
+        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(appContext));
+        dispatcher.setLoadOnStartup(1);
+        dispatcher.addMapping("/");
+    }
+}
+```
+
+#### **Configuration Java avec la classe AbstractAnnotationConfigDispatcherServletInitializer**
+
+**AbstractAnnotationConfigDispatcherServletInitializer** est une classe abstraite qui a 3 méthodes abstraites que nous devrions remplacer pour configurer notre dispatcherServlet
+
+##### 1- getServletMapping() pour configurer le mapping de notre dispatcherServlet
+
+```
+protected String[] getServletMappings() {
+    return new String[]{"/"}; 
+}
+```
+
+##### 2- getServletConfigClasses() pour initialiser notre webApplicationContext
+
+```
+protected Class<?>[] getServletConfigClasses() {
+    Class[] classes = {MyConfig.class} ;
+    return classes ;
+}
+```
+
+**MyConfig Class** est une classe de configuration (remplacement d’un fichier xml qui contient nos beans ou qui utilise l’analyse des composants pour trouver nos beans)
+
+```java
+@Configuration
+@ComponentScan("net.autourducode")
+public class MyConfig {
+}
+```
+
+lorsque **DispatcherServlet** recherche une **applicationContext**, il utilise cette classe pour trouver tous les beans que nous devons instancier (c’est-à-dire controllers, Service beans, Repository, ….).
+
+la classe finale devrait ressembler à ceci :
+
+```java
+public class MyAppConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class[0];
+    }
+
+    protected Class<?>[] getServletConfigClasses() {
+        Class[] classes = {MyConfig.class} ;
+        return classes ;
+    }
+
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
+}
+```
+
+> **NB** : Il n’y a pas de **ViewResolver** ajouté par défaut à notre **WebApplicationContext**, nous devons donc en ajouter un à notre conteneur. Nous pouvons le faire en créant un bean dans la classe de configuration que nous avons précédemment créée (par exemple MyConfig) comme ceci :
+
+```java
+@Configuration
+@ComponentScan("net.autourducode")
+public class MyConfig {
+
+    @Bean
+    ViewResolver viewResolver(){
+         InternalResourceViewResolver internalResourceViewResolver = new InternalResourceViewResolver();
+         internalResourceViewResolver.setPrefix("/WEB-INF/pages/");
+        internalResourceViewResolver.setSuffix(".jsp");
+        return  internalResourceViewResolver;
+    }
+}
+```
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

@@ -1,0 +1,139 @@
+---
+title: "GIT – Les Commandes / Partie I"
+slug: "git-les-commandes-git-pull-git-fetch-et-git-merge"
+language: "fr"
+publishedAt: "2022-09-04"
+tags: ["devops", "git"]
+readingTime: 4
+excerpt: "Dans cet article, nous allons partager avec vous les commandes de base de GIT pour une prise en main rapide."
+status: "published"
+---
+
+Dans cet article, nous allons partager avec vous les commandes de base de [GIT](https://git-scm.com/) pour une prise en main rapide.
+
+### **GIT, c’est quoi ?**
+
+**Git** est un système de contrôle de version qui vous permet de gérer et de conserver l’historique de votre code source.
+
+*Pour héberger notre dépôt Git, nous allons utiliser GitHub*
+
+### **Pour commencer**
+
+* Utiliser la commande **git init** pour initialiser un dépôt **GIT** dans un nouveau répertoire ; *Un répertoire de configuration**.***
+
+Commande ***git init***
+
+* Le dépôt GIT existe au niveau d’un hébergeur, dans ce cas la commande **git clone** est principalement utilisé pour pointer vers le dépôt existant et faire un clone ou une copie de ce dépôt dans un nouveau répertoire.
+
+Commande **git clone**
+
+* Le dépôt GIT existe en local, utiliser la commande **git remote add** pour créer simplement une entrée dans votre configuration git qui spécifie un *nom* pour une *URL particulière*
+
+Commande **git remote add**
+
+### **Parlons des commandes**
+
+```bash
+git pull = git fetch + git merge
+```
+
+* Supposons que la branche locale est en synchronisation avec la branche distante pour le moment.  
+  la branche ‘**main**‘ (copie locale) et ‘**origin/main**‘ (pointe vers le master distant) pointent vers le même commit ‘aad0854c….‘
+
+Commande **git log**
+
+* Maintenant, supposons que l’un de vos coéquipiers a ajouté/poussé un nouveau fichier sur la branche **main** (***origin/main***) distante. La branche **main** locale n’est pas au courant de ce changement.  
+  Faisons un « **git fetch** » et voyons ce qui se passe.
+
+```bash
+git fetch
+```
+
+Commande **git fetch**
+
+Que s’est-il passé ? Faisons ‘git log’ et voyons :
+
+```bash
+git log
+```
+
+Commande **git log**
+
+Nous constatons que la branche ‘**main**‘ pointe vers ‘aad0854c….‘, mais où est ‘**origin/main**‘ ?
+
+Après la commande ‘**git fetch**‘, ‘**origin/main**‘ a été mis à jour avec ce qui se trouve dans le fichier distant ‘**main**‘. Comme votre coéquipier a ajouté un nouveau changement, il doit pointer vers lui.
+
+Cherchons où se trouve ‘origin/main’.
+
+```bash
+git log origin/main
+```
+
+Commande **git log** sur une branche
+
+* Nous pouvons voir, ‘**origin/main**‘ pointe vers le dernier commit qui est sur le serveur distant ‘**main**‘, mais le local ‘**main**‘ pointe toujours vers ‘aad0854c….‘ l’ancien commit.  
+  Comment pouvons-nous les synchroniser à nouveau ? Nous devons faire une fusion maintenant
+
+```bash
+git merge
+```
+
+Commande **git merge**
+
+Après le *merge*, ‘**origin/main**‘ et ‘**main**‘ pointent maintenant vers le même commit.
+
+Commande **git log** après un **git merge**
+
+* Nous pouvons effectuer le processus complet **git fetch** + **git merge**, en faisant simplement **git pull**.  
+  Supposons que votre coéquipier ait ajouté un nouveau fichier texte sur le serveur distant ‘**main**‘ et que votre serveur local ‘**main**‘ ne soit pas au courant de ce changement.
+
+Etat actuel du journal – ‘git log‘
+
+* Faisons « **git pull** » et voyons ce qui se passe.
+
+```bash
+git pull
+```
+
+Commande **git pull**
+
+Commande **git log** après un **git pull**
+
+Lorsque nous avons fait un ‘**git pull**‘, il a d’abord effectué un ‘**git fetch**‘ suivi d’un ‘**git merge**‘.  
+‘**origin/main**‘ et **‘main’** pointent sur le même commit
+
+### **Création et publication d’une branche**
+
+* Créer une branche locale **demo1** puis on se positionne sur la branche nouvellement créée ; nous pouvons utiliser les commandes suivantes pour la création d’une branche et pour se positionner sur la branche créée.
+
+```bash
+git branch demo1
+```
+
+```bash
+git checkout demo1
+```
+
+Ou
+
+```bash
+git checkout -b demo1
+```
+
+Création d’une branche locale
+
+* Le serveur distant n’est pas au courant de cette nouvelle branche **‘demo1’**
+
+**git pull**
+
+* Publions la nouvelle branche **‘demo1’** sur le serveur distant
+
+```bash
+git push -u origin demo1
+```
+
+git push -u
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : **https://bit.ly/3IwIK04**

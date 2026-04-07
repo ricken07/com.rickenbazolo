@@ -1,0 +1,365 @@
+---
+title: "Spring Boot – Creation of a WEB SERVICE"
+slug: "spring-boot-creation-dun-service-web"
+language: "en"
+publishedAt: "2022-09-24"
+tags: ["api", "java", "spring", "spring-boot"]
+readingTime: 2
+excerpt: "In this article, we will create a web service with spring boot, then we will configure the connection of the web service to a postgresql database"
+status: "published"
+---
+
+In this article, we will create **a web service with spring boot**, then we will configure the connection of the web service to a **postgresql database**.
+
+### **Creation of the WEB SERVICE**
+
+Spring Boot project structure
+
+### A)- **The pom.xml file**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>net.autourducode</groupId>
+    <artifactId>microservice-commande</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>microservice-commande</name>
+    <description>microservice-commande</description>
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+* **spring-boot-starter-web**: Used to build the web application, including **RESTful applications using Spring MVC**. It uses Tomcat as the default embedded container.
+* **spring-boot-starter-data-jpa**: **JPA** is a standard for defining the persistence layer and **[Spring Data JPA](https://spring.io/projects/spring-data-jpa)** is a subproject under the protection of **[Spring Framework](https://spring.io/projects/spring-framework)** which allows Spring applications to integrate with JPA; Spring uses **[Hibernate](https://hibernate.org/)** as its default JPA provider.
+
+### B)- **The application.yml file**
+
+**[YAML](https://yaml.org/)** is a data serialization language that is often used to write configuration files. So, the **application.yml** configuration file in Spring Boot provides a very convenient syntax for storing application configurations in a hierarchical format. The application.properties file is not very readable.
+
+Here is the configuration file of our control microservice, we find:
+
+* Embedded Tomcat server port configuration
+* The configuration of the **[DataSouce](https://docs.oracle.com/javase/8/docs/api/javax/sql/DataSource.html)**
+
+```
+# Spring Boot configuration
+server:
+  port: 50324 # Port d'écoute du serveur Tomcat embarqué
+spring:
+  # Database
+  datasource:
+    driver-class-name: org.postgresql.Driver # Le nom de la classe qui implémente java.sql.Driver
+    url: jdbc:postgresql://localhost:5432/commandes # url de connexion à la base de données postgres commandes
+    username: autourducode # Nom d'utilisateur de la base de données
+    password: autourducode # Mot de passe
+
+  # JPA/Hibernate propriétés
+  jpa:
+    hibernate:
+      ddl-auto: update # utilisée pour créer automatiquement les tables en fonction des classes d'entités dans l'application.
+    database-platform: org.hibernate.dialect.PostgreSQLDialect # le dialecte actuel permet de générer de meilleures requêtes SQL pour cette base de données
+```
+
+### C- **The Command class**
+
+The **Order** class is a **JPA** entity, it represents the “**orders**” table in the database, and each instance of this class corresponds to a row in this table.
+
+```java
+package net.autourducode.commande.model;
+
+import javax.annotation.processing.Generated;
+import javax.persistence.*;
+import java.util.Objects;
+
+/**
+ * @author rickenbazolo
+ */
+@Entity
+@Table(name = "commandes")
+public class Commande {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String nom;
+    private int quantite;
+    private double prix;
+
+    public Commande() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public int getQuantite() {
+        return quantite;
+    }
+
+    public void setQuantite(int quantite) {
+        this.quantite = quantite;
+    }
+
+    public double getPrix() {
+        return prix;
+    }
+
+    public void setPrix(double prix) {
+        this.prix = prix;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Commande commande = (Commande) o;
+        return quantite == commande.quantite && Double.compare(commande.prix, prix) == 0
+                && id.equals(commande.id) && nom.equals(commande.nom);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nom, quantite, prix);
+    }
+}
+```
+
+### D- **The CommandeDto record**
+
+A **record** is a special type of class with clear syntax for defining ***immutable classes containing only data.***
+
+```
+package net.autourducode.commande.model.dto;
+
+/**
+ * @author rickenbazolo
+ */
+public record CommandeDto (String nom, int quantite, double prix) {}
+```
+
+### E- **The CommandRepository interface**
+
+The **CommandRepository** interface here represents our **persistence layer** which is the **JpaRepository** interface, a **JPA** extension ([Java Persistence API](https://fr.wikipedia.org/wiki/Jakarta_Persistence)) specific to Repository. It contains the full API of **CrudRepository** and **PagingAndSortingRepository**. So it contains the API for basic **CRUD** operations and also the API for paging and sorting.
+
+```xml
+package net.autourducode.commande.repository;
+
+import net.autourducode.commande.model.Commande;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * @author rickenbazolo
+ */
+public interface CommandeRepository extends JpaRepository<Commande, Long> {
+}
+```
+
+### F- **The CommandService class**
+
+The **@Service** annotation is used to mark the class as a service provider, the class provides business logic.
+
+```xml
+package net.autourducode.commande.service;
+
+import lombok.AllArgsConstructor;
+import net.autourducode.commande.model.Commande;
+import net.autourducode.commande.model.dto.CommandeDto;
+import net.autourducode.commande.model.mapper.CommandeMapper;
+import net.autourducode.commande.repository.CommandeRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @author rickenbazolo
+ */
+@Service
+@AllArgsConstructor
+public class CommandeService {
+
+    private final CommandeMapper commandeMapper;
+    private final CommandeRepository commandeRepository;
+
+    /**
+     * Créer une commande
+     * @param commandeDto
+     * @return une Commande
+     */
+    public Commande create(CommandeDto commandeDto) {
+        Commande commande = commandeMapper.toEntity(commandeDto);
+        commande = commandeRepository.save(commande);
+        return commande;
+    }
+
+    /**
+     * Récupérer les commandes
+     * @return une liste des commandes
+     */
+    public List<Commande> read() {
+        return commandeRepository.findAll();
+    }
+
+    /**
+     * Mise à jour d'une commande
+     * @param id
+     * @param commandeDto
+     * @return une commande
+     */
+    public Commande update(Long id, CommandeDto commandeDto) {
+        return commandeRepository.findById(id).map(c -> {
+            c.setNom(commandeDto.nom());
+            c.setPrix(commandeDto.prix());
+            c.setQuantite(commandeDto.quantite());
+            return commandeRepository.save(c);
+        }).orElseThrow(() -> new IllegalStateException("Erreur !"));
+    }
+
+    /**
+     * Supprimer une commande
+     * @param id
+     * @return un message de confirmation
+     */
+    public String delete(Long id) {
+        if (commandeRepository.findById(id).isPresent()) {
+            commandeRepository.deleteById(id);
+            return "Commande supprimée";
+        } else {
+            return "Commande invalide!";
+        }
+    }
+}
+```
+
+### G- **The CommandController class**
+
+**Spring 4.0** introduced the **@RestController** annotation to simplify the creation of ***RESTful web services***. This is a convenient annotation that combines @Controller and @ResponseBody, eliminating the need to annotate each request-handling method of the controller class with the @ResponseBody annotation.
+
+```xml
+package net.autourducode.commande.controller;
+
+import lombok.AllArgsConstructor;
+import net.autourducode.commande.model.Commande;
+import net.autourducode.commande.model.dto.CommandeDto;
+import net.autourducode.commande.service.CommandeService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * @author rickenbazolo
+ */
+@RestController
+@RequestMapping("/commande")
+@AllArgsConstructor
+public class CommandeController {
+
+    private final CommandeService commandeService;
+
+    @PostMapping
+    public Commande create(@RequestBody  CommandeDto commandeDto) {
+        return commandeService.create(commandeDto);
+    }
+
+    @GetMapping
+    public List<Commande> read() {
+        return commandeService.read();
+    }
+
+    @PutMapping("/{id}")
+    public Commande update(@PathVariable Long id, @RequestBody CommandeDto commandeDto) {
+        return commandeService.update(id, commandeDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id) {
+        return commandeService.delete(id);
+    }
+}
+```
+
+### **Database**
+
+### **Testing the web service with Postman**
+
+Create an order
+
+Retrieve the list of orders
+
+Updating an order
+
+Delete an order
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: **https://bit.ly/3IwIK04**

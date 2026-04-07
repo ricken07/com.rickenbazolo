@@ -7,7 +7,6 @@ tags: ["api", "java"]
 readingTime: 12
 excerpt: "Dans cet article, nous allons apprendre les opérations terminales de Java Streams telles que AnyMatch , Collectors , Count , FindAny , FindFirst , Min , Max , NoneMatch et AllMatch ."
 status: "published"
-canonical: "https://autourducode.net/java/java-streams-operations-terminales-avec-exemples/"
 ---
 
 Dans cet article, nous allons apprendre les opérations terminales de Java Streams telles que **AnyMatch**, **Collectors**, **Count**, **FindAny**, **FindFirst**, **Min**, **Max**, **NoneMatch** et **AllMatch**.
@@ -52,8 +51,6 @@ public class JavaStreamAnyMatchTest {
 ##### Sortie console
 
 Dans ce test, nous avons une liste de pays qui comprend plusieurs éléments, et dans notre méthode de test, d’abord, **(ligne 20)** nous filtrons les éléments de pays non vides, **(ligne 21)** puis nous transformons les éléments filtrés en majuscule, et enfin, **(ligne 22)** nous vérifions s’il y a des éléments qui contiennent « **CONGO**« . Si oui, la méthode ***anyMatch()*** renvoie **true**, sinon elle renvoie **false**. Dans notre test, la liste de pays contient des éléments qui contiennent « **CONGO** » et la méthode ***anyMatch()*** renvoie **true** pour ce test.
-
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-20-à-17.36.06.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-20-à-17.36.06.png)
 
 #### *****collect()***** Opération terminale
 
@@ -155,8 +152,6 @@ Comme on le voit, les résultats des tests ci-dessous ;
 * Dans le deuxième exemple, nous utilisons la méthode ***joining()*** et nous avons joint les éléments du flux avec le délimiteur  » – « .
 * Dans le troisième exemple, nous regroupons les éléments du flux en fonction de règles spécifiques telles que la longueur de la chaîne, les éléments qui contiennent « r » et le regroupement par leur dernier caractère respectivement.
 
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-21-à-21.03.04-1024x307.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-21-à-21.03.04.png)
-
 #### *******count()******* Opération terminale
 
 La méthode ***count()*** retourne le nombre d’éléments dans un flux. L’exemple de fonctionnement de l’opération terminale ***count()*** est le suivant.
@@ -192,8 +187,6 @@ public class JavaStreamCountTest {
 ##### Sortie console
 
 Comme on le voit dans le résultat du test ci-dessous, le flux de nombres a deux filtres qui filtrent les nombres pairs inférieurs à 8, puis sautent le premier et avec la méthode ***count()***, nous les comptons. Ainsi, les nombres qui passent par le filtre sont 2, 4, 6 et le code saute le nombre 2, et les éléments finaux du flux sont 4 et 6 et le compte est 2.
-
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-13.51.46-1024x183.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-13.51.46.png)
 
 #### ***findAny()* Opération terminale**
 
@@ -293,8 +286,6 @@ Nous avons une liste de footballeurs et dans le **premier exemple**, le code tra
 
 L’exécution parallèle ne garantit pas toujours la meilleure performance et dans le troisième exemple, nous avons une mauvaise performance. Nous devrions utiliser des exécutions de flux parallèles, par exemple lorsque nous avons des opérations d’E/S ou des conditions similaires. Par exemple, si nous testons les liens brisés d’un site web, l’exécution parallèle améliore beaucoup les performances car nous attaquons les liens en parallèle, obtenons les résultats et les traitons. Dans ce cas, le parallélisme est beaucoup plus performant. Cependant, dans ce genre d’exemples simples, l’exécution parallèle est plus lente que l’exécution synchrone, comme vous pouvez le voir ci-dessous.
 
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-14.09.15-1024x432.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-14.09.15.png)
-
 #### ***findFirst()* **Opération terminale****
 
 La méthode ***findFirst()*** renvoie un Optional décrivant le premier élément de ce flux, ou un Optional vide si le flux est vide. Si le flux n’a pas d’ordre de rencontre, alors n’importe quel élément peut être retourné. Cette méthode est aussi une opération terminale de court-circuitage comme **findAny()**. Maintenant, il est temps de faire quelques exemples.
@@ -357,8 +348,6 @@ public class JavaStreamFindFirstTest {
 **Dans le premier exemple**, le code trouve le premier nombre pair qui est plus petit que 8, il devrait normalement être 2 mais à cause de la méthode skip() le code saute le 2 et le premier nombre qui satisfait la condition est 4. Nous avons imprimé le résultat avec les styles fonctionnel et non fonctionnel.
 
 **Dans le deuxième exemple**, le code ne peut pas trouver d’élément qui satisfait aux conditions du flux et, pour cette raison, il lève une « **NoSuchElementException**« .
-
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-14.34.48-1024x323.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-14.34.48.png)
 
 #### ***min()* et *max()* ****Opération terminale******
 
@@ -431,8 +420,6 @@ public class JavaStreamMinMaxTest {
 
 **Dans le quatrième exemple**, max avec l’ordre inverse est une sorte d’inverse de la recherche d’un nombre maximum que nous avons fait dans le troisième exemple, et le code imprime 1. (Inverse de Max à cause de reverseOrder).
 
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-14.51.40-1024x499.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-14.51.40.png)
-
 #### ***noneMatch()* et *allMatch()* ****Opération terminale******
 
 La méthode ***noneMatch()*** retourne **true** si aucun élément de ce flux ne correspond au prédicat fourni. Elle peut ne pas évaluer le prédicat sur tous les éléments si cela n’est pas nécessaire pour déterminer le résultat. Si le flux est vide, true est retourné et le prédicat n’est pas évalué.
@@ -489,8 +476,6 @@ public class JavaStreamNoneAndAllMatchTest {
 **Dans le premier exemple**, le code filtre les éléments de chaîne de caractères non vides, puis les transforme en minuscules et essaie ensuite de faire correspondre « **DEV** » aux éléments du flux, et aucun élément de ce flux ne correspond à cette condition, il renvoie donc true.
 
 **Dans le second exemple**, le code filtre les éléments de chaîne de caractères non vides, puis les transforme en minuscules et tente ensuite de faire correspondre « **DEV** » aux éléments du flux, et tous les éléments de ce flux ne correspondent pas à cette condition, il renvoie donc false.
-
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-20.57.12-1024x281.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décran-2022-06-22-à-20.57.12.png)
 
 Dans cet article, j’ai expliqué les opérations terminales les plus importantes de Java Streams avec des exemples. J’espère que vous avez apprécié sa lecture.
 

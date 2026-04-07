@@ -1,0 +1,166 @@
+---
+title: "JPA / Hibernate – Use a Map as an association"
+slug: "jpa-hibernate-utiliser-une-map-comme-association"
+language: "en"
+publishedAt: "2023-04-05"
+tags: ["hibernate", "java", "jpa"]
+readingTime: 2
+excerpt: "In this article we will see how to use a Map as an association between our entities, according to the Hibernate documentation, there are several annotations available (@MapKey, @MapKeyColumn, @MapKeyJoinColumn, @MapKeyEnumerated, @MapKeyTemporal, etc.)"
+status: "published"
+---
+
+In this article we will see how to use a **Map** as an association between our entities, according to the **Hibernate** documentation, there are several annotations available (**@MapKey**, **@MapKeyColumn**, **@MapKeyJoinColumn**, **@MapKeyEnumerated**, **@MapKeyTemporal**, etc.) the documentation says:
+
+Alternatively, the mapping key is mapped to one or more dedicated columns. To customize the mapping, use one of the following elements (annotations):
+
+* **@MapKeyColumn** if the key is a base type. If you do not specify the column name, the property name followed by an underscore followed by KEY is used (for example KEY_ORDERS).
+* **@MapKeyEnumerated** / **@MapKeyTemporal** if the key type is an enumeration or a date, respectively.
+* **@MapKeyJoinColumn** / **@MapKeyJoinColumns** if the key type is another entity.
+* **@AttributeOverride** / **@AttributeOverrides** when the mapping key is an embeddable object (**@Embeddable**).
+
+> Use the key. as a prefix for the property name of your **embeddable** object. You can also use **@MapKeyClass** to set the type of the key if you are not using generics.
+
+***By doing some examples, I am able to understand that @MapKey is just used to map the key to a property of the target entity and that key is used only to retrieve records. @MapKeyColumn is used to associate the key with a property of the target entity and this key is used to save and retrieve records.***
+
+When using a **Map**, you must always associate at least two entities. Suppose we have an entity ***Owner*** that relates to the entity ***Car*** (**Car** has an FK to **Owner**).
+
+Thus, the owner will have a **Map** of car(s):
+
+```xml
+Map<X, Voiture>
+```
+
+## **@MapKey**
+
+The **@MapKey** will give you ownership of the car used to group a car to its owner. For example, if we have a **level** (Vehicle Identification Number) property in **Car**, we could use it as the **mapCar** key:
+
+```xml
+@Entity
+public class Proprietaire {
+    @Id
+    private long id;
+
+    @OneToMany(mappedBy="proprietaire")
+    @MapKey(name = "niv")
+    private Map<String, Voiture> mapVoiture;
+}
+
+@Entity
+public class Voiture {
+    @Id
+    private long id;
+
+    @ManyToOne
+    private Proprietaire proprietaire;
+
+    private String niv;
+
+}
+```
+
+## **@MapKeyEnumerated**
+
+The **@MapKeyEnumerated** will use a Car *Enum*, such as *Drive Wheels*:
+
+```xml
+@Entity
+public class Proprietaire {
+    @Id
+    private long id;
+
+    @OneToMany(mappedBy="proprietaire")
+    @MapKeyEnumerated(EnumType.STRING)
+    private Map<RoueMotrice, Voiture > mapVoiture;
+}
+
+@Entity
+public class Voiture {
+    @Id
+    private long id;
+
+    @ManyToOne
+    private Proprietaire proprietaire;
+
+    @Column(name = "roue_motrice")
+    @Enumerated(EnumType.STRING)
+    private RoueMotrice roueMotrice;
+
+}
+
+public enum RoueMotrice {
+    2RM, 
+    4RM;             
+}
+```
+
+This allows cars to be grouped according to their drive wheels.
+
+## **@MapKeyTemporal**
+
+The **@MapKeyTemporal** will use a *Date* or *Calend*ar field for grouping, like createdOn.
+
+```xml
+@Entity
+public class Proprietaire {
+    @Id
+    private long id;
+
+    @OneToMany(mappedBy="proprietaire")
+    @MapKeyTemporal(TemporalType.TIMESTAMP)
+    private Map<Date, Voiture> mapVoiture;
+}
+
+@Entity
+public class Voiture {
+    @Id
+    private long id;
+
+    @ManyToOne
+    private Proprietaire proprietaire;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="created_on")
+    private Date createdOn;         
+}
+```
+
+## **@MapKeyJoinColumn**
+
+The **@MapKeyJoinColumn** column requires a third entity, such as the manufacturer, *in order to associate the owner with the car and the car with a manufacturer, which allows all of the owner's cars to be grouped by manufacturer*:
+
+```xml
+@Entity
+public class Proprietaire {
+    @Id
+    private long id;
+
+    @OneToMany(mappedBy="proprietaire")
+    @MapKeyJoinColumn(name="fabricant_id")
+    private Map<Fabricant, Voiture> mapVoiture;
+}
+
+@Entity
+public class Voiture {
+    @Id
+    private long id;
+
+    @ManyToOne
+    private Proprietaire proprietaire;
+
+    @ManyToOne
+    @JoinColumn(name = "fabricant_id")
+    private Fabricant fabricant;          
+}
+
+@Entity
+public class Fabricant {
+    @Id
+    private long id;
+
+    private String nom;
+}
+```
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our videos **#autourducode** on our YouTube channel:**https://bit.ly/3IwIK04**

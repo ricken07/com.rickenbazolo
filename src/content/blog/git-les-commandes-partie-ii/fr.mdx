@@ -1,0 +1,98 @@
+---
+title: "GIT – Les Commandes / Partie II"
+slug: "git-les-commandes-partie-ii"
+language: "fr"
+publishedAt: "2022-09-08"
+tags: ["devops", "git"]
+readingTime: 2
+excerpt: "Dans cette deuxième partie, nous allons continuer à explorer les commandes de base pour une prise en main rapide de GIT."
+status: "published"
+---
+
+Dans cette deuxième partie, nous allons continuer à explorer les commandes de base pour une prise en main rapide de GIT.
+
+### **Parlons des commandes GIT**
+
+#### Exploration de la commande **git log** pour visualiser les logs (journaux) de commits
+
+```bash
+git log
+```
+
+* Visualisation les **n derniers** commits (ici 2 commits)
+
+```bash
+git log -n2
+```
+
+* Visualisation des informations **en une ligne** de chaque commit
+
+```bash
+git log --oneline
+```
+
+* Sauter les n derniers commits (dans ce cas 2 commits)
+
+```bash
+git log --skip=2
+```
+
+* Rechercher facilement une chaîne de caractères ou une expression régulière dans une arborescence validée ou dans le répertoire de travail
+
+```xml
+git log --grep=<pattern>
+```
+
+#### git cherry-pick est cool 😎
+
+```xml
+git cherry-pick <commit id>
+```
+
+* Comme son nom l’indique, il permet de récupérer les changements d’un commit existant et de les appliquer en créant un nouveau commit. Voyons un exemple simple ; nous sommes actuellement sur la branche ‘**demo1**‘ et nous avons ajouté un nouveau changement avec l’id de commit ‘****6013975a02495**…**‘. – *Ajout du fichier newFile.txt*
+
+* Nous constatons que la branche ‘**main**‘ est en retard d’un commit par rapport à ‘**demo1**‘. Nous savons qu’une façon de mettre à jour ‘**main**‘ est de faire un **merge** (fusion) avec la branche ‘**demo1**‘. Mais ici, nous allons voir comment fonctionne le **cherry-pick**. Nous pouvons choisir un commit et l’appliquer. Donc choisissons le commit ‘**6013975a02495…**‘ et appliquons-le à ‘**main**‘. Positionnons-nous sur la branche ‘**main**‘ et faisons du **cherry pick**.
+
+Après le cherry-pick, les mêmes changements de ce commit sont appliqués à la branche ‘**main**‘. Mais cela crée un nouveau commit avec un **sha1** (id du commit) différent.
+
+* Voyons la différence entre les 2 commits
+
+```bash
+git diff commit1 commit2
+```
+
+a/… pour le commit1 ‘**6013975…**‘ et b/… est pour le commt2 ‘**58cebda…**‘ on peut voir un fichier (**newFile.txt**) a été ajouté dans le commit2
+
+* De la même manière, vous pouvez voir la différence entre deux branches.
+
+```bash
+git diff branchA branchB
+```
+
+* Pour voir la différence entre les changements en local **non indexés** et **indexés**.
+
+```bash
+git diff
+```
+
+* Pour voir la différence entre les modifications **indexées** et celles qui ont été **commitées** dans le dépôt local
+
+```bash
+git diff --staged
+```
+
+ou
+
+```bash
+git diff --cached
+```
+
+* Pour voir les changements dans un commit
+
+```xml
+git show <commit-sha>
+```
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : **https://bit.ly/3IwIK04**

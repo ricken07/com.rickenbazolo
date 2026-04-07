@@ -1,0 +1,162 @@
+---
+title: "Secure your API Gateway with Json Web Tokens (JWT)"
+slug: "securite-spring-cloud-gateway-json-web-token"
+language: "en"
+publishedAt: "2022-05-19"
+tags: ["api", "cloud", "java", "spring", "spring-boot"]
+readingTime: 2
+excerpt: "Spring recently released an update for microservices applications, and this update is a Spring Cloud Gateway that sits in front of all your microservices and accepts requests and then redirects them to the corresponding service. It’s handy to add a layer of security here, so that if a […]"
+status: "published"
+---
+
+Spring recently released an update for microservices applications, and this update is a gateway [**Spring Cloud Gateway**](https://spring.io/projects/spring-cloud-gateway) that stands in front of all your microservices and accepts requests, then redirects them to the corresponding service.
+
+It is convenient to add a layer of security here, so that if an unauthorized request arrives, it will not be forwarded to the resource microservice and will be rejected at the API gateway.
+
+##### **How should security work?**
+
+A client makes a request to a secure resource without authorization. The API gateway rejects it and redirects the user to the authorization server to authorize them in the system and obtain all the required permissions, then resubmits the request with those permissions to receive information from this secure resource.
+
+Simplified API Gateway architecture
+
+##### **Let's see the API gateway code:**
+
+First, we need to generate the token, validate it if it is present. So we need a JWT utility that will parse this token for us and see if it is valid. For this we need to create a custom useful JWT component.
+
+```java
+@Component
+@AllArgsConstructor
+public class JwtUtil {
+    @Value("${jwt.security.secret.key}")
+    private String jwtSecret;
+    @Value("${jwt.token.validity}")
+    private long tokenValidity;
+
+    public Claims getClaims(final String token) {
+        try {
+            Claims body = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+            return body;
+        } catch (Exception e) {
+            System.out.println(e.getMessage() + " => " + e);
+        }
+        return null;
+    }
+
+    public String generateToken(String id) {
+        Claims claims = Jwts.claims().setSubject(id);
+        long nowMillis = System.currentTimeMillis();
+        long expMillis = nowMillis + tokenValidity;
+        Date exp = new Date(expMillis);
+        return Jwts.builder().setClaims(claims).setIssuedAt(new Date(nowMillis)).setExpiration(exp)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+    }
+
+    public void validateToken(final String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+        } catch (SignatureException ex) {
+            System.out.println("Invalid JWT signature");
+        } catch (MalformedJwtException ex) {
+            System.out.println("Invalid JWT token");
+        } catch (ExpiredJwtException ex) {
+            System.out.println("Expired JWT token");
+        } catch (UnsupportedJwtException ex) {
+            System.out.println("Unsupported JWT token");
+        } catch (IllegalArgumentException ex) {
+            System.out.println("JWT claims string is empty.");
+        }
+    }
+}
+```
+
+We need the **filter**, which will check that all incoming requests to our API contain a valid token.
+
+```xml
+@RefreshScope
+@Component
+@AllArgsConstructor
+public class JwtAuthenticationFilter implements GatewayFilter {
+
+    private final JwtUtil jwtUtil;
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest request = (ServerHttpRequest) exchange.getRequest();
+        final List<String> apiEndpoints = List.of("/register", "/login");
+        Predicate<ServerHttpRequest> isApiSecured = r -> apiEndpoints.stream()
+                .noneMatch(uri -> r.getURI().getPath().contains(uri));
+
+        if (isApiSecured.test(request)) {
+
+            if (!request.getHeaders().containsKey("Authorization")) {
+                ServerHttpResponse response = exchange.getResponse();
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+
+                return response.setComplete();
+            }
+
+            final String token = request.getHeaders().getOrEmpty("Authorization").get(0);
+
+            try {
+                jwtUtil.validateToken(token);
+            } catch (Exception e) {
+                // e.printStackTrace();
+                ServerHttpResponse response = exchange.getResponse();
+                response.setStatusCode(HttpStatus.BAD_REQUEST);
+                return response.setComplete();
+            }
+            Claims claims = jwtUtil.getClaims(token);
+            exchange.getRequest().mutate().header("id", String.valueOf(claims.get("id"))).build();
+
+        }
+        return chain.filter(exchange);
+    }
+}
+```
+
+In this filter we have defined that we have secure routes and others that do not require a token.
+
+If a request is made to the secure route, we check its token, see if it is present in the request. If all of these conditions are true, we mutate our current request.
+
+There is no need to parse the token at each microservice to obtain this data. We just do it once at the API gateway and that's it.
+
+##### Gateway configuration:
+
+We have the filter and route validator, the JWT utility, and now we want to configure our API gateway.
+
+It’s about understanding which request should be routed to which microservice. There should be a set of rules for this, let's create it:
+
+```java
+@Configuration
+@AllArgsConstructor
+public class GatewayConfig {
+
+    private final JwtAuthenticationFilter filter;
+
+    @Bean
+    public RouteLocator routes(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route("secure", r -> r.path("/secure/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://secure-service"))
+                .route("public", r -> r.path("/public/**")
+                        .uri("lb://public-service"))
+                .build();
+    }
+}
+```
+
+So we defined a **GatewayConfig** with **RouteLocator** and said:
+
+* All requests that start with /secure/** should be routed to the **secure service** and our custom JWT filter should be applied to each of these requests.
+* All requests that start with /public/** should be directed to the **public service** which is not secure.
+
+Here is the behavior for requests that start with **/secure/**:**
+
+The browser will see the 401 Unauthorized error, understand that it must authorize itself.
+
+To access this resource, he will be redirected to the authorization server, get the token, make another request to this resource and this time the system will allow him to do so without any doubt.
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

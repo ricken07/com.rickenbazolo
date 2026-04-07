@@ -1,0 +1,174 @@
+---
+title: "Kubernetes: Using kubectl."
+slug: "kubernetes-utilisation-de-kubectl"
+language: "en"
+publishedAt: "2022-07-20"
+tags: ["cloud", "container", "devops", "k8s", "kubernetes", "pods"]
+readingTime: 3
+excerpt: "I would like to talk about using kubectl. “kubectl” as we mentioned is the CLI tool for Kubernetes which is a secure way to communicate with the Kube API server."
+status: "published"
+---
+
+In this article I would like to talk about using kubectl. “**kubectl**” as we mentioned is the CLI tool for Kubernetes which is a secure way to communicate with the **Kube API server**.
+
+This means I can create, list, delete and update Kubernetes resources using "kubectl". In other words, we can apply HTTP methods on the restore API to the kube-api server in a simple and secure way!
+
+I'll start with the basics all the way to advanced usage. An excellent list of commands is available here: [**https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands**](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands)
+
+## **Kubectl Create**
+
+Let's start by creating a resource:
+
+```xml
+kubectl create <ressourceType> <nomDeLaResource>
+```
+
+```
+kubectl create deployment testdeploy --image=nginx
+```
+
+We can create it from a YAML file:
+
+```
+kubectl create -f demok8sresource.yaml
+```
+
+```
+kubectl apply -f demok8sresource.yaml
+```
+
+> Important Note: The difference between “**create**” and “**apply**” is that, “create” can only create a resource, while “apply” can create and update a resource.
+>
+> For example, if the resource is already operational and you have made changes in the YAML, the “create” command will fail but “apply” will update the resource.
+
+Create the resource and run the Pod directly
+
+```xml
+kubectl run <nomDuPod> --image=<image>
+```
+
+```
+kubectl run nginx --image=nginx
+```
+
+## **List resources with Kubectl**
+
+To list any resource, we use “get”:
+
+```xml
+kubectl get <ressourceType>
+```
+
+```
+kubectl get deployments
+```
+
+This will get all available deployments in the default namespace. For a specific namespace, we need to add the parameter “**–namespace**” or “**-n**” and specify the namespace name.
+
+```
+kubectl get pods -n default
+```
+
+To list pods in all namespaces:
+
+```
+kubectl get pods --all-namespaces
+```
+
+To list all development-related resources available in, you can use:
+
+```
+kubectl get all
+```
+
+This will give you most of the resources, but except for a few types like secrets etc.
+
+We can get a specific resource:
+
+```xml
+kubectl get <ressourceType> <nomDeLaResource>
+```
+
+For more options, please refer [here](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#get).
+
+To get more information about a resource, we can describe it:
+
+```xml
+kubectl describe <ressourceType> <nomDeLaResource>
+```
+
+```
+kubectl describe pod nginx
+```
+
+## **Advanced use of Kubectl**
+
+As we mentioned in previous series, **kubectl** sends an HTTP request and receives an HTTP response in JSON format. Kubectl embellishes this answer and gives us understandable output in a different format.
+
+There are few different output options that you can use with '-o'.
+
+### For example:
+
+```
+kubectl get pods -o wide
+```
+
+As you can see, this will also give you the node and IP address information.
+
+If we want to see the JSON output
+
+```
+kubectl get pods -o json
+```
+
+Since we have **JSON** output, we can get specific information about it using **jsonpath**.
+
+```xml
+kubectl get <ressourceType> -o jsonpath=’{jsonpath.to.the.information}’
+```
+
+```
+kubectl get pods -o jsonpath=’{.items[*].metadata.name}’
+```
+
+> This will return the pod names.
+
+Another great option is “**custom columns**”. Using this flag we can beautify the output we want. As the name suggests, we create our custom columns and add the information that corresponds to them.
+
+```xml
+kubectl get <ressourceType> -o custom-columns=’<TITRE1>:<jsonpath>,<TITRE2>:<jsonpath>, …’
+```
+
+Important Note: When using jsonpath, you must mention the first item (i.e. .Items[]) because you are providing jsonpath. But when you use custom columns you ignore the first element.
+
+```
+kubectl get pods -o custom-columns=’NAME:.metadata.name’
+```
+
+Or with several columns:
+
+```
+kubectl get pods -o custom-columns='NAME:.metadata.name,NODE:.spec.name'
+```
+
+We can save the output in the format of our choice by adding `> <FileName>.<fileType>`:
+
+```
+kubectl get pods -o wide > pods.txt
+```
+
+Or
+
+```
+kubectl get pods -o json > pods.json
+```
+
+or even custom columns:
+
+```
+kubectl get pods -o custom-columns=’NAME:.metadata.name,STATUS:.status.phase’ > podstatus.txt
+```
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel:**https://bit.ly/3IwIK04**

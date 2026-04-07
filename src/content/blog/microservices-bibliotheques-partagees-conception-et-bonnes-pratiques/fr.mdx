@@ -1,0 +1,124 @@
+---
+title: "Microservices – Bibliothèques partagées, Conception et bonnes pratiques"
+slug: "microservices-bibliotheques-partagees-conception-et-bonnes-pratiques"
+language: "fr"
+publishedAt: "2023-01-26"
+tags: ["architecture", "microservices"]
+readingTime: 9
+excerpt: "Les meilleures pratiques d’aujourd’hui ne sont peut-être pas les meilleures pratiques de demain, vous êtes donc invités à essayer de nouvelles approches"
+status: "published"
+---
+
+Nous aimons les microservices, n’est-ce pas ? Cette architecture vous aide à diviser l’application en petites applications autonomes, avec des avantages significatifs, tels qu’une mise à l’échelle plus rapide et à moindre coût, une base de code plus petite et plus lisible, un développement et une mise à disposition de fonctionnalités plus rapides s’ils sont planifiés correctement.
+
+CEPENDANT, cela introduit également plusieurs difficultés, comme
+
+* communication — nécessite une communication réseau entre différents microservices,
+* débogage — le code et les logs sont distribués,
+* architecture plus complexe – généralement, les microservices sont utilisés avec une conception axée sur le domaine qui nécessite plus d’efforts pour être conçue correctement.
+
+## **Pourquoi il est important d’avoir des bibliothèques partagées.**
+
+Les bibliothèques partagées sont la solution clé pour la duplication de code entre les microservices.
+
+*L’un des exemples les plus courants du besoin de bibliothèques partagées est la journalisation. La journalisation peut avoir une logique personnalisée, comme le formatage ou le masquage d’informations sensibles, telles que les adresses et les numéros de téléphone des clients.*
+
+Imaginez maintenant que chaque microservice ait sa propre implémentation, combien d’heures de développement seront perdues à créer la même implémentation ? Et si ce n’est pas exactement la même implémentation dans les différents microservices ?
+
+L’agrégation des journaux deviendra une tâche encore plus difficile, deux enregistrements de journaux similaires peuvent être étiquetés différemment à cause de petits changements dans l’implémentation.
+
+*Un exemple qui mérite d’être mentionné est la [vulnérabilité de log4j](https://www.fortinet.com/blog/threat-research/critical-apache-log4j-log4shell-vulnerability-what-you-need-to-know) découverte, qui nécessite beaucoup plus d’efforts dans une architecture de microservices, car vous devez identifier et corriger chaque microservice.*
+
+Si vous disposez de votre propre bibliothèque de journalisation qui utilise log4j en interne, vous ne devez pas vous protéger de cette vulnérabilité qu’en un seul point.
+
+La journalisation apparaît dans n’importe quel microservice que vous créez (espérons-le), et elle ne dépend d’aucun d’entre eux, ***c’est donc un excellent exemple pour une bibliothèque partagée***. D’autres bons exemples de bibliothèques partagées sont la *sécurité*, le *monitoring*, la *communication asynchrone* et les *exceptions*.
+
+## **Pourquoi il est important de bien faire les choses**
+
+Une architecture de microservices a été créée pour découpler les différentes parties de l’application (entre autres raisons). Les bibliothèques partagées font le contraire, c’est un code commun partagé par tous les microservices.
+
+Cela signifie que si vous ne le faites pas bien, cela a le potentiel d’annuler l’un des plus grands avantages accordés par l’architecture des microservices ! *Le résultat est un étrange mélange de pièces, comme le monstre de Frankenstein 🧟‍♂️.*
+
+## **Les bonnes pratiques**
+
+### **Ne créez pas une seule bibliothèque**
+
+Il y a plusieurs façons de gérer vos bibliothèques partagées, le mieux étant de créer un dépôt différent pour chaque bibliothèque nécessaire ou un seul dépôt avec plusieurs bibliothèques. L’important est que d’une manière ou d’une autre, elles soient séparées.
+
+Par exemple, introduisez un référentiel unique qui comprend un projet pour le ***monitoring***, la ***sécurité***, la ***journalisation*** – chacun d’eux sera autonome (sauf s’il y a des dépendances nécessaires).
+
+Pourquoi (dans notre cas) avoir un seul dépôt qui inclut différents projets, il y a de multiples raisons pour lesquelles nous aimons cette approche, telles que :
+
+* Habituellement, chaque bibliothèque (dans notre cas en tout cas) est assez mince
+* Nous pouvons avoir un seul pipeline Jenkins pour la construction et la publication de toutes les bibliothèques
+* Il est plus facile d’avoir des dépendances (si nécessaire) entre les bibliothèques sous le même référentiel
+* Lors de la construction d’une nouvelle version, nous créons la même version pour toutes les bibliothèques, donc lors de la consommation des bibliothèques, nous pouvons avoir une seule version pour toutes
+
+### **Structure de la bibliothèque**
+
+Chaque bibliothèque peut être structurée comme vous le souhaitez, mais il existe 2 structures possibles qui s’adaptent particulièrement bien :
+
+1. Un simple dossier src contenant tout votre code
+2. Diviser la bibliothèque en 3 projets distincts : api, impl (pour l’implémentation) et test-kit, impl et le test-kit dépendant du projet api
+
+Plongeons plus profondément dans la deuxième structure…
+
+* Le **projet api** contient toutes les interfaces et classes utilisées par le client de la bibliothèque
+* Le **projet impl** a toute la logique réelle
+* Le **projet test-kit** contient un support de simulation et de test – par exemple, si votre bibliothèque utilise des appels REST, vous voudrez probablement faire un *mock* de la requête et de la réponse
+
+La séparation en 3 projets différents permet d’encapsuler les détails d’implémentation de la librairie, avec 3 bénéfices majeurs :
+
+* Éviter de rompre le contrat avec les utilisateurs lors de la modification des détails de mise en œuvre
+* Vous pouvez utiliser le projet **impl** et, pendant les tests, dépendre du **test-kit**. Cela présente au client de la bibliothèque une bien meilleure expérience lors des tests
+* Optimisation de l’outil de build, l’utilisation du projet **test-kit** ne nécessite pas le chargement du projet **impl**. De plus, certains outils de build ont des mécanismes de cache (tels que **gradle**), il n’est donc pas nécessaire de reconstruire des projets qui n’ont pas été modifiés
+
+Vous pouvez avoir une bibliothèque partagée qui utilise **LaunchDarkly** en interne.
+
+> ***[LaunchDarkly](https://launchdarkly.com/)*** est une plateforme pour gérer les **flags** de fonctionnalités, en l’utilisant, vous pouvez gérer les fonctionnalités en production, contrôler quels utilisateurs y ont accès et quand. Si vous avez un problème avec une nouvelle fonctionnalité ? Aucun problème, vous pouvez désactiver le **flag** de fonctionnalité correspondant et il sera désactivé en production jusqu’à ce qu’une enquête plus approfondie soit menée, sans qu’il soit nécessaire de redéployer.
+
+### **Éviter la rupture de compatibilité descendante**
+
+La dernière chose que vous voulez faire est de créer une bibliothèque mal conçue qui introduira des ruptures de compatibilité descendante potentielles à l’avenir.
+
+### **Encapsulation**
+
+Il est important d’encapsuler les décisions internes et la logique de l’utilisateur, c’est essentiel pour la programmation en général, et plus particulièrement pour une bibliothèque partagée.
+
+Si vous créez une bibliothèque avec du code spécifique d’un fournisseur, par exemple une bibliothèque permettant de télécharger des images vers un stockage, il est essentiel de créer l’interface/les classes qui sont utilisées par le client de manière générique.  
+Vous devez éviter les noms tels que « **S3ImageUploader** » (**s3** est un service Amazon de stockage de fichiers).
+
+En effet, si plus tard, vous souhaitez passer à **Azure Blob** (***service Microsoft équivalent pour amazon S3***), tous vos clients devront corriger la signature de la méthode.
+
+Il est préférable d’utiliser des noms tels que « **ImageUploader** » pour les interfaces exposées à l’utilisateur.
+
+### **Atténuez les dégâts**
+
+Parfois, vous devez casser le code, par exemple, vous devez remplacer une bibliothèque utilisée en interne à cause d’une nouvelle vulnérabilité.
+
+1. Utilisez ***[le versionnement sémantique](https://semver.org/)***, de sorte que vos versions suivent le modèle MAJOR.MINOR.PATCH, ce qui permet à vos clients de mettre à niveau les versions de manière appropriée. Le changement dans la version majeure permet aux gens de savoir que cette version pourrait introduire une rupture de compatibilité, afin qu’ils puissent faire leurs recherches et décider de mettre à niveau ou non. Le versionnement sémantique peut être difficile à gérer manuellement, mais ne vous inquiétez pas ***[Les commits conventionnels](https://www.conventionalcommits.org/en/v1.0.0/)*** viennent à la rescousse ! (nous y reviendrons plus tard)
+2. Une autre option consiste, au lieu de modifier le comportement de l’interface existante, à introduire une nouvelle interface avec la nouvelle logique à l’intérieur ; Vous pouvez également utiliser des parties ou la totalité du code existant, marquer l’ancienne interface comme *dépréciée* et ne pas supporter de nouvelle fonctionnalité à l’ancienne interface, mais seulement à la nouvelle. Cela aidera à pousser vos clients à adopter la nouvelle interface (avec le nouveau comportement).
+
+### **Faire du clean** **!**
+
+N’oubliez pas que de nombreuses personnes peuvent travailler sur la bibliothèque partagée, n’en faites pas un monolithe ! Réfléchissez bien avant d’introduire une nouvelle bibliothèque, et lorsque vous en créez une, essayez de penser à la façon dont elle pourrait évoluer et à qui pourrait l’utiliser. Ne soyez pas tenté de la créer pour vos propres besoins spécifiques, ce qui rendrait difficile son utilisation ou son extension par d’autres.
+
+N’écrivez pas de code spécifique au domaine à l’intérieur ! Même le code partagé qui est lié au domaine n’est probablement pas censé s’y trouver !  
+Par exemple, un modèle ***Utilisateur*** qui commence de la même manière pour tous les microservices est toujours une logique liée au domaine, et il n’a sûrement pas besoin d’être dans la bibliothèque, même si cela signifie que chaque microservice qui utilise ce modèle doit le dupliquer. La raison en est que différents microservices pourraient avoir besoin de le modifier à l’avenir pour répondre à leurs besoins commerciaux. Cela n’a aucun sens qu’ils travaillent tous avec le même modèle, cela peut introduire des champs ou une logique qui ne sont pas liés à d’autres **M.S** ou même les briser, s’ils veulent renommer ou changer une partie de la logique.
+
+Lors de l’utilisation d’un référentiel unique, nous trouvons que ***[les commits conventionnels](https://www.conventionalcommits.org/en/v1.0.0/)*** sont très utiles pour communiquer les changements que nous introduisons dans le code.
+
+Utilisez des conventions pour les commits, comme commencer chaque commit par un **fix** – *pour une correction de bogue (lié au patch)*, **feat** – *pour l’introduction d’une nouvelle fonctionnalité (lié au minor dans le versioning)*, et **BREAKING CHANGE** – *pour (vous l’avez deviné) un changement de rupture dans l’API (lié au major dans le versioning)*.  
+Cela est très utile lorsque quelqu’un d’autre essaie de comprendre l’historique du dépôt, ce qui a été fait et où dans le code.
+
+Il existe de nombreux excellents outils pour aider à l’automatisation ici, certains d’entre eux son **[action-semantic-pull-request](https://github.com/amannn/action-semantic-pull-request)** pour appliquer les commits conventionnels et **[la version standard](https://github.com/conventional-changelog/standard-version)** pour augmenter la version et créer un journal des modifications en fonction des commits conventionnels.
+
+### **Eh bien, c’est ça !**
+
+Après avoir lu cet article, vous êtes encouragé à essayer de créer des bibliothèques partagées qui aideront votre organisation à éviter la duplication de code et beaucoup de temps perdu à résoudre les problèmes introduits par des bibliothèques partagées mal écrites.
+
+Les meilleures pratiques d’aujourd’hui ne sont peut-être pas les meilleures pratiques de demain, vous êtes donc invités à essayer de nouvelles approches, mais seulement après avoir compris pourquoi et comment nous concevons et implémentons des bibliothèques partagées.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos **#autourducode** sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

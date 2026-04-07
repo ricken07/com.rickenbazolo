@@ -1,0 +1,162 @@
+---
+title: "Sécuriser votre API Gateway avec Json Web Tokens (JWT)"
+slug: "securite-spring-cloud-gateway-json-web-token"
+language: "fr"
+publishedAt: "2022-05-19"
+tags: ["api", "cloud", "java", "spring", "spring-boot"]
+readingTime: 2
+excerpt: "Spring a récemment publié une mise à jour pour les applications microservices, et cette mise à jour est une passerelle Spring Cloud Gateway qui se tient devant tous vos microservices et accepte les demandes, puis les redirige vers le service correspondant. Il est pratique d’ajouter une couche de sécurité ici, de sorte que si une […]"
+status: "published"
+---
+
+Spring a récemment publié une mise à jour pour les applications microservices, et cette mise à jour est une passerelle [**Spring Cloud Gateway**](https://spring.io/projects/spring-cloud-gateway) qui se tient devant tous vos microservices et accepte les demandes, puis les redirige vers le service correspondant.
+
+Il est pratique d’ajouter une couche de sécurité ici, de sorte que si une demande non autorisée arrive, elle ne sera pas transmise au microservice de ressources et sera rejetée au niveau de la passerelle API.
+
+##### **Comment la sécurité doit-elle fonctionner ?**
+
+Un client fait une demande à une ressource sécurisée sans autorisation. La passerelle API la rejette et redirige l’utilisateur vers le serveur d’autorisation pour l’autoriser dans le système et obtenir toutes les autorisations requises, ensuite refait la demande avec ces autorisations pour recevoir des informations de cette ressource sécurisée.
+
+Architecture simplified API Gateway
+
+##### **Voyons le code de la passerelle API :**
+
+Tout d’abord, nous avons besoin de générer le jeton (token), le valider s’il est présent. Nous avons donc besoin d’un utilitaire JWT qui analysera ce jeton pour nous et verra s’il est valide. Pour cela, nous devons créer un composant JWT utile personnalisé.
+
+```java
+@Component
+@AllArgsConstructor
+public class JwtUtil {
+    @Value("${jwt.security.secret.key}")
+    private String jwtSecret;
+    @Value("${jwt.token.validity}")
+    private long tokenValidity;
+
+    public Claims getClaims(final String token) {
+        try {
+            Claims body = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+            return body;
+        } catch (Exception e) {
+            System.out.println(e.getMessage() + " => " + e);
+        }
+        return null;
+    }
+
+    public String generateToken(String id) {
+        Claims claims = Jwts.claims().setSubject(id);
+        long nowMillis = System.currentTimeMillis();
+        long expMillis = nowMillis + tokenValidity;
+        Date exp = new Date(expMillis);
+        return Jwts.builder().setClaims(claims).setIssuedAt(new Date(nowMillis)).setExpiration(exp)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+    }
+
+    public void validateToken(final String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+        } catch (SignatureException ex) {
+            System.out.println("Invalid JWT signature");
+        } catch (MalformedJwtException ex) {
+            System.out.println("Invalid JWT token");
+        } catch (ExpiredJwtException ex) {
+            System.out.println("Expired JWT token");
+        } catch (UnsupportedJwtException ex) {
+            System.out.println("Unsupported JWT token");
+        } catch (IllegalArgumentException ex) {
+            System.out.println("JWT claims string is empty.");
+        }
+    }
+}
+```
+
+Nous avons besoin du **filtre**, qui vérifiera que toutes les demandes entrantes de notre API contiennent un jeton (token) valide.
+
+```xml
+@RefreshScope
+@Component
+@AllArgsConstructor
+public class JwtAuthenticationFilter implements GatewayFilter {
+
+    private final JwtUtil jwtUtil;
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest request = (ServerHttpRequest) exchange.getRequest();
+        final List<String> apiEndpoints = List.of("/register", "/login");
+        Predicate<ServerHttpRequest> isApiSecured = r -> apiEndpoints.stream()
+                .noneMatch(uri -> r.getURI().getPath().contains(uri));
+
+        if (isApiSecured.test(request)) {
+
+            if (!request.getHeaders().containsKey("Authorization")) {
+                ServerHttpResponse response = exchange.getResponse();
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+
+                return response.setComplete();
+            }
+
+            final String token = request.getHeaders().getOrEmpty("Authorization").get(0);
+
+            try {
+                jwtUtil.validateToken(token);
+            } catch (Exception e) {
+                // e.printStackTrace();
+                ServerHttpResponse response = exchange.getResponse();
+                response.setStatusCode(HttpStatus.BAD_REQUEST);
+                return response.setComplete();
+            }
+            Claims claims = jwtUtil.getClaims(token);
+            exchange.getRequest().mutate().header("id", String.valueOf(claims.get("id"))).build();
+
+        }
+        return chain.filter(exchange);
+    }
+}
+```
+
+Dans ce filtre, nous avons défini que nous avons des routes sécurisées et d’autres qui ne nécessitent pas de jeton.
+
+Si une demande est faite à la route sécurisée, nous vérifions son jeton, voir s’il est présent dans la demande. Si toutes ces conditions sont vraies, nous mutons notre demande en cours.
+
+Il n’est pas nécessaire d’analyser le jeton au niveau de chaque microservice pour obtenir ces données. Nous le faisons juste une fois au niveau de la passerelle API et c’est tout.
+
+##### Configuration de la passerelle :
+
+Nous avons le validateur de filtre et de route, l’utilitaire JWT, et maintenant nous voulons configurer notre passerelle API.
+
+Il s’agit de comprendre quelle requête doit être routée vers quel microservice. Il devrait y avoir un ensemble de règles pour cela, créons-le :
+
+```java
+@Configuration
+@AllArgsConstructor
+public class GatewayConfig {
+
+    private final JwtAuthenticationFilter filter;
+
+    @Bean
+    public RouteLocator routes(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route("secure", r -> r.path("/secure/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://secure-service"))
+                .route("public", r -> r.path("/public/**")
+                        .uri("lb://public-service"))
+                .build();
+    }
+}
+```
+
+Nous avons donc défini un **GatewayConfig** avec **RouteLocator** et dit :
+
+* Toutes les demandes qui commencent par /secure/** doivent être acheminées vers le **service secure** et notre filtre JWT personnalisé doit s’appliquer à chacune de ces demandes.
+* Toutes les requêtes qui commencent par /public/** doivent être dirigées vers le **service public** qui n’est pas sécurisé.
+
+Voici le comportement lors des demandes qui commencent par **/secure/** :**
+
+Le navigateur verra l’erreur 401 Unauthorized, comprendra qu’il doit s’autoriser.
+
+Pour accéder à cette ressource, il sera rediriger vers le serveur d’autorisation, obtiendra le jeton, fera une autre demande à cette ressource et cette fois le système lui permettra de le faire sans aucun doute.
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube : [**https://bit.ly/3IwIK04**](https://bit.ly/3IwIK04)

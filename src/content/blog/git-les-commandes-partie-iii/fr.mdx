@@ -1,0 +1,104 @@
+---
+title: "GIT – Les commandes / Partie III"
+slug: "git-les-commandes-partie-iii"
+language: "fr"
+publishedAt: "2022-10-04"
+tags: ["devops", "git"]
+readingTime: 2
+excerpt: "Dans cette troisième partie, nous allons continuer à explorer les commandes de base pour une prise en main rapide de GIT."
+status: "published"
+---
+
+Dans cette troisième partie, nous allons continuer à explorer les commandes de base pour une prise en main rapide de GIT.
+
+### **Parlons des commandes GIT**
+
+#### **1- Définissez votre nom d’utilisateur et votre adresse électronique**
+
+Le nom d’utilisateur et l’adresse e-mail sont nécessaires pour lier les commits à votre nom. vous pouvez définir ou mettre à jour votre nom d’utilisateur et l’adresse e-mail en utilisant n’importe quel nom avec la commande **git config**. Le nouveau nom sera automatiquement reflété dans tous les futurs commits que vous enverrez à GitHub/GITLAB/BITBUCKET depuis la ligne de commande.
+
+```bash
+git config --global user.name "autourducode"
+```
+
+```bash
+git config --global user.email "dev@example.com"
+```
+
+#### **2- Mettez en cache vos informations d’identification**
+
+Vous pouvez simplement mettre en cache vos identifiants de connexion en utilisant le paramètre config et l’option -global. Cela permet d’éviter de retaper le nom d’utilisateur et le mot de passe à chaque fois que vous effectuez un commit, d’une autre manière, cette option permet également de gagner du temps.
+
+```bash
+git config --global credential.helper cache
+```
+
+#### **3- Initialiser un référentiel**
+
+Vous pouvez créer un dépôt **Git** vide ou réinitialiser un dépôt existant en utilisant le paramètre init. Il créera un répertoire caché appelé .git lors de l’initialisation. Ce répertoire contient tous les objets et références que Git utilise et crée dans le cadre de l’historique de votre projet.
+
+```bash
+git init
+```
+
+#### **4- Ajouter un fichier**
+
+Vous pouvez ajouter un fichier en utilisant le paramètre **add** et le nom du fichier. Vous pouvez également ajouter tous les fichiers et répertoires avec ‘**.**‘ à la place du nom du fichier.
+
+```bash
+git add mon_fichier.txt
+```
+
+```bash
+git add .
+```
+
+#### **5- Vérifier l’état d’un référentiel**
+
+Vous pouvez voir l’état du référentiel actuel en utilisant le mot-clé *status*, qui inclut les fichiers **staged**, **unstaged** et **untracked**.
+
+```bash
+git status
+```
+
+#### 6- Valider les changements
+
+Vous pouvez ajouter un message d’une seule ligne lors d’un commit dans votre dépôt en utilisant le flag **commit** avec **-m**
+
+```bash
+git commit -m "Votre bref résumé"
+```
+
+Vous pouvez également ouvrir un éditeur de texte dans le terminal pour écrire un message complet. Ce message peut contenir un texte de plusieurs lignes pour vous permettre d’expliquer de manière détaillée les modifications apportées à un dépôt.
+
+```bash
+git commit
+```
+
+#### **7- Afficher l’historique des commits avec les modifications**
+
+Parfois, nous avons besoin de vérifier les changements effectués et les détails de commits, pour cela GIT vous aidera à suivre avec le paramètre **log** et vous pouvez ajouter quelques flag supplémentaires, comme ci-dessous **-p** qui fournira les changements détaillés.
+
+```bash
+git log -p
+```
+
+#### **8- Rétablir les changements**
+
+Vous pouvez restaurer les fichiers de l’arbre de travail non mis à jour en utilisant le paramètre **checkout**. Vous devez fournir un chemin de fichier pour le mettre à jour. Si le chemin d’accès au fichier n’est pas défini, alors ***git checkout*** mettra à jour le **HEAD** pour définir la branche spécifiée comme branche courante.
+
+```bash
+git checkout mon_fichier.txt
+```
+
+```bash
+git reset HEAD mon_fichier.txt
+```
+
+```bash
+git reset HEAD
+```
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos #autourducode sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

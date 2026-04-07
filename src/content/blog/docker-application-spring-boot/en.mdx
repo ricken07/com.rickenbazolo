@@ -1,0 +1,165 @@
+---
+title: "Dockerize a Spring Boot application"
+slug: "docker-application-spring-boot"
+language: "en"
+publishedAt: "2022-05-16"
+tags: ["devops", "docker", "java", "spring", "spring-boot"]
+readingTime: 3
+excerpt: "Around the Code we guide you through the process of building a Docker image to run a Spring Boot application."
+status: "published"
+---
+
+In this article, we will create a Docker container for a simple “**hello World!**” Spring boot application using Maven
+
+#### Prerequisites:
+
+* [JDK 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or newer
+* [Docker](https://docker.com/)
+* [Maven 3.2+](https://maven.apache.org/download.cgi)
+* An IDE
+
+Once you have installed all the required software, it's time to download the source code
+
+[Download](https://github.com/autourducode/docker-spring-boot) and unzip the source code or clone the code using [Git](https://github.com/ricken07/docker-spring-boot.git):
+
+git clone https://github.com/autourducode/docker-spring-boot.git
+
+In the **pom.xml** file located at the root of the “docker-sprint-boot” folder we find the Maven plugin for Docker, the native Docker executable via the [maven exec plugin](https://www.mojohaus.org/exec-maven-plugin/) This means that the version of Docker that is injected into the Maven lifecycle is always the same as the Docker daemon that will actually run the image.
+
+```xml
+           <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.9</version>
+                <configuration>
+                    <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                </configuration>
+            </plugin>
+```
+
+Here we mention the prefix of the Docker image that we are going to build; This configuration specifies one mandatory thing, which is that the image will be created as `${docker.image.prefix}/${project.artifactId}`
+
+```xml
+<artifactId>docker-spring-boot</artifactId>
+    <version>1.0</version>
+    <name>DockerSpringBoot</name>
+    <description>DockerSpringBoot</description>
+    <properties>
+        <docker.image.prefix>mydocker</docker.image.prefix>
+```
+
+image name: **mydocker/docker-spring-boot**
+
+Spring Boot's Maven plugin collects all the jars on the [classpath](https://docs.oracle.com/javase/tutorial/essential/environment/paths.html) and builds a single executable jar, making it more convenient to run and transport your service. It looks for the **public static void main()** method to flag it as an executable class. It also provides a built-in dependency resolver that sets the version number to match Spring Boot dependencies.
+
+#### The configuration also specifies the following:
+
+* a task to unpack the jar file
+* the name of the image (or tag) is defined from the properties of the jar file, which will be found here in the following form **mydocker/docker-spring-boot**
+* the location of the unzipped Jarfile, which we could have hardcoded into the **Dockerfile** file
+* a build argument to docker pointing to the jar file (the jar file can be renamed in the pom.xml with the tag `\<finalName>hello\</finalName>`)
+
+#### Configuring the Spring Boot application
+
+Understanding the MainApplication.java class which is located in the src folder
+
+```java
+package com.autourducode.dockerspringboot;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+@SpringBootApplication
+@RestController
+public class MainApplication {
+    
+    @RequestMapping("/")
+    public String hello() {
+        return "Hello Docker World";
+    }
+    
+    public static void main(String[] args) {
+        SpringApplication.run(MainApplication.class, args);
+    }
+    
+}
+```
+
+The class is marked as **@SpringBootApplication** and as **@RestController** which means it is ready to be used by Spring MVC to handle web requests, **@RequestMapping** maps / to the **hello()** method which simply sends a "Hello Docker World" response.
+
+The **main()** method uses Spring Boot's **SpringApplication.*run*()** method to launch the application.
+
+Run the application without the Docker container (i.e. in the host OS) with Maven, run the cmd below to build the jar and launch the application on port 8080
+
+```bash
+./mvnw package && java -jar target/hello.jar
+```
+
+Go to **http://localhost:8080** to see your “**Hello Docker World**” message.  
+If you can see the "Hello Docker World" message, the Spring Boot application is up and running in Tomcat. But it is not yet containerized.
+
+#### Let’s containerize our application
+
+The **Dockerfile** file located at the root of the project.
+
+```dockerfile
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
+ARG DEPENDENCY=target/dependency
+COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY ${DEPENDENCY}/META-INF /app/META-INF
+COPY ${DEPENDENCY}/BOOT-INF/classes /app
+ENTRYPOINT ["java","-cp","app:app/lib/*","MainApplication.Application"]
+```
+
+Before building the Docker image, let's check that Docker is running by running the command below
+
+```
+docker ps
+```
+
+If you get an error message, something is wrong. Review the Docker configuration
+
+Building the Docker image with the maven plugin
+
+```bash
+./mvnw spring-boot:build-image
+```
+
+```json
+[INFO] <<< spring-boot-maven-plugin:2.6.3:build-image (default-cli) < package @ docker-spring-boot <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.6.3:build-image (default-cli) @ docker-spring-boot ---
+[INFO] Building image 'docker.io/library/docker-spring-boot:1.0'
+```
+
+```json
+[INFO] <<< spring-boot-maven-plugin:2.6.3:build-image (default-cli) < package @ docker-spring-boot <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.6.3:build-image (default-cli) @ docker-spring-boot ---
+[INFO] Building image 'docker.io/library/docker-spring-boot:1.0'
+[INFO] Successfully built image 'docker.io/library/docker-spring-boot:1.0'
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+Run Docker image
+
+```
+docker run -p 8081:8080 -t docker-spring-boot:1.0
+```
+
+The application is then available at [http://localhost:8081](http://localhost:8081/) (visit it and it says “Hello Docker World”). Here, 8081 is the Docker port and 8080 is the Tomcat port. This means that the application running on Tomcat port 8080 will be available on Docker port 8081.  
+When Docker is running, you can see in the list of containers, with the command:
+
+```
+docker ps
+```
+
+#### **It’s done! We created a Docker container for the Spring Boot application.**
+
+[best site to buy replica watches](https://watches1.is/)

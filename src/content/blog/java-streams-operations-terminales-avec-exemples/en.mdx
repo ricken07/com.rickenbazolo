@@ -7,7 +7,6 @@ tags: ["api", "java"]
 readingTime: 11
 excerpt: "In this article, we will learn terminal operations of Java Streams such as AnyMatch, Collectors, Count, FindAny, FindFirst, Min, Max, NoneMatch and AllMatch."
 status: "published"
-canonical: "https://autourducode.net/java/java-streams-operations-terminales-avec-exemples/"
 ---
 
 In this article, we will learn terminal operations of Java Streams such as **AnyMatch**, **Collectors**, **Count**, **FindAny**, **FindFirst**, **Min**, **Max**, **NoneMatch** and **AllMatch**.
@@ -52,8 +51,6 @@ System.out.println(result);
 ##### Console output
 
 In this test, we have a list of countries which includes several elements, and in our test method, first, **(line 20)** we filter the non-empty country elements, **(line 21)** then we transform the filtered elements to uppercase, and finally, **(line 22)** we check if there are elements which contain "**CONGO**".If yes, the ***anyMatch()*** method returns **true**, otherwise it returns **false**.In our test, the country list contains elements that contain "**CONGO**" and the ***anyMatch()*** method returns **true** for this test.
-
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-20-à-17.36.06.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-20-à-17.36.06.png)
 
 #### *****collect()***** Terminal operation
 
@@ -155,8 +152,6 @@ As seen, the test results below;
 * In the second example, we use the ***joining()*** method and joined the stream elements with the "-" delimiter.
 * In the third example, we group the elements in the stream based on specific rules such as string length, elements that contain "r" and grouping by their last character respectively.
 
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-21-à-21.03.04-1024x307.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-21-à-21.03.04.png)
-
 #### *******count()******* Terminal operation
 
 The ***count()*** method returns the number of elements in a stream.The working example of the terminal operation ***count()*** is as follows.
@@ -192,8 +187,6 @@ System.out.println("Count: " + count);
 ##### Console output
 
 As seen in the test result below, the number stream has two filters that filter even numbers less than 8, then skip the first one and with the ***count()*** method we count them.So the numbers that pass through the filter are 2, 4, 6 and the code skips the number 2, and the final elements of the stream are 4 and 6 and the count is 2.
-
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-13.51.46-1024x183.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-13.51.46.png)
 
 #### ***findAny()* Terminal operation**
 
@@ -293,8 +286,6 @@ We have a list of footballers and in the **first example**, the code first trans
 
 Parallel execution does not always guarantee the best performance and in the third example we have poor performance.We should use parallel stream executions, for example when we have I/O operations or similar conditions.For example, if we are testing broken links of a website, parallel execution improves performance a lot because we attack the links in parallel, get the results and process them.In this case, parallelism is much more efficient.However, in these kinds of simple examples, parallel execution is slower than synchronous execution, as you can see below.
 
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.09.15-1024x432.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.09.15.png)
-
 #### ***findFirst()* **Terminal operation****
 
 The ***findFirst()*** method returns an Optional describing the first element of this stream, or an empty Optional if the stream is empty.If the stream has no encounter order, then any element can be returned.This method is also a terminal short-circuiting operation like **findAny()**.Now it's time to do some examples.
@@ -357,8 +348,6 @@ firstFoundNumber.ifPresent(System.out::println);
 **In the first example**, the code finds the first even number that is smaller than 8, it should normally be 2 but because of the skip() method the code skips the 2 and the first number that satisfies the condition is 4. We printed the result with the functional and non-functional styles.
 
 **In the second example**, the code cannot find an element that satisfies the conditions of the flow and, for this reason, it throws a “**NoSuchElementException**“.
-
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.34.48-1024x323.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.34.48.png)
 
 #### ***min()* and *max()* ****Terminal operation******
 
@@ -431,8 +420,6 @@ max.ifPresent(System.out::println);
 
 **In the fourth example**, max with reverse order is a sort of inverse of finding a maximum number that we did in the third example, and the code prints 1. (Reverse of Max because of reverseOrder).
 
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.51.40-1024x499.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-14.51.40.png)
-
 #### ***noneMatch()* and *allMatch()* ****Terminal operation******
 
 The ***noneMatch()*** method returns **true** if no element in this stream matches the provided predicate.It may not evaluate the predicate on all elements if this is not necessary to determine the outcome.If the stream is empty, true is returned and the predicate is not evaluated.
@@ -489,8 +476,6 @@ System.out.println(result);
 **In the first example**, the code filters out non-empty string elements, then changes them to lowercase and then tries to match "**DEV**" to the elements in the stream, and no elements in this stream match this condition, so it returns true.
 
 **In the second example**, the code filters out non-empty string elements, then changes them to lowercase and then tries to match "**DEV**" to the elements in the stream, and not all elements in that stream match this condition, so it returns false.
-
-[![](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-20.57.12-1024x281.png)](https://autourducode.net/wp-content/uploads/2022/06/Capture-décr-2022-06-22-à-20.57.12.png)
 
 In this article, I have explained the most important terminal operations of Java Streams with examples.I hope you enjoyed reading it.
 

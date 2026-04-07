@@ -1,0 +1,29 @@
+---
+title: "GlassFish Encoding, change Default value"
+slug: "glassfish-encodage-modifier-la-valeur-par-defaut"
+language: "en"
+publishedAt: "2017-05-17"
+tags: ["galssfish", "server"]
+readingTime: 1
+excerpt: "GlassFish's default encoding returns text encoded in ISO 8859 1. This is based on the Hypertext Transfer Protocol HTTP/1.1 RFC 3.7.1 Canonicalization and defaults for text that requires encoding pa"
+status: "published"
+coverImage: "/legacy/blogger/glassfish-encodage-modifier-la-valeur-par-defaut/01.png"
+---
+
+The default GlassFish encoding returns ISO-8859-1 encoded text. This is based on Hypertext Transfer Protocol - HTTP/1.1 RFC 3.7.1 Canonicalization and Text Defaults which requires the default encoding for text to be returned in this manner.  
+  
+Web application developers often use UTF-8 as an encoding in their applications, but fail to change the server defaults. This applies to anything that uses Servlets (including JSP and JSF). You can change the default values ​​in sun-web.xml or glassfish-web.xml as shown below by setting the parameter encoding element.  
+  
+```xml
+<glassfish-web-app>
+    <!-- Change the default character encoding from ISO-8859-1 to UTF-8 -->
+    <parameter-encoding default-charset="UTF-8"/>
+</glassfish-web-app>
+```
+
+|  |
+| --- |
+|  |
+| glassfich-web.xml file |
+
+source: [JHON YEARY](http://javaevangelist.blogspot.com/)

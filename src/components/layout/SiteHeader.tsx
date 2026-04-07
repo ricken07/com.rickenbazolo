@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Container } from "./Container";
 import { ThemeToggle } from "../ui/ThemeToggle";
@@ -14,8 +15,6 @@ interface SiteHeaderProps {
 const NAV_ITEMS = [
   { key: "about", href: "/about" },
   { key: "blog", href: "/blog" },
-  { key: "speaking", href: "/speaking" },
-  { key: "tools", href: "/tools" },
 ];
 
 export function SiteHeader({ locale }: SiteHeaderProps) {
@@ -99,15 +98,19 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
 }
 
 function LocaleSwitcher({ locale }: { locale: string }) {
+  const pathname = usePathname();
   const target = locale === "fr" ? "en" : "fr";
   const flagUrls: Record<"fr" | "en", string> = {
     fr: "https://cdn.jsdelivr.net/npm/twemoji@latest/2/svg/1f1eb-1f1f7.svg",
     en: "https://cdn.jsdelivr.net/npm/twemoji@latest/2/svg/1f1fa-1f1f8.svg",
   };
 
+  // Replace the locale segment in the current path (e.g. /fr/blog → /en/blog)
+  const targetPath = pathname.replace(/^\/(fr|en)/, `/${target}`);
+
   return (
     <Link
-      href={`/${target}`}
+      href={targetPath}
       className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground transition hover:border-accent hover:text-accent"
       aria-label={`Switch language to ${target.toUpperCase()}`}
     >

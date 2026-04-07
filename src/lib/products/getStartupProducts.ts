@@ -1,15 +1,8 @@
 import path from "node:path";
 import { promises as fs } from "node:fs";
+import type { StartupProduct } from "@/lib/types";
 
-export interface StartupProduct {
-  slug: string;
-  name: string;
-  tagline: string;
-  description: Record<string, string>;
-  techStack: string[];
-  websiteUrl?: string;
-  featured?: boolean;
-}
+export type { StartupProduct };
 
 const PRODUCTS_PATH = path.join(process.cwd(), "src", "content", "products", "gad-digital-products.json");
 

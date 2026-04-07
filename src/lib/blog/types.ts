@@ -8,9 +8,11 @@ export interface BlogPost {
   excerpt: string;
   language: Language;
   tags: string[];
-  publishedAt: string;       // "YYYY-MM-DD"
-  readingTime?: number;
+  publishedAt: string;  // "YYYY-MM-DD"
+  readingTime: number;  // auto-calculated, frontmatter value used as fallback
   status: "draft" | "published";
+  coverImage?: string;  // optional cover image URL or /public path
+  canonical?: string;   // original URL if cross-posted
 }
 
 export interface BlogPostWithContent extends BlogPost {

@@ -1,0 +1,218 @@
+---
+title: "Jakarta EE 10 – Setting up a WebSocket Server"
+slug: "jakarta-ee-9-1-mise-en-place-dun-serveur-websocket"
+language: "en"
+publishedAt: "2022-08-31"
+tags: ["jakarta-ee", "java", "websocket"]
+readingTime: 3
+excerpt: "WebSocket is a bidirectional communications protocol that allows clients to send and receive messages through a single connection to a server"
+status: "published"
+---
+
+WebSocketConnection
+
+In this article, I would like to share how to set up a **WebSocket** server.
+
+WebSocket is a bidirectional communications protocol that allows clients to send and receive messages through a single connection to a server; WebSocket is a vendor-neutral standard. **The Jakarta WebSocket API**, part of the [Jakarta EE Platform](https://jakarta.ee/), can be used to develop **WebSocket servers** as well as **WebSocket clients**. This article provides a brief overview of the **Jakarta WebSocket** specification by creating a webSocket server.
+
+### **Jakarata WebSocket, the project**
+
+We will use **[intellij IDEA](https://www.jetbrains.com/fr-fr/idea/download/#section=mac)** to initialize a new application **[Java Enterprise](https://jakarta.ee/)**.
+
+Intellij IDEA, creation of a Java Enterprise application
+
+### Add the following dependency to the dependency block in the pom.xml file:
+
+```xml
+<dependency>
+   <groupId>jakarta.websocket</groupId>
+   <artifactId>jakarta.websocket-api</artifactId>
+   <version>2.1.1</version>
+   <scope>provided</scope>
+ </dependency>
+```
+
+Define the name of the “war” file using the tag in the pom.xml:
+
+```xml
+<build>
+  <finalName>webSocketServer</finalName>
+</build>
+```
+
+### **The WebSocket endpoint**
+
+To communicate with a WebSocket server, you must configure a server endpoint. The simplest endpoint is a standard Java class that is annotated with **@ServerEndpoint**, it is used to decorate a class and declare it as a WebSocket endpoint. You can *provide it with a parameter that represents the path on which the endpoint is exposed*.
+
+WebSocket messages can be both textual and binary. We'll create an endpoint that can process both types of messages.
+
+Create a new class called **SimpleEndpoint** and annotate it with **@ServerEndpoint(“/simple”)**, The @ServerEndpoint annotation accepts **the URI** (**“/simple”**) to which the WebSocket server will accept messages that need to be sent. ***The URI can also be used to register clients as recipients of WebSocket messages***.
+
+```java
+import jakarta.websocket.server.ServerEndpoint;
+
+/**
+ * @author autourducode
+ */
+@ServerEndpoint("/simple")
+public class SimpleEndpoint {
+
+}
+```
+
+The **@OnMessage** annotation connects Java methods to binary or text events (the annotated method will be called when the event is received).
+
+For demonstration purposes, we will create an echo server that will return the received message to the sender.
+
+In order to test binary messages, we will send images to the WebSocket server. The default maximum size depends on the container, but you can use the **maxMessageSize** parameter to specify the message size to support.
+
+### **Methods:**
+
+```java
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
+import java.util.logging.Logger;
+
+/**
+ * @author autouducode
+ */
+@ServerEndpoint("/simple")
+public class SimpleEndpoint {
+    private static final Logger logger = Logger.getLogger(SimpleEndpoint.class.getName());
+    @OnOpen
+    public void connected(Session session) {
+        System.out.println("***** Message du serveur, client connecté *****");
+    }
+
+    @OnMessage
+    public String textMessage(String message) {
+        logger.info("***** Nouveau message texte reçu *****");
+        logger.info(message);
+        return message + " - Modification du serveur";
+    }
+
+    @OnMessage(maxMessageSize = 1024000)
+    public byte[] binaryMessage(byte[] buffer) {
+        logger.info("***** Nouveau message binaire reçu *****");
+        return buffer;
+    }
+}
+```
+
+Note that the method signature determines ***the type of message the method will process***. See the documentation for the **[OnMessage](https://jakarta.ee/specifications/websocket/1.1/apidocs/javax/websocket/onmessage)** annotation for a list of supported method signatures.
+
+### **A client to test the application**
+
+A client can connect to the server endpoint URI to open the connection, ***which will remain open to send and receive messages for the duration of the session***.
+
+```xml
+<html>
+<head>
+  <style>
+    #messages {
+      text-align: left;
+      width: 50%;
+      padding: 1em;
+      border: 1px solid blue;
+    }
+  </style>
+  <title>Exemple de client WebSocket</title>
+</head>
+<body>
+<div class="container">
+  <div id="messages" class="messages"></div>
+  <div class="input-fields">
+    <p>Ecrivez un message et cliquez sur envoyer :</p>
+    <input id="message"/>
+    <button id="envoyer">Envoyer</button>
+
+    <p>Choisir une image et cliquez sur envoyer :</p>
+    <input type="file" id="file" accept="image/*"/>
+    <button id="envoyerImage">Envoyer l'image</button>
+  </div>
+</div>
+</body>
+<script type = "text/javascript">
+  let messageWindow = document.getElementById("messages");
+  let sendButton = document.getElementById("envoyer");
+  let messageInput = document.getElementById("message");
+  let fileInput = document.getElementById("file");
+  let sendImageButton = document.getElementById("envoyerImage");
+  let wsUri = "ws://localhost:8080/webSocketServer/simple";
+  var socket;
+
+  function testWebSocket() {
+    socket = new WebSocket(wsUri);
+    socket.binaryType = "arraybuffer";
+    socket.onopen = function (event) {
+      addMessageToWindow("Client connecté: ");
+    };
+    socket.onmessage = function (event) {
+      if (event.data instanceof ArrayBuffer) {
+        addMessageToWindow(`J'ai reçu une image (message binaires):`);
+        addImageToWindow(event.data);
+      } else {
+        addMessageToWindow(`J'ai reçu un message text: ${event.data}`);
+      }
+    };
+  }
+
+  sendButton.onclick = function (event) {
+    sendMessage(messageInput.value);
+    messageInput.value = "";
+  };
+
+  sendImageButton.onclick = function (event) {
+    let file = fileInput.files[0];
+    sendMessage(file);
+    fileInput.value = null;
+  };
+
+  function sendMessage(message) {
+    socket.send(message);
+    addMessageToWindow("Message : " + message);
+  }
+
+  function addMessageToWindow(message) {
+    messageWindow.innerHTML += `<div>${message}</div>`
+  }
+
+  function addImageToWindow(image) {
+    let url = URL.createObjectURL(new Blob([image]));
+    messageWindow.innerHTML += `<img src="${url}"/>`
+  }
+  
+  window.addEventListener("load", testWebSocket, false);
+</script>
+</html>
+```
+
+### Configure **[Payara Server](https://www.payara.fish/products/payara-server/)** to deploy the application
+
+Payara Server Enterprise
+
+### **Start the application**
+
+The WebSocket server is now complete. Start your application and access your client at:
+
+```
+http://localhost:8080/webSocketServer/
+```
+
+Example JavaScript client for testing the WebSocket server
+
+The message "**Client connected**" indicates that the JavaScript client was able to establish a connection.
+
+Try sending a *text message by typing in the input field* and clicking the send button. *Also try uploading an image*. In either case, you should see the same message and image returned.
+
+JavaScript client example showing an echoed text and binary message.
+
+In this tutorial, you learned how to create a WebSocket server using the **[Jakarta WebSocket Specification](https://jakarta.ee/specifications/websocket/2.0/websocket-spec-2.0.html)** standard, which can receive binary and text messages and run on any standard-compliant container.
+
+The source code for this tutorial can be found in the **[WebSocket-Server](https://github.com/autourducode/WebSocket-Serveur)** repository.
+
+I hope this article was useful to you. Thanks for reading it.
+
+Find our #autourducode videos on our YouTube channel: **https://bit.ly/3IwIK04**

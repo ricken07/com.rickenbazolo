@@ -1,0 +1,41 @@
+---
+title: "Architecture Hexagonale – Pourquoi ?"
+slug: "architecture-hexagonale"
+language: "fr"
+publishedAt: "2023-03-03"
+tags: ["architecture"]
+readingTime: 3
+excerpt: "Architecture hexagonale : Créez votre application pour qu’elle fonctionne sans interface utilisateur ni base de données, afin que vous puissiez exécuter des tests de régression automatisés sur l’application, travailler lorsque la base de données devient indisponible et relier les applications entre elles sans aucune intervention de l’utilisateur."
+status: "published"
+---
+
+Un logiciel qui n’est pas bien organisé et qui manque de principes d’architecture logicielle solides peut fonctionner correctement mais développer une dette technique au fil du temps. Au fur et à mesure que de nouvelles fonctionnalités sont ajoutées, logiciel peut devenir plus complexe à maintenir car il n’y a pas de base commune pour guider les modifications du code. Partant de ce problème, cet article explique comment **l’architecture hexagonale** permet de lutter contre la dette technique en établissant une base commune pour les changements de code ; une approche où la logique métier est découplée du code technologique, ce qui permet au premier d’évoluer sans dépendre du second.
+
+## **Architecture Hexagonale ?**
+
+> Créez votre application pour qu’elle fonctionne sans interface utilisateur ni base de données, afin que vous puissiez exécuter des tests de régression automatisés sur l’application, travailler lorsque la base de données devient indisponible et relier les applications entre elles sans aucune intervention de l’utilisateur.
+>
+> – Alistair Cockburn.
+
+Cette citation jette les bases de la compréhension de l’architecture hexagonale. Nous pouvons aller encore plus loin avec les pensées de *Cockburn* et faire fonctionner notre application sans aucune technologie ; et pas seulement la technologie liée à l’interface utilisateur ou aux bases de données.
+
+L’une des principales idées de **l’architecture hexagonale** est de séparer le code métier du code technologique. Mais ce n’est pas tout, il faut aussi s’assurer que le côté technologique dépend de l’aspect métier afin que ce dernier puisse évoluer sans se soucier de la technologie utilisée pour atteindre les objectifs du business.
+
+Nous devons déterminer un endroit où le code métier existera, isolé et protégé de tout souci technologique. Cela donnera lieu à la création de notre *premier hexagone* : **l’hexagone du Domaine**.
+
+Dans **l’hexagone du domaine**, nous rassemblons les éléments responsables de la description *des problèmes fondamentaux que nous voulons que notre logiciel résolve*. Les *entités* et les *objets de valeur* sont les principaux éléments qui sont utilisés dans l’hexagone du domaine.
+
+* **Les entités représentent des choses auxquelles nous pouvons attribuer une identité**
+* **Les objets de valeur sont des composants immuables que l’on peut utiliser pour composer nos entités**
+
+> Les termes utilisés font référence aux **entités** et aux **objets de valeur** qui proviennent des principes **DDD**.
+
+*Nous avons également besoin de moyens pour utiliser, traiter et orchestrer les règles métier provenant de l’hexagone de domaine*. C’est ce que fait **l’hexagone de l’Application**. Il se situe entre le Domaine (le métier) et la technologie, servant d’intermédiaire pour interagir avec les deux parties. **L’hexagone de l’Application** utilise des **ports** et des **cas d’utilisation** pour remplir ses fonctions.
+
+**L’hexagone du Framework** fournit l’interface du monde extérieur. C’est l’endroit où nous avons la possibilité de déterminer comment exposer les fonctionnalités de l’application – c’est là que nous définissons les points de terminaison *REST* ou *gRPC*, par exemple. Et pour consommer des éléments provenant de sources externes, nous utilisons **l’hexagone du Framework** pour spécifier les mécanismes de récupération des données à partir de bases de données ou de tout autre système. Dans l’architecture hexagonale, nous matérialisons les décisions technologiques par des **adaptateurs**. Le diagramme suivant fournit une vue de haut niveau de l’architecture :
+
+L’architecture hexagonale
+
+J’espère que cet article vous a été utile. Merci de l’avoir lu.
+
+Retrouvez nos vidéos **#autourducode** sur notre chaîne YouTube :**https://bit.ly/3IwIK04**

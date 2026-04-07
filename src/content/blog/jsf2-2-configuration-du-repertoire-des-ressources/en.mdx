@@ -1,0 +1,24 @@
+---
+title: "JSF2.2: configuring \"resource directory\""
+slug: "jsf2-2-configuration-du-repertoire-des-ressources"
+language: "en"
+publishedAt: "2017-02-13"
+tags: ["galssfish", "java"]
+readingTime: 1
+excerpt: "JSF 2.2 allows you to configure the directory used for searching resources. By default, the resource management mechanism introduced in JSF 2.0 searches for resources in the following locations: 1. /r"
+status: "published"
+coverImage: "/legacy/blogger/jsf2-2-configuration-du-repertoire-des-ressources/01.png"
+---
+
+JSF 2.2 allows you to configure the directory used for searching resources.  
+  
+By default, the resource management mechanism introduced in JSF 2.0 looks for resources in the following locations:
+
+1. /resources under the web application root folder.
+2. /META-INF/resources in JAR files.
+
+The downside of /resources is that everything in that folder is accessible from the outside by default. This is not always desirable, especially for composite components. Therefore, *JSF 2.2* introduces the *javax.faces.WEBAPP_RESOURCES_DIRECTORY* context parameter to specify the directory used for resource searching in the web application's file system (point 1 in the list above). In the list below, the path is moved to */WEB-INF/resources* for example. Resources inside /WEB-INF can be accessed by JSF, but never from the "outside world".  
+  
+illustration:
+
+![](/legacy/blogger/jsf2-2-configuration-du-repertoire-des-ressources/01.png)
