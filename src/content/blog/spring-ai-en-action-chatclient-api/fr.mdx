@@ -1,0 +1,326 @@
+---
+title: "ChatClient API : Premiers pas avec l'API ChatClient de Spring AI"
+slug: "spring-ai-en-action-chatclient-api"
+language: "fr"
+publishedAt: "2026-04-09"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot"]
+readingTime: 8
+excerpt: "Le ChatClient est le point d'entrée principal pour interagir avec les modèles d'IA dans Spring AI. Dans cet article, nous explorons son utilisation à travers trois sous-modules : un prompt simple avec suivi des tokens, un contrôleur REST avec streaming multi-modèle, et le support de la multimodalité."
+status: "published"
+---
+
+Après avoir posé les bases de Spring AI dans l'article d'introduction, il est temps de mettre les mains dans le code. Le **ChatClient** est le composant central du framework : c'est lui qui nous permet de communiquer avec les modèles d'IA.
+
+Dans cet article, nous allons explorer le ChatClient à travers trois sous-modules du projet démo :
+
+* **single-chat-model** : premier prompt et suivi des tokens
+* **multi-chat-model** : contrôleur REST avec appel synchrone et streaming
+* **multimodality-chat-model** : support des modèles de vision (multimodalité)
+
+## A- Le ChatClient : une API fluide familière
+
+Le `ChatClient` de Spring AI offre une API fluide pour communiquer avec les modèles d'IA. Si vous avez déjà utilisé `WebClient` ou `RestClient` de Spring, vous vous sentirez en terrain connu.
+
+Le principe est simple :
+
+1. **Construire** un `ChatClient` à partir du `ChatClient.Builder` (auto-configuré par Spring Boot)
+2. **Envoyer un prompt** avec `.prompt("votre question")`
+3. **Appeler le modèle** avec `.call()` (synchrone) ou `.stream()` (réactif)
+4. **Récupérer la réponse** avec `.content()` (texte brut) ou `.chatResponse()` (réponse complète avec métadonnées)
+
+```java
+ChatClient chatClient = chatClientBuilder.build();
+
+// Réponse simple (texte)
+String text = chatClient.prompt("Bonjour !").call().content();
+
+// Réponse complète (avec métadonnées)
+ChatResponse response = chatClient.prompt("Bonjour !").call().chatResponse();
+
+// Streaming réactif
+Flux<String> stream = chatClient.prompt("Bonjour !").stream().content();
+```
+
+## B- Single Chat Model : premier prompt et suivi des tokens
+
+Le premier sous-module, `single-chat-model`, illustre l'utilisation la plus basique du `ChatClient` : envoyer un prompt à un modèle et récupérer la réponse complète avec le suivi des tokens consommés.
+
+### Dépendance
+
+Pour utiliser Ollama comme moteur d’inférence, une seule dépendance suffit :
+
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-ollama</artifactId>
+</dependency>
+```
+
+### Configuration
+
+La configuration du modèle se fait dans `application.yaml` :
+
+```yaml
+spring:
+  ai:
+    ollama:
+      chat:
+        model: qwen3:0.6b
+```
+
+Ici, nous utilisons **qwen3:0.6b**, un modèle léger de Qwen idéal pour les tests locaux. Il faut au préalable l'avoir téléchargé avec `ollama pull qwen3:0.6b`.
+
+### Code
+
+Le code utilise un `CommandLineRunner` pour exécuter le prompt au démarrage de l'application :
+
+```java
+@SpringBootApplication
+public class SingleChatApplication {
+
+    static void main(String[] args) {
+        SpringApplication.run(SingleChatApplication.class, args);
+    }
+
+    @Bean
+    CommandLineRunner runnerSingleChat(ChatClient.Builder chatClientBuilder) {
+        return _ -> {
+            ChatClient chatClient = chatClientBuilder.build();
+            var response = chatClient
+                    .prompt("Peux-tu m'expliquer brièvement le fonctionnement des LLM ?")
+                    .call().chatResponse();
+            var tokenUsage = response.getMetadata().getUsage();
+            System.out.printf(
+                "Tokens used: %d (prompt: %d, response: %d)%n",
+                tokenUsage.getTotalTokens(),
+                tokenUsage.getPromptTokens(),
+                tokenUsage.getCompletionTokens()
+            );
+        };
+    }
+}
+```
+
+### Points clés
+
+* Le `ChatClient.Builder` est **auto-configuré** par Spring Boot grâce au starter Ollama. Il suffit de l'injecter.
+* L'appel `.call().chatResponse()` retourne un objet `ChatResponse` qui contient la réponse textuelle mais aussi les **métadonnées** comme l'utilisation des tokens.
+* Le pattern `_ ->` dans le lambda est une fonctionnalité de Java 22+ (variables anonymes) : on n'utilise pas le paramètre `args` du `CommandLineRunner`.
+* Le suivi des tokens est essentiel en production pour **monitorer les coûts** et la consommation.
+
+### Détail des tokens
+
+| Métrique | Méthode | Description |
+| --- | --- | --- |
+| Tokens du prompt | `getPromptTokens()` | Nombre de tokens envoyés au modèle |
+| Tokens de la réponse | `getCompletionTokens()` | Nombre de tokens générés par le modèle |
+| Total | `getTotalTokens()` | Somme des deux |
+
+## C- Multi Chat Model : REST + Streaming + Multi-fournisseur
+
+Le second sous-module, `multi-chat-model`, va plus loin en exposant le `ChatClient` via un contrôleur REST avec support du **streaming** et de **plusieurs fournisseurs** (Ollama + OpenAI).
+
+### Dépendances
+
+Ce module déclare deux starters de modèles :
+
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-ollama</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
+</dependency>
+```
+
+### Configuration
+
+```yaml
+spring:
+  ai:
+    ollama:
+      chat:
+        model: qwen3:0.6b
+    openai:
+      api-key: ${OPENAI_API_KEY}
+    model:
+      chat: none
+```
+
+La propriété `spring.ai.model.chat: none` est importante lorsque plusieurs modèles de chat sont disponibles. Elle désactive l'auto-configuration automatique du modèle par défaut, vous laissant le contrôle total sur le choix du modèle.
+
+### Contrôleur REST
+
+```java
+@RestController
+@RequestMapping("/chat")
+public class DemoController {
+
+    private final ChatClient chatClient;
+
+    public DemoController(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
+    }
+
+    @GetMapping
+    public String sync(String message) {
+        return chatClient.prompt(message).call().content();
+    }
+
+    @GetMapping("/stream")
+    public Flux<String> stream(String message) {
+        return chatClient.prompt(message).stream().content();
+    }
+}
+```
+
+### Points clés
+
+* **Appel synchrone** (`/chat?message=...`) : `.call().content()` bloque jusqu'à la réponse complète puis retourne le texte.
+* **Streaming** (`/chat/stream?message=...`) : `.stream().content()` retourne un `Flux<String>` qui émet les tokens au fur et à mesure de leur génération. Idéal pour une expérience utilisateur fluide avec un affichage progressif.
+* Le `ChatClient` est construit une seule fois dans le constructeur et réutilisé. Il est **thread-safe**.
+
+### Tester les endpoints
+
+```bash
+# Appel synchrone
+curl "http://localhost:8080/chat?message=Bonjour"
+
+# Streaming (les tokens arrivent progressivement)
+curl -N "http://localhost:8080/chat/stream?message=Raconte-moi une histoire"
+```
+
+Le flag `-N` de curl désactive le buffering pour voir les tokens arriver en temps réel.
+
+## D- Multimodalité : quand l’IA comprend vos images
+
+Le troisième sous-module, `multimodality-chat-model`, introduit le support de la **multimodalité** : la capacité d’envoyer au modèle d’IA non seulement du texte, mais aussi des images, des fichiers audio et des vidéos.
+
+### Configuration
+
+```yaml
+spring:
+  ai:
+    ollama:
+      chat:
+        model: qwen3-vl:2b
+```
+
+Le modèle **qwen3-vl:2b** est un modèle de vision-langage qui peut analyser des images et répondre à des questions les concernant.
+
+### Code
+
+```java
+@SpringBootApplication
+public class MultimodalityChatApplication {
+
+    static void main(String[] args) {
+        SpringApplication.run(MultimodalityChatApplication.class, args);
+    }
+
+    @Bean
+    CommandLineRunner runnerMultimodalityChat(ChatClient.Builder chatClientBuilder) {
+        return _ -> {
+            var chatClient = chatClientBuilder.build();
+            var response = chatClient
+                    .prompt("Peux-tu m'expliquer brièvement le fonctionnement des LLM ?")
+                    .call().content();
+            System.out.println(response);
+        };
+    }
+}
+```
+
+### Support multimodal avec Spring AI
+
+Spring AI offre un support natif de la multimodalité via les classes `Resource` et `MimeTypeUtils`. Voici un exemple de prompt multimodal avec une image :
+
+```java
+@Value("classpath:test-image.png")
+private Resource imageResource;
+
+var response = chatClient.prompt()
+    .user(u -> u.text("Décris cette image")
+        .media(MimeTypeUtils.IMAGE_PNG, imageResource))
+    .call()
+    .content();
+```
+
+### Points clés
+
+* La multimodalité nécessite un **modèle compatible** (comme qwen3-vl, GPT-4o, Claude, etc.)
+* Spring AI gère la sérialisation de l'image et son envoi au modèle de manière transparente
+* Le même `ChatClient` est utilisé — seul le prompt change pour inclure des médias
+* Les types de médias supportés dépendent du modèle : images (PNG, JPEG), audio, etc.
+
+## E- La portabilité en action
+
+Un des grands avantages de Spring AI est la **portabilité du code**. Regardez le contrôleur REST du module `multi-chat-model` : aucune référence à Ollama ou OpenAI dans le code Java. Le choix du fournisseur est entièrement piloté par la **configuration**.
+
+Pour passer d'Ollama à OpenAI, il suffit de changer la configuration :
+
+```yaml
+# Avant : Ollama local
+spring:
+  ai:
+    ollama:
+      chat:
+        model: qwen3:0.6b
+
+# Après : OpenAI cloud
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+```
+
+Le code Java reste **strictement identique**. C'est la puissance de l'abstraction de Spring AI.
+
+## F- Récapitulatif
+
+| Fonctionnalité | Module | API |
+| --- | --- | --- |
+| Prompt simple + tokens | single-chat-model | `.call().chatResponse()` |
+| Appel synchrone REST | multi-chat-model | `.call().content()` |
+| Streaming réactif | multi-chat-model | `.stream().content()` → `Flux<String>` |
+| Multimodalité | multimodality-chat-model | `.user(u -> u.text().media())` |
+| Multi-fournisseur | multi-chat-model | Configuration YAML uniquement |
+
+## Conclusion
+
+Le `ChatClient` de Spring AI est un composant puissant et élégant. En quelques lignes de code, nous avons pu :
+
+* Envoyer un prompt et récupérer la réponse avec les métadonnées de tokens
+* Exposer un endpoint REST synchrone et un endpoint streaming
+* Utiliser des modèles de vision pour la multimodalité
+* Basculer entre fournisseurs sans modifier le code Java
+
+Dans le prochain article, nous verrons comment **donner de la mémoire à notre IA** en gérant le contexte conversationnel avec Spring AI.
+
+J'espère que cet article vous a été utile. Merci de l'avoir lu.
+
+Pour en savoir plus :
+
+* **Documentation ChatClient** : [https://docs.spring.io/spring-ai/reference/api/chatclient.html](https://docs.spring.io/spring-ai/reference/api/chatclient.html)
+* **Code source du projet** : [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Retrouvez nos vidéos #autourducode sur notre [chaîne YouTube](https://www.youtube.com/@autourducode)
+
+
+---
+
+## Série « Spring AI en Action »
+
+1. [Introduction à Spring AI](/fr/blog/spring-ai-en-action-introduction)
+2. [ChatClient API : Premiers pas avec l'API](/fr/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory : contexte conversationnel](/fr/blog/spring-ai-en-action-chat-memory)
+4. [RAG : Pipeline d ingestion](/fr/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG : Du Naïf à l Avancé](/fr/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/fr/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/fr/blog/spring-ai-en-action-tools-security)
+8. [Orchestration multi-agents](/fr/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/fr/blog/spring-ai-en-action-mcp)
