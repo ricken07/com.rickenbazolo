@@ -1,15 +1,15 @@
 [
   {
+    "id": "uHK83sv9rVA",
+    "title": "Spring AI en action : intégrer les capacités des LLM dans vos applications Java (RAG, Tools, Agents)",
+    "url": "https://www.youtube.com/watch?v=uHK83sv9rVA",
+    "thumbnailUrl": "https://i.ytimg.com/vi/uHK83sv9rVA/hqdefault.jpg"
+  },
+  {
     "id": "BqcQpj-WC2w",
     "title": "Sécuriser une application Spring Boot 3 avec Spring Security 6 | Authentification et Autorisations",
     "url": "https://youtu.be/BqcQpj-WC2w",
     "thumbnailUrl": "https://i.ytimg.com/vi/BqcQpj-WC2w/hqdefault.jpg"
-  },
-  {
-    "id": "eXGEputG9Bc",
-    "title": "Comprendre le @ControllerAdvice de Spring | Intercepter les exceptions de vos contrôleurs | API",
-    "url": "https://www.youtube.com/watch?v=eXGEputG9Bc",
-    "thumbnailUrl": "https://i.ytimg.com/vi/eXGEputG9Bc/hqdefault.jpg"
   },
   {
     "id": "Zzjn_Jz-A2E",
@@ -18,9 +18,9 @@
     "thumbnailUrl": "https://i.ytimg.com/vi/Zzjn_Jz-A2E/hqdefault.jpg"
   },
   {
-    "id": "XlhPUMgzdnY",
-    "title": "Réessayer l'appel à une méthode | Résilience | API | Spring Retry",
-    "url": "https://www.youtube.com/watch?v=XlhPUMgzdnY",
-    "thumbnailUrl": "https://i.ytimg.com/vi/XlhPUMgzdnY/hqdefault.jpg"
+    "id": "7eJppZ3uenY",
+    "title": "Utiliser la puissance du LLM dans une application Java avec Spring AI",
+    "url": "https://www.youtube.com/watch?v=7eJppZ3uenY",
+    "thumbnailUrl": "https://i.ytimg.com/vi/7eJppZ3uenY/hqdefault.jpg"
   }
 ]
