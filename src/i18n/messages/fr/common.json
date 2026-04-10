@@ -6,5 +6,12 @@
   },
   "footer": {
     "rights": "Tous droits réservés"
+  },
+  "notFound": {
+    "label": "Page introuvable",
+    "title": "Cette page n'existe pas",
+    "description": "La page que vous cherchez a peut-être été déplacée, supprimée ou n'a jamais existé.",
+    "home": "Retour à l'accueil",
+    "blog": "Voir le blog"
   }
 }

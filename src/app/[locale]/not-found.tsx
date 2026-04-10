@@ -1,32 +1,36 @@
 import Link from "next/link";
+import { getTranslations, getLocale } from "next-intl/server";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "common.notFound" });
+
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 px-4 text-center">
       <div className="space-y-4">
         <p className="font-heading text-8xl font-bold text-[#0693e3] opacity-30">404</p>
         <p className="text-sm font-semibold uppercase tracking-wider text-[#0693e3]">
-          Page introuvable
+          {t("label")}
         </p>
         <h1 className="font-heading text-3xl font-bold">
-          Cette page n&apos;existe pas
+          {t("title")}
         </h1>
         <p className="max-w-md text-muted-foreground">
-          La page que vous cherchez a peut-être été déplacée, supprimée ou n&apos;a jamais existé.
+          {t("description")}
         </p>
       </div>
       <div className="flex flex-wrap justify-center gap-4">
         <Link
-          href="/"
+          href={`/${locale}`}
           className="rounded-full bg-[#0693e3] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0576c2]"
         >
-          Retour à l&apos;accueil
+          {t("home")}
         </Link>
         <Link
-          href="/fr/blog"
+          href={`/${locale}/blog`}
           className="rounded-full border border-[#0693e3]/30 bg-[#0693e3]/10 px-6 py-2.5 text-sm font-semibold text-[#0693e3] transition hover:bg-[#0693e3]/20"
         >
-          Voir le blog
+          {t("blog")}
         </Link>
       </div>
     </div>

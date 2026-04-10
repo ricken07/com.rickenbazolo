@@ -6,5 +6,12 @@
   },
   "footer": {
     "rights": "All rights reserved"
+  },
+  "notFound": {
+    "label": "Page not found",
+    "title": "This page does not exist",
+    "description": "The page you are looking for may have been moved, deleted, or never existed.",
+    "home": "Back to home",
+    "blog": "View blog"
   }
 }
