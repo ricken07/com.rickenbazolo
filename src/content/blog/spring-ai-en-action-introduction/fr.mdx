@@ -1,0 +1,220 @@
+---
+title: "Spring AI en Action : Intégrer les capacités des LLM dans vos applications Java"
+slug: "spring-ai-en-action-introduction"
+language: "fr"
+publishedAt: "2026-04-09"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot"]
+readingTime: 7
+excerpt: "Spring AI est un framework qui facilite l'intégration des capacités d'intelligence artificielle dans les applications Spring. Dans cet article d'introduction à la série « Spring AI en Action », nous explorons les défis de l'intégration des LLM en Java, les avantages de Spring AI, et l'architecture du projet démo basé sur Spring Boot 4 et Spring AI 2.0.0-M2."
+status: "published"
+---
+
+L'intelligence artificielle générative a transformé notre façon de concevoir les applications logicielles. Les modèles de langage (LLM) offrent des capacités remarquables : génération de texte, traduction, analyse de données, et bien plus encore. Mais intégrer ces capacités dans une application Java d'entreprise n'est pas trivial.
+
+C'est précisément le problème que **Spring AI** résout. Dans cette série d'articles « **Spring AI en Action** », nous allons explorer en profondeur chaque fonctionnalité du framework à travers des exemples concrets et fonctionnels.
+
+Dans cet article d'introduction, nous allons voir :
+
+* Les contraintes de l'intégration directe des LLM
+* Ce qu'est Spring AI et ses avantages
+* Les concepts clés du framework
+* L'architecture du projet démo
+
+## A- Les contraintes de l'intégration des LLM
+
+Intégrer un LLM directement dans une application Java présente plusieurs défis :
+
+### Gestion des requêtes et réponses
+
+Les appels au LLM requièrent la configuration de prompts au format JSON, la gestion de l'authentification, la configuration des en-têtes HTTP, ainsi que le traitement et l'analyse des réponses. Chaque fournisseur (OpenAI, Anthropic, Google, etc.) possède sa propre API avec ses spécificités.
+
+### Coût et latence
+
+Les appels à un LLM peuvent être coûteux et le temps de réponse peut varier selon le volume d'appels, la complexité des requêtes, ou encore le modèle utilisé. Il faut mettre en place des stratégies de gestion des tokens, de cache, etc.
+
+### Verrouillage fournisseur
+
+Sans couche d'abstraction, le code applicatif est fortement couplé à un fournisseur spécifique. Migrer d'OpenAI vers Anthropic ou un modèle local nécessiterait de réécrire une grande partie du code.
+
+### Fonctionnalités transverses
+
+Des besoins comme la mémoire conversationnelle, le RAG (Retrieval-Augmented Generation), l'appel d'outils ou l'orchestration d'agents nécessitent des implémentations complexes qu'il serait inefficace de reconstruire à chaque projet.
+
+## B- Spring AI : simplifier l'intégration IA
+
+Spring AI est un framework qui vient faciliter l'intégration des capacités d'IA dans les applications Spring, en fournissant un cadre complet et cohérent.
+
+### Quelques avantages de Spring AI
+
+* **Intégration IA simplifiée** : offre une interface unifiée pour différents services IA
+* **Cohérence** : utilisation des modèles Spring familiers pour le développement IA
+* **Réduction du code superflu** : gère l'authentification, les appels réseau, etc
+* **API portable** : API unifiée pour les différents fournisseurs de modèles d'IA et de bases de données vectorielles
+
+## C- Les concepts clés de Spring AI
+
+Spring AI s'articule autour de plusieurs concepts fondamentaux :
+
+### ChatClient API
+
+Une API fluide pour communiquer avec le modèle d'IA, idiomatiquement similaire aux APIs `WebClient` et `RestClient` de Spring.
+
+```java
+ChatClient chatClient = chatClientBuilder.build();
+String response = chatClient.prompt("Explique-moi les LLM")
+        .call()
+        .content();
+```
+
+### API portable
+
+API unifiée pour les différents fournisseurs de bases de données vectorielles et de modèles d'IA. Changer de fournisseur se résume souvent à modifier la configuration, sans toucher au code métier.
+
+### Ingestion de documents
+
+Un framework ETL (Extract, Transform, Load) pour les tâches d'ingénierie des données : lecture de documents, découpage en chunks, génération d'embeddings et stockage dans une base vectorielle.
+
+### Advisors
+
+Le pattern Advisor encapsule des préoccupations transverses récurrentes dans les applications IA : mémoire conversationnelle, RAG, journalisation, etc.
+
+### Appels d'outils / Function Calling
+
+Permet au modèle d'IA de demander l'exécution d'outils et de fonctions côté client, accédant ainsi à des informations en temps réel ou déclenchant des actions.
+
+### Support de la mémoire
+
+Prise en charge native de la mémoire conversationnelle pour maintenir le contexte entre les échanges avec le LLM.
+
+## D- Fournisseurs supportés
+
+Spring AI prend en charge tous les principaux fournisseurs de modèles d'IA :
+
+| Type | Fournisseurs |
+| --- | --- |
+| **Chat** | OpenAI, Anthropic, Google, Amazon Bedrock, Azure OpenAI, Ollama, Mistral, etc. |
+| **Embeddings** | OpenAI, Ollama, Azure, Amazon, etc. |
+| **Bases vectorielles** | PostgreSQL/PGVector, Chroma, Pinecone, Milvus, Redis, Elasticsearch, Neo4j, etc. |
+| **Image** | OpenAI DALL-E, Stability AI |
+| **Audio** | OpenAI (Transcription, Speech) |
+
+## E- Architecture du projet démo
+
+Le projet « Spring AI en Action » est un projet multi-modules Maven conçu pour illustrer chaque fonctionnalité de Spring AI de manière progressive :
+
+```xml
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.0.2</version>
+</parent>
+
+<groupId>com.rickenbazolo</groupId>
+<artifactId>spring-ai-en-action</artifactId>
+<version>0.1.0-SNAPSHOT</version>
+<packaging>pom</packaging>
+
+<properties>
+    <java.version>25</java.version>
+    <spring-ai.version>2.0.0-M2</spring-ai.version>
+</properties>
+
+<modules>
+    <module>chat</module>
+    <module>rag</module>
+    <module>tools</module>
+    <module>agent</module>
+    <module>mcp</module>
+</modules>
+```
+
+### Stack technique
+
+* **Spring Boot 4.0.2** : dernière version majeure du framework
+* **Spring AI 2.0.0-M2** : version milestone du framework IA
+* **Java 25** : Version LTS du JDK
+* **Ollama** : exécution locale des modèles (qwen3, mistral, etc.)
+* **PostgreSQL + PGVector** : base de données vectorielle pour le RAG
+
+### Les modules
+
+| Module | Description | Fonctionnalités Spring AI |
+| --- | --- | --- |
+| **chat** | Interactions avec un LLM | ChatClient, streaming, multi-modèle, mémoire |
+| **rag** | Retrieval-Augmented Generation | VectorStore, embeddings, ingestion, requêtes avancées |
+| **tools** | Appels d'outils / Function Calling | @Tool, @Description, ToolContext, Spring Security |
+| **agent** | Orchestration d'agents IA | Multi-agents, exécution parallèle, évaluation |
+| **mcp** | Model Context Protocol | MCP Server/Client, outils distants |
+
+## F- Exécution locale avec Ollama
+
+Un des avantages du projet est l'utilisation d'**Ollama** pour exécuter les modèles localement, sans dépendance cloud. Pour démarrer :
+
+```bash
+# Installer Ollama (macOS)
+brew install ollama
+
+# Démarrer le serveur
+ollama serve
+
+# Télécharger les modèles utilisés dans le projet
+ollama pull qwen3:0.6b
+ollama pull mistral
+ollama pull mxbai-embed-large
+ollama pull qwen3-vl:2b
+```
+
+La configuration Spring AI pour Ollama est simple :
+
+```yaml
+spring:
+  ai:
+    ollama:
+      chat:
+        model: qwen3:0.6b
+```
+
+## G- Plan de la série
+
+Cette série d'articles couvrira l'ensemble des modules du projet :
+
+1. **Introduction** (cet article) — Vue d'ensemble de Spring AI et du projet
+2. **ChatClient API** — Du prompt simple au streaming multi-modèle
+3. **Chat Memory** — Gestion du contexte conversationnel
+4. **RAG : Pipeline d'ingestion** — Construction du pipeline de données
+5. **RAG : Du Naïf à l'Avancé** — Stratégies de pré-retrieval
+6. **Function Calling** — Quand le LLM appelle vos méthodes Java
+7. **Tools + Security** — Sécuriser les outils IA avec Spring Security
+8. **Agents** — Orchestration multi-agents avec les Virtual Threads
+9. **MCP** — Model Context Protocol avec Spring AI
+
+Chaque article est accompagné de code source complet et fonctionnel disponible sur [GitHub](https://github.com/ricken07/spring-ai-en-action).
+
+## Conclusion
+
+Spring AI apporte à l'écosystème Java ce dont les développeurs avaient besoin : une intégration IA de premier ordre, cohérente avec les conventions Spring, et suffisamment abstraite pour ne pas être verrouillé sur un fournisseur unique.
+
+Dans le prochain article, nous plongerons dans le **ChatClient API** avec des exemples concrets : prompt simple, suivi des tokens, streaming de réponses, et support multi-modèle.
+
+J'espère que cet article vous a été utile. Merci de l'avoir lu.
+
+Pour en savoir plus :
+
+* **Documentation Spring AI** : [https://docs.spring.io/spring-ai/reference/](https://docs.spring.io/spring-ai/reference/)
+* **Code source du projet** : [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Retrouvez nos vidéos #autourducode sur notre [chaîne YouTube](https://www.youtube.com/@autourducode)
+
+
+---
+
+## Série « Spring AI en Action »
+
+1. [Introduction à Spring AI](/fr/blog/spring-ai-en-action-introduction)
+2. [ChatClient API : du prompt simple au streaming](/fr/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory : contexte conversationnel](/fr/blog/spring-ai-en-action-chat-memory)
+4. [RAG : Pipeline d ingestion](/fr/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG : Du Naïf à l Avancé](/fr/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/fr/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/fr/blog/spring-ai-en-action-tools-security)
+8. [Orchestration multi-agents](/fr/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/fr/blog/spring-ai-en-action-mcp)
