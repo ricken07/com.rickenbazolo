@@ -1,8 +1,12 @@
+import { readdir } from "node:fs/promises";
+import path from "node:path";
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { Container } from "@/components/layout/Container";
 import { getAllPosts } from "@/lib/blog/getAllPosts";
 import type { BlogPost } from "@/lib/blog/types";
 import { BubbleGallery } from "@/components/gallery/BubbleGallery";
+import type { GalleryImage } from "@/components/gallery/BubbleGallery";
 import { NewsletterInlineForm } from "@/components/newsletter/NewsletterInlineForm";
 import youtubeVideos from "@/content/videos/youtube-videos.json";
 import { PostCard } from "@/components/blog/PostCard";
@@ -15,19 +19,13 @@ const heroSocials = [
   { name: "YouTube", href: "https://www.youtube.com/@rickenbazolo", icon: YoutubeIcon },
 ];
 
-const galleryImages = [
-  "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1505238680356-667803448bb6?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=600&q=80",
-];
-
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  noStore();
+
   const { locale } = await params;
   const posts = await getAllPosts(locale);
   const latestPosts = posts.slice(0, 3);
+  const galleryImages = await getGalleryImages();
 
   return (
     <main className="py-8 md:py-16">
@@ -192,6 +190,37 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
         </section>
 
+        {/* GALLERY - Redesign moderne */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wider text-accent">
+                {locale === "fr" ? "Galerie" : "Gallery"}
+              </p>
+              <h2 className="font-heading text-3xl font-bold md:text-4xl">
+                {locale === "fr" ? "Moments & Projets" : "Moments & Projects"}
+              </h2>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-background to-card p-8 md:p-12">
+            <div className="blob absolute -left-6 -top-6 h-32 w-32 rounded-full bg-[#0693e3]/20" />
+            <div className="blob blob-delayed absolute -right-8 bottom-0 h-40 w-40 rounded-full bg-[#273171]/15" />
+
+            <div className="relative">
+              <BubbleGallery images={galleryImages} />
+            </div>
+
+            <div className="mt-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                {locale === "fr"
+                    ? "Cliquez sur les bulles pour voir les images en plein écran"
+                    : "Click on bubbles to view images fullscreen"}
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* NEWSLETTER - Redesign moderne */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0693e3]/10 via-card to-[#273171]/5 p-8 md:p-12">
           <div className="blob absolute -right-16 top-0 h-64 w-64 rounded-full bg-[#0693e3]/20" />
@@ -221,37 +250,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 ? "Sans spam. Désabonnement en un clic."
                 : "No spam. Unsubscribe anytime."}
             </p>
-          </div>
-        </section>
-
-        {/* GALLERY - Redesign moderne */}
-        <section className="space-y-6 hidden">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-accent">
-                {locale === "fr" ? "Galerie" : "Gallery"}
-              </p>
-              <h2 className="font-heading text-3xl font-bold md:text-4xl">
-                {locale === "fr" ? "Moments & Projets" : "Moments & Projects"}
-              </h2>
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-background to-card p-8 md:p-12">
-            <div className="blob absolute -left-6 -top-6 h-32 w-32 rounded-full bg-[#0693e3]/20" />
-            <div className="blob blob-delayed absolute -right-8 bottom-0 h-40 w-40 rounded-full bg-[#273171]/15" />
-
-            <div className="relative">
-              <BubbleGallery images={galleryImages} />
-            </div>
-
-            <div className="mt-8 text-center">
-              <p className="text-sm text-muted-foreground">
-                {locale === "fr"
-                  ? "Cliquez sur les bulles pour voir les images en plein écran"
-                  : "Click on bubbles to view images fullscreen"}
-              </p>
-            </div>
           </div>
         </section>
 
@@ -313,4 +311,24 @@ function YoutubeIcon({ className }: { className?: string }) {
       />
     </svg>
   );
+}
+
+const GALLERY_DIRECTORY = path.join(process.cwd(), "public", "gallery");
+const IMAGE_FILE_PATTERN = /\.(avif|gif|jpe?g|png|webp)$/i;
+
+async function getGalleryImages(): Promise<GalleryImage[]> {
+  const files = await readdir(GALLERY_DIRECTORY, { withFileTypes: true }).catch(() => []);
+
+  return files
+    .filter((entry) => entry.isFile() && IMAGE_FILE_PATTERN.test(entry.name))
+    .map((entry) => ({
+      src: `/gallery/${encodeURIComponent(entry.name)}`,
+      priority: extractImagePriority(entry.name),
+    }))
+    .sort((left, right) => right.priority - left.priority || left.src.localeCompare(right.src));
+}
+
+function extractImagePriority(filename: string): number {
+  const match = filename.match(/(\d+)(?=\.[^.]+$)/);
+  return Number(match?.[1] ?? 0);
 }
