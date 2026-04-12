@@ -1,0 +1,274 @@
+---
+title: "Giving Memory to Your AI: Managing Conversational Context with Spring AI"
+slug: "spring-ai-en-action-chat-memory"
+language: "en"
+publishedAt: "2026-04-09"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot"]
+readingTime: 7
+excerpt: "LLMs are stateless by nature: each request is processed independently. Spring AI solves this problem through the Chat Memory system and the Advisor pattern. In this article, we implement a chatbot with conversational memory in just a few lines of code."
+status: "published"
+---
+
+If you followed the previous article on the [ChatClient](/en/blog/spring-ai-en-action-chatclient-api), you saw that sending a prompt and retrieving a response is straightforward. But there's a fundamental problem: **LLMs are stateless**.
+
+Each request is processed completely independently. The model doesn't "remember" what you told it previously. For a chatbot application or conversational assistant, this is a major obstacle.
+
+Spring AI solves this problem elegantly through the **Chat Memory** system and the **Advisor** pattern.
+
+In this article, we will cover:
+
+* Why LLMs need external memory
+* Spring AI's Advisor pattern
+* Concrete implementation with `MessageWindowChatMemory`
+* `MessageChatMemoryAdvisor` in action
+
+## A- The Problem: Stateless LLMs
+
+Let's take a simple scenario. Without memory, here's what happens:
+
+```
+User: "My name is Ricken"
+AI: "Hello Ricken! How can I help you?"
+
+User: "What is my name?"
+AI: "I don't have that information."
+```
+
+The model forgot the first interaction. Each LLM call is treated as an **entirely new conversation**, with no link to previous exchanges.
+
+To solve this problem, we need to:
+
+1. **Store** the exchanged messages (user + AI)
+2. **Reinject** the history into each new prompt
+3. **Manage the size** of the history to avoid exceeding the model's context window
+
+This is exactly what Spring AI automates.
+
+## B- The Advisor Pattern
+
+Spring AI uses the **Advisor** pattern to encapsulate cross-cutting concerns in AI applications. An Advisor can intercept and modify the prompt before it's sent to the model, or the response after it's received.
+
+```
+User → [Advisor(s)] → AI Model → [Advisor(s)] → Response
+```
+
+The `MessageChatMemoryAdvisor` is an Advisor that:
+
+1. **Before the call**: retrieves the message history and adds it to the prompt
+2. **After the call**: saves the new user message and AI response to memory
+
+This mechanism is completely transparent to application code: you use the `ChatClient` in exactly the same way, with or without memory.
+
+## C- MessageWindowChatMemory
+
+`MessageWindowChatMemory` is Spring AI's simplest memory implementation. It works with a **sliding window** of messages: only the last N messages are kept.
+
+```java
+var chatMemory = MessageWindowChatMemory.builder()
+        .build();
+```
+
+By default, the window keeps the **last 20 messages**. This number can be configured:
+
+```java
+var chatMemory = MessageWindowChatMemory.builder()
+        .maxMessages(50)
+        .build();
+```
+
+### Memory Architecture
+
+Spring AI separates memory into two concepts:
+
+| Concept | Role | Examples |
+| --- | --- | --- |
+| **ChatMemory** | Management strategy (window, summary, etc.) | `MessageWindowChatMemory` |
+| **ChatMemoryRepository** | Physical message storage | `InMemoryChatMemoryRepository`, `JdbcChatMemoryRepository`, `CassandraChatMemoryRepository`, `Neo4jChatMemoryRepository` |
+
+By default, `MessageWindowChatMemory` uses an `InMemoryChatMemoryRepository`: messages are stored in memory and lost when the application restarts. For persistence, you can use JDBC, Cassandra, or Neo4j.
+
+## D- Implementation: A Chatbot with Memory
+
+Here is the complete implementation of the `chat-memory` module from the demo project.
+
+### Dependencies
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-webmvc</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-ollama</artifactId>
+</dependency>
+```
+
+### Configuration
+
+```yaml
+spring:
+  ai:
+    ollama:
+      chat:
+        model: qwen3:0.6b
+```
+
+### REST Controller
+
+```java
+@RestController
+@RequestMapping("/chat")
+public class DemoController {
+
+    private final ChatClient chatClient;
+
+    public DemoController(ChatClient.Builder chatClientBuilder) {
+        var chatMemory = MessageWindowChatMemory.builder()
+                .build();
+        this.chatClient = chatClientBuilder
+                .defaultAdvisors(
+                    MessageChatMemoryAdvisor.builder(chatMemory).build()
+                )
+                .build();
+    }
+
+    @GetMapping
+    public String sync(String message) {
+        return chatClient.prompt(message)
+                .call()
+                .content();
+    }
+}
+```
+
+### What Happens Under the Hood
+
+Here is the execution flow for each request:
+
+1. The user sends a message via `GET /chat?message=...`
+2. The `ChatClient` creates a prompt with the message
+3. The `MessageChatMemoryAdvisor` intercepts the prompt:
+   - Retrieves the message history from `MessageWindowChatMemory`
+   - Adds historical messages to the prompt
+4. The enriched prompt is sent to the Ollama model
+5. The model generates its response
+6. The `MessageChatMemoryAdvisor` intercepts the response:
+   - Saves the user message and AI response to memory
+7. The text response is returned to the user
+
+### Key Points
+
+* Memory is configured **once** when building the `ChatClient` via `.defaultAdvisors()`.
+* The call `.prompt(message).call().content()` is **identical** to the one without memory — the complexity is entirely encapsulated in the Advisor.
+* The `ChatClient.Builder` accepts multiple Advisors: you can combine memory, RAG, logging, etc.
+
+## E- Testing the Chatbot
+
+Let's test our chatbot with memory:
+
+```bash
+# First exchange
+curl "http://localhost:8080/chat?message=My name is Ricken"
+# → "Hello Ricken! How can I help you?"
+
+# Second exchange — the model remembers!
+curl "http://localhost:8080/chat?message=What is my name?"
+# → "Your name is Ricken."
+```
+
+Unlike the example without memory, the model maintains context between exchanges.
+
+## F- Conversation ID and Multi-User Support
+
+By default, all exchanges share the same conversation identifier. For a multi-user application, it's essential to isolate conversations:
+
+```java
+@GetMapping
+public String sync(String message, String conversationId) {
+    return chatClient.prompt(message)
+            .advisors(a -> a.param(
+                ChatMemory.CONVERSATION_ID, conversationId))
+            .call()
+            .content();
+}
+```
+
+Each `conversationId` will have its own memory window, ensuring isolation between users.
+
+## G- Persistence with JDBC
+
+For a production application, in-memory storage is not enough. Spring AI provides a `JdbcChatMemoryRepository`:
+
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-model-chat-memory-repository-jdbc</artifactId>
+</dependency>
+```
+
+```java
+@Bean
+ChatMemoryRepository chatMemoryRepository(JdbcTemplate jdbcTemplate) {
+    return JdbcChatMemoryRepository.builder()
+            .jdbcTemplate(jdbcTemplate)
+            .build();
+}
+
+@Bean
+ChatMemory chatMemory(ChatMemoryRepository repository) {
+    return MessageWindowChatMemory.builder()
+            .chatMemoryRepository(repository)
+            .maxMessages(50)
+            .build();
+}
+```
+
+Messages will then be persisted in your relational database and survive application restarts.
+
+## H- Summary
+
+| Component | Role |
+| --- | --- |
+| `MessageWindowChatMemory` | Sliding window memory strategy |
+| `MessageChatMemoryAdvisor` | Advisor that injects/saves history |
+| `ChatMemoryRepository` | Physical storage interface |
+| `InMemoryChatMemoryRepository` | In-memory storage (default) |
+| `JdbcChatMemoryRepository` | Persistent JDBC storage |
+| `conversationId` | Multi-user conversation isolation |
+
+## Conclusion
+
+In just a few lines of code, Spring AI transforms a simple LLM call into a **conversation with memory**. The Advisor pattern encapsulates all the complexity of history management, allowing the developer to focus on business logic.
+
+Key takeaways:
+
+* LLMs are **stateless** : memory must be managed on the application side
+* `MessageWindowChatMemory` : offers a simple and effective sliding window
+* `MessageChatMemoryAdvisor` : injects history **transparently**
+* Multiple storage backends are available (in-memory, JDBC, Cassandra, Neo4j)
+
+In the next article, we will dive into **RAG (Retrieval-Augmented Generation)**: how to enrich your AI's responses with your own data.
+
+I hope you found this article useful. Thank you for reading.
+
+To learn more:
+
+* **Chat Memory Documentation**: [https://docs.spring.io/spring-ai/reference/api/chat-memory.html](https://docs.spring.io/spring-ai/reference/api/chat-memory.html)
+* **Project source code**: [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Find our #autourducode videos on our [YouTube channel](https://www.youtube.com/@autourducode)
+
+
+---
+
+## "Spring AI in Action" Series
+
+1. [Introduction to Spring AI](/en/blog/spring-ai-en-action-introduction)
+2. [ChatClient API: Getting Started with the API](/en/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory: Conversational Context](/en/blog/spring-ai-en-action-chat-memory)
+4. [RAG: Ingestion Pipeline](/en/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG: From Naive to Advanced](/en/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/en/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/en/blog/spring-ai-en-action-tools-security)
+8. [Multi-Agent Orchestration](/en/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/en/blog/spring-ai-en-action-mcp)
