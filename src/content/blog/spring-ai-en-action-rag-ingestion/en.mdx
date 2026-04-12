@@ -1,0 +1,267 @@
+---
+title: "RAG with Spring AI: Building a Data Ingestion Pipeline"
+slug: "spring-ai-en-action-rag-ingestion"
+language: "en"
+publishedAt: "2026-04-12"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot", "rag"]
+readingTime: 7
+excerpt: "RAG (Retrieval-Augmented Generation) enriches LLM responses with your own data. In this article, we build the ingestion pipeline: reading documents, splitting into chunks, generating embeddings, and storing them in PostgreSQL/PGVector."
+status: "published"
+---
+
+LLMs are trained on public data and have a knowledge cutoff date. They know nothing about your internal documents or business data. **RAG (Retrieval-Augmented Generation)** solves this problem by enriching the prompt with relevant information extracted from your own data sources.
+
+In this article, we will build the **ingestion pipeline**: the essential first step of RAG. This is the ETL (Extract, Transform, Load) process that prepares your data for semantic search.
+
+## A- RAG at a Glance
+
+RAG works in two phases:
+
+### Phase 1: Ingestion (this article)
+
+```
+Document → Reading → Splitting (chunks) → Embeddings → Vector Database
+```
+
+### Phase 2: Query (next article)
+
+```
+Question → Embedding → Similarity Search → Context → LLM → Response
+```
+
+The idea is simple: instead of relying solely on the model's knowledge, we provide **relevant context** extracted from our own documents at query time.
+
+## B- Infrastructure: PostgreSQL + PGVector
+
+To store embeddings (vector representations of documents), we use **PostgreSQL** with the **PGVector** extension. The project provides a ready-to-use `docker-compose.yml`:
+
+```yaml
+name: spring-ai-en-action
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: lab-postgres
+    environment:
+      - 'POSTGRES_DB=demo_db'
+      - 'POSTGRES_PASSWORD=demo'
+      - 'POSTGRES_USER=demo'
+    ports:
+      - "5438:5432"
+```
+
+```bash
+# Start PostgreSQL with PGVector
+docker compose up -d
+```
+
+The `pgvector/pgvector:pg17` image includes PostgreSQL 17 with the PGVector extension pre-installed.
+
+## C- The data-ingestion Module
+
+The `data-ingestion` module illustrates the three steps of Spring AI's ETL pipeline.
+
+### Dependencies
+
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-ollama</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+</dependency>
+```
+
+* `spring-ai-starter-model-ollama`: provides the local embedding model
+* `spring-ai-starter-vector-store-pgvector`: auto-configures the `VectorStore` with PGVector
+
+### Configuration
+
+```yaml
+spring:
+  ai:
+    ollama:
+      chat:
+        model: mistral
+      embedding:
+        model: mxbai-embed-large
+  datasource:
+    url: jdbc:postgresql://localhost:5438/demo_db
+    username: demo
+    password: demo
+```
+
+The **mxbai-embed-large** embedding model is an Ollama model optimized for generating semantic vectors. It transforms text into numerical vectors.
+
+```bash
+ollama pull mxbai-embed-large
+```
+
+### The Complete Pipeline
+
+```java
+@SpringBootApplication
+public class DataIngestionApplication {
+
+    static void main(String[] args) {
+        SpringApplication.run(DataIngestionApplication.class, args);
+    }
+
+    @Bean
+    CommandLineRunner runnerDataIngestion(
+            VectorStore vectorStore,
+            JdbcTemplate jdbcTemplate,
+            @Value("classpath:/corpus/recettes_cuisine_europe_africaine.txt")
+            Resource file) {
+        return _ -> {
+            // Clear vector store
+            jdbcTemplate.update("delete from vector_store");
+
+            // 1. Extract: read the document
+            var documents = new TextReader(file).read();
+
+            // 2. Transform: split into chunks
+            var chunks = TokenTextSplitter.builder()
+                    .withChunkSize(300)
+                    .withMinChunkLengthToEmbed(20)
+                    .build()
+                    .apply(documents);
+
+            // 3. Load: store in the vector store
+            vectorStore.add(chunks);
+        };
+    }
+}
+```
+
+## D- Step by Step: The ETL Pipeline
+
+### Extract: TextReader
+
+```java
+var documents = new TextReader(file).read();
+```
+
+`TextReader` reads a text file and converts it into a list of `Document` objects. Spring AI provides several readers:
+
+| Reader | Format |
+| --- | --- |
+| `TextReader` | Plain text files (.txt) |
+| `JsonReader` | JSON files |
+| `TikaDocumentReader` | PDF, Word, HTML, etc. (via Apache Tika) |
+| `PagePdfDocumentReader` | PDF (page by page) |
+
+### Transform: TokenTextSplitter
+
+```java
+var chunks = TokenTextSplitter.builder()
+        .withChunkSize(300)
+        .withMinChunkLengthToEmbed(20)
+        .build()
+        .apply(documents);
+```
+
+The `TokenTextSplitter` splits documents into size-controlled **chunks**:
+
+* `chunkSize(300)`: each chunk contains approximately 300 tokens
+* `minChunkLengthToEmbed(20)`: chunks that are too short (< 20 characters) are ignored
+
+Splitting is crucial: chunks that are too large dilute information, chunks that are too small lose context.
+
+### Load: VectorStore
+
+```java
+vectorStore.add(chunks);
+```
+
+For each chunk, Spring AI:
+
+1. Generates an **embedding** (numerical vector) via the configured embedding model
+2. Stores the chunk and its vector in the PGVector database
+
+The `VectorStore` is auto-configured thanks to the PGVector starter. Spring AI automatically creates the `vector_store` table with the necessary columns.
+
+## E- Embeddings: How Do They Work?
+
+An embedding is a numerical representation of a piece of text in a vector space. Semantically similar texts are represented by vectors that are close to each other.
+```
+"risotto recipe" → [0.12, -0.45, 0.78, ..., 0.33]  (1024 dimensions)
+"how to make risotto" → [0.11, -0.44, 0.79, ..., 0.34]  (very close!)
+"weather in Paris" → [0.89, 0.23, -0.56, ..., -0.12]  (very different)
+```
+
+The `mxbai-embed-large` model generates 1024-dimensional vectors. **Cosine similarity** is used to measure the proximity between two vectors.
+
+## F- Supported Vector Databases
+
+Spring AI supports many vector databases through a unified API:
+
+| Database | Starter |
+| --- | --- |
+| **PostgreSQL/PGVector** | `spring-ai-starter-vector-store-pgvector` |
+| **Chroma** | `spring-ai-starter-vector-store-chroma` |
+| **Pinecone** | `spring-ai-starter-vector-store-pinecone` |
+| **Milvus** | `spring-ai-starter-vector-store-milvus` |
+| **Redis** | `spring-ai-starter-vector-store-redis` |
+| **Elasticsearch** | `spring-ai-starter-vector-store-elasticsearch` |
+| **Neo4j** | `spring-ai-starter-vector-store-neo4j` |
+
+Switching vector databases only requires changing the dependency and configuration, the Java code remains identical.
+
+## G- Running and Verification
+
+```bash
+# 1. Start PostgreSQL
+docker compose up -d
+
+# 2. Download the models
+ollama pull mistral
+ollama pull mxbai-embed-large
+
+# 3. Run the ingestion
+./mvnw spring-boot:run -pl rag/data-ingestion
+```
+
+You can verify the data in PostgreSQL:
+
+```sql
+SELECT count(*) FROM vector_store;
+-- Result: number of ingested chunks
+
+SELECT content, embedding FROM vector_store LIMIT 1;
+-- Chunk content and its vector
+```
+
+## Conclusion
+
+The ingestion pipeline is the foundation of RAG. In just a few lines of code, Spring AI allows us to:
+
+* **Read** documents
+* **Split** into optimized chunks with `TokenTextSplitter`
+* **Vectorize and store** with the auto-configured `VectorStore`
+
+In the next article, we will see how to **query** this data: from naive RAG with similarity search to advanced RAG with query rewriting and expansion.
+
+I hope you found this article useful. Thank you for reading.
+
+To learn more:
+
+* **RAG Documentation**: [https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html](https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html)
+* **Project source code**: [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Find our #autourducode videos on our [YouTube channel](https://www.youtube.com/@autourducode)
+
+
+---
+
+## "Spring AI in Action" Series
+
+1. [Introduction to Spring AI](/en/blog/spring-ai-en-action-introduction)
+2. [ChatClient API: Getting Started with the API](/en/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory: Conversational Context](/en/blog/spring-ai-en-action-chat-memory)
+4. [RAG: Ingestion Pipeline](/en/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG: From Naive to Advanced](/en/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/en/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/en/blog/spring-ai-en-action-tools-security)
+8. [Multi-Agent Orchestration](/en/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/en/blog/spring-ai-en-action-mcp)
