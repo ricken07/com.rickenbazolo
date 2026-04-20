@@ -25,6 +25,7 @@ const STATIC_PAGES: Array<{ path: string; priority: number; changefreq: ChangeFr
   { path: "",             priority: 1.0, changefreq: "weekly"  },
   { path: "/blog",        priority: 0.9, changefreq: "daily"   },
   { path: "/about",       priority: 0.8, changefreq: "monthly" },
+  { path: "/speaking",    priority: 0.7, changefreq: "monthly" },
   { path: "/opensource",  priority: 0.7, changefreq: "monthly" },
   { path: "/newsletter",  priority: 0.5, changefreq: "yearly"  },
 ];

@@ -139,7 +139,7 @@ export default async function BlogPostPage({
       name: "Ricken Bazolo",
       logo: {
         "@type": "ImageObject",
-        url: "https://rickenbazolo.com/images/me/avatar.jpeg",
+        url: "https://rickenbazolo.dev/avatar.jpeg",
       },
     },
     keywords: currentTags.join(", "),

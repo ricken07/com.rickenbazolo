@@ -1,23 +1,46 @@
 [
   {
-    "slug": "spring-ai-paris",
-    "title": "Industrialiser Spring AI",
-    "event": "Spring I/O Paris",
-    "location": "Paris, France",
-    "date": "2024-10-12",
-    "language": "fr",
-    "tags": ["Spring", "AI"],
+    "slug": "llm-java-bordeaux-jug",
+    "status": "past",
+    "title": {
+      "fr": "Intégrer les capacités des LLM dans vos applications Java",
+      "en": "Integrating LLM Capabilities into Your Java Applications"
+    },
+    "host": "Bordeaux JUG Session",
+    "summary": {
+      "fr": "Présentation des enjeux concrets liés à l’intégration de modèles de langage dans des applications Java : structuration des interactions, gestion du contexte métier et interfaçage avec les services existants. Focus sur Spring AI et son intégration naturelle dans l’écosystème Spring.",
+      "en": "A practical overview of integrating language models into Java applications: structuring interactions, handling business context, and interfacing with existing services. Special focus on Spring AI and its natural fit within the Spring ecosystem."
+    },
+    "tags": ["Java", "LLM", "Spring AI"],
     "slidesUrl": "https://speakerdeck.com/rickenbazolo/spring-ai",
     "videoUrl": "https://youtube.com/watch?v=dummy"
   },
   {
-    "slug": "ai-governance-london",
-    "title": "AI Governance for Builders",
-    "event": "GraphQL Conf",
-    "location": "London, UK",
-    "date": "2024-06-18",
-    "language": "en",
-    "tags": ["AI", "Governance"],
-    "slidesUrl": "https://speakerdeck.com/rickenbazolo/ai-governance"
+    "slug": "spring-ai-quarkus-langchain4j-paris-jug",
+    "status": "past",
+    "title": {
+      "fr": "Spring AI et Quarkus LangChain4J",
+      "en": "Spring AI and Quarkus LangChain4J"
+    },
+    "host": "Paris JUG Session",
+    "summary": {
+      "fr": "Exploration des approches modernes pour intégrer des LLM dans des applications Java. Mise en perspective de Spring AI et LangChain4J avec Quarkus, avec un focus sur les gains en productivité, en robustesse et sur la conception de pipelines RAG.",
+      "en": "An exploration of modern approaches for integrating LLMs into Java applications. The session compares Spring AI and LangChain4J with Quarkus, with a focus on productivity, robustness, and the design of RAG pipelines."
+    },
+    "tags": ["Java", "LLM", "Spring AI", "Quarkus", "LangChain4J", "RAG"]
+  },
+  {
+    "slug": "spring-ai-java-meetup-tech-review",
+    "status": "past",
+    "title": {
+      "fr": "Utiliser la puissance du LLM dans une application Java avec Spring AI",
+      "en": "Using LLM Power in a Java Application with Spring AI"
+    },
+    "host": "Spring Paris Meetup & Tech Review IA Gen",
+    "summary": {
+      "fr": "Démonstration des capacités offertes par Spring AI pour intégrer efficacement des modèles de langage dans des applications Spring Boot. Présentation de patterns d’architecture, dont la mise en place d’un framework ETL pour supporter des cas d’usage de type RAG.",
+      "en": "A demonstration of Spring AI capabilities for integrating language models into Spring Boot applications. It covers architecture patterns, including the setup of an ETL framework to support RAG-oriented use cases."
+    },
+    "tags": ["Java", "Spring Boot", "Spring AI", "LLM", "RAG", "ETL"]
   }
 ]

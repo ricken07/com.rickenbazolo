@@ -1,4 +1,24 @@
 {
   "title": "Prises de parole",
-  "intro": "Ateliers, keynotes et panels autour de l'IA et de l'architecture logicielle."
+  "intro": "Sélection d'interventions autour de l'IA et de l'ingenieurie logicielle.",
+  "meta": {
+    "title": "Prises de parole",
+    "description": "Événements à venir et interventions passées de Ricken Bazolo autour de Java, des LLM et de l'IA appliquée."
+  },
+  "eyebrow": "Conférences",
+  "upcoming": {
+    "title": "Événements à venir",
+    "description": "Les prochaines sessions et conférences prévues.",
+    "empty": "Pas d'événements pour le moment",
+    "table": {
+      "title": "Titre de l'événement",
+      "host": "Hôte",
+      "date": "Date"
+    }
+  },
+  "past": {
+    "title": "Événements passés",
+    "description": "Conférences et sessions déjà animées.",
+    "label": "Conférencier"
+  }
 }

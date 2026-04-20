@@ -30,6 +30,14 @@ const siteDescription =
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://rickenbazolo.dev"),
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: [{ url: "/favicon.ico" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   title: {
     default: siteTitle,
     template: "%s | Ricken Bazolo",

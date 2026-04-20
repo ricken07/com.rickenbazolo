@@ -3,12 +3,12 @@ export type { Language } from "@/lib/blog/types";
 
 export interface Talk {
   slug: string;
-  title: string;
-  event: string;
-  location: string;
-  date: string;
-  language: string;
-  tags: string[];
+  status: "past" | "upcoming";
+  title: Record<string, string>;
+  host: string;
+  date?: string;
+  summary?: Record<string, string>;
+  tags?: string[];
   slidesUrl?: string;
   videoUrl?: string;
 }

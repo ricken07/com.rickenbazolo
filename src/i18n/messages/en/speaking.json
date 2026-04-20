@@ -1,4 +1,24 @@
 {
   "title": "Speaking",
-  "intro": "Workshops, keynotes and panels about AI and architecture."
+  "intro": "A curated selection of talks about LLMs, Spring AI, and software architecture.",
+  "meta": {
+    "title": "Speaking",
+    "description": "Upcoming events and past talks by Ricken Bazolo on Java, LLMs, and applied AI."
+  },
+  "eyebrow": "Speaking",
+  "upcoming": {
+    "title": "Upcoming events",
+    "description": "The next planned sessions and conferences.",
+    "empty": "No events at the moment",
+    "table": {
+      "title": "Event title",
+      "host": "Host",
+      "date": "Date"
+    }
+  },
+  "past": {
+    "title": "Past events",
+    "description": "Conferences and sessions already delivered.",
+    "label": "Speaker"
+  }
 }

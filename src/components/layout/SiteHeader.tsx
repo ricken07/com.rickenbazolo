@@ -14,6 +14,7 @@ interface SiteHeaderProps {
 
 const NAV_ITEMS = [
   { key: "about", href: "/about" },
+  { key: "speaking", href: "/speaking" },
   { key: "blog", href: "/blog" },
 ];
 
@@ -27,7 +28,7 @@ export function SiteHeader({ locale }: SiteHeaderProps) {
         <Link href={`/${locale}`} className="flex items-center gap-2">
           <span className="sr-only">Ricken Bazolo</span>
           <Image
-            src="https://rickenbazolo.com/images/me/avatar.jpeg"
+            src="/avatar.jpeg"
             alt="Photo de profil de Ricken Bazolo - Senior Java & AI Technologist"
             width={40}
             height={40}
