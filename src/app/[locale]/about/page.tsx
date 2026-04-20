@@ -56,6 +56,13 @@ const highlights: Highlight[] = [
     initials: "SG",
   },
   {
+    name: "SCIAM (PJ)",
+    role: { fr: "Lead technique & ingénieur en IA générative", en: "Technical Lead & Generative AI Engineer" },
+    period: "2023-24",
+    logo: null,
+    initials: "SC",
+  },
+  {
     name: "BNP Paribas",
     role: { fr: "Lead technique", en: "Technical Lead" },
     period: "2023-24",
