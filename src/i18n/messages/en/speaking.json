@@ -1,9 +1,9 @@
 {
   "title": "Speaking",
-  "intro": "A curated selection of talks about LLMs, Spring AI, and software architecture.",
+  "intro": "A curated selection of talks about AI and software engineering.",
   "meta": {
     "title": "Speaking",
-    "description": "Upcoming events and past talks by Ricken Bazolo on Java, LLMs, and applied AI."
+    "description": "Upcoming events and past talks by Ricken Bazolo on Java, software engineering, and applied AI."
   },
   "eyebrow": "Speaking",
   "upcoming": {
