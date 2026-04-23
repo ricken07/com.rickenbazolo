@@ -1,0 +1,270 @@
+---
+title: "Securing AI Tools with Spring Security"
+slug: "spring-ai-en-action-tools-security"
+language: "en"
+publishedAt: "2026-04-16"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot", "spring-security"]
+readingTime: 7
+excerpt: "When an LLM can call your Java methods, security becomes critical. In this article, we combine Spring AI and Spring Security to control access to AI tools with @PreAuthorize and HTTP Basic authentication."
+status: "published"
+---
+
+In the previous article, we saw how to allow an LLM to call Java functions via [Function Calling](/fr/blog/spring-ai-en-action-function-calling). But in an enterprise context, a crucial question arises: **who is allowed to use which tool?**
+
+Should a user with a basic role be able to view bank account balances? Should a tool that modifies data be accessible to everyone? The `fc-tools-secure` module shows how to combine **Spring AI and Spring Security** to secure AI tools.
+
+## A- The Secured Architecture
+
+The pattern is elegant: instead of executing logic directly in the tool functions, we **delegate it to a secured Spring service** with `@PreAuthorize`.
+
+```
+LLM → Tool (Function/Method) → DemoService (@PreAuthorize) → Business logic
+```
+
+If the authenticated user doesn't have the required role, Spring Security blocks the call before the business logic even executes.
+
+## B- Spring Security Configuration
+
+```java
+@Configuration
+@EnableMethodSecurity
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
+        return http
+                .httpBasic(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth ->
+                    auth.anyRequest().authenticated())
+                .build();
+    }
+
+    @Bean
+    UserDetailsService userDetailsService() {
+        var admin = User.builder()
+                .username("admin")
+                .password("{noop}password")
+                .roles("USER", "ADMIN")
+                .build();
+
+        var user = User.builder()
+                .username("user")
+                .password("{noop}password")
+                .roles("USER")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin, user);
+    }
+}
+```
+
+### Key Points
+
+* `@EnableMethodSecurity`: enables method-level security (`@PreAuthorize`)
+* **HTTP Basic**: simple authentication for the demo
+* Two users: `admin` (ROLE_ADMIN + ROLE_USER) and `user` (ROLE_USER only)
+
+## C- The Secured Service: DemoService
+
+```java
+@Service
+public class DemoService {
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public TollResponse getUserAccountByName(ToolRequest toolRequest) {
+        var name = toolRequest.name();
+        var userAccount = USER_ACCOUNTS.stream()
+                .filter(account ->
+                    account.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+        if (userAccount == null) {
+            return new TollResponse(String.format(
+                "Account for %s was not found", name));
+        }
+        return new TollResponse(String.format(
+            "Account for %s has a balance of %d, type %s",
+            userAccount.name(), userAccount.sold(),
+            userAccount.accountType()));
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_USER, ROLE_ADMIN')")
+    public String getCurrentDateTime() {
+        return LocalDateTime.now()
+                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public String getCurrentJavaVersion() {
+        return System.getProperty("java.version");
+    }
+}
+```
+
+### Permission Matrix
+
+| Tool | Required Role | admin | user |
+| --- | --- | --- | --- |
+| `getUserAccountByName` | ROLE_ADMIN | OK | KO |
+| `getCurrentDateTime` | ROLE_USER or ROLE_ADMIN | OK | OK |
+| `getCurrentJavaVersion` | ROLE_ADMIN | OK | KO |
+
+## D- Secured Function as Tool
+
+The tool beans delegate to the secured `DemoService`:
+
+```java
+@Configuration
+public class FunctionAsTools {
+
+    private final DemoService demoService;
+
+    public FunctionAsTools(DemoService demoService) {
+        this.demoService = demoService;
+    }
+
+    @Bean
+    @Description("Get user account by name")
+    public Function<DemoService.ToolRequest, DemoService.TollResponse>
+            getUserAccountByName() {
+        return demoService::getUserAccountByName;
+    }
+
+    @Bean
+    @Description("Get the current date and time")
+    public Supplier<String> getCurrentDateTime() {
+        return demoService::getCurrentDateTime;
+    }
+}
+```
+
+Note the difference from the unsecured version: here, the beans are simple **method references** (`demoService::getUserAccountByName`) that delegate to the protected service.
+
+## E- Secured Method as Tool
+
+```java
+@Component
+public class MethodAsTools {
+
+    private final DemoService demoService;
+
+    public MethodAsTools(DemoService demoService) {
+        this.demoService = demoService;
+    }
+
+    @Tool(description = "Get current Java version")
+    String getCurrentJavaVersion() {
+        System.out.printf("Call getCurrentJavaVersion tool%n");
+        return demoService.getCurrentJavaVersion();
+    }
+}
+```
+
+Same pattern: the `@Tool` method delegates to `DemoService`, where `@PreAuthorize` checks permissions.
+
+## F- The REST Controller
+
+```java
+@RestController
+@RequestMapping("/chat")
+public class DemoController {
+
+    private final ChatClient chatClient;
+    private final DemoService demoService;
+
+    public DemoController(ChatClient.Builder chatClientBuilder,
+                          DemoService demoService) {
+        this.chatClient = chatClientBuilder.build();
+        this.demoService = demoService;
+    }
+
+    @GetMapping
+    public String ask(String message) {
+        return chatClient.prompt(message)
+                .toolNames("getUserAccountByName",
+                            "getCurrentDateTime")
+                .tools(new MethodAsTools(this.demoService))
+                .call()
+                .content();
+    }
+}
+```
+
+## G- Testing Security
+
+```bash
+# Admin can do everything
+curl -u admin:password \
+  "http://localhost:8080/chat?message=What+is+Dubois+account+balance?"
+# → "Dubois's account has a balance of 100, type Courant"
+
+# User CANNOT access accounts (ROLE_ADMIN required)
+curl -u user:password \
+  "http://localhost:8080/chat?message=What+is+Dubois+account+balance?"
+# → AccessDeniedException (403)
+
+# User CAN ask for the time (ROLE_USER is sufficient)
+curl -u user:password \
+  "http://localhost:8080/chat?message=What+time+is+it?"
+# → "It is currently 2026-04-09T14:30:00"
+
+# Without authentication → 401
+curl "http://localhost:8080/chat?message=Hello"
+# → 401 Unauthorized
+```
+
+## H- Security Pattern
+
+The pattern applied here is reusable in any Spring AI project:
+
+```
+1. Create a @Service with business logic
+2. Annotate each method with @PreAuthorize
+3. Create tools (Function/Method) that delegate to the service
+4. Configure Spring Security (@EnableMethodSecurity)
+```
+
+This pattern follows the **separation of concerns** principle:
+
+* **Tools** manage the LLM interface (description, parameters)
+* **Service** manages business logic and security
+* **Configuration** defines users and roles
+
+## Conclusion
+
+The combination of Spring AI and Spring Security provides a robust security model for AI tools. The `@PreAuthorize` annotation at the service level ensures that access controls are enforced regardless of how the tool is called.
+
+Key takeaways:
+
+* **Delegate** logic to the secured service, not in the tools
+* `@PreAuthorize` protects each method individually
+* The LLM never bypasses security, control is server-side
+* The pattern is compatible with OAuth2, JWT, or any other Spring Security mechanism
+
+In the next article, we will see **multi-agent orchestration**: how to coordinate multiple specialized AI agents.
+
+I hope you found this article useful. Thank you for reading.
+
+To learn more:
+
+* **Tools Documentation**: [https://docs.spring.io/spring-ai/reference/api/tools.html](https://docs.spring.io/spring-ai/reference/api/tools.html)
+* **Project source code**: [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Find our #autourducode videos on our [YouTube channel](https://www.youtube.com/@autourducode)
+
+
+---
+
+## "Spring AI in Action" Series
+
+1. [Introduction to Spring AI](/en/blog/spring-ai-en-action-introduction)
+2. [ChatClient API: Getting Started with the API](/en/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory: Conversational Context](/en/blog/spring-ai-en-action-chat-memory)
+4. [RAG: Ingestion Pipeline](/en/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG: From Naive to Advanced](/en/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/en/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/en/blog/spring-ai-en-action-tools-security)
+8. [Multi-Agent Orchestration](/en/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/en/blog/spring-ai-en-action-mcp)

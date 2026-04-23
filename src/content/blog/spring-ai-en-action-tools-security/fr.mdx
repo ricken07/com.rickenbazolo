@@ -1,0 +1,270 @@
+---
+title: "Sécuriser les outils IA avec Spring Security"
+slug: "spring-ai-en-action-tools-security"
+language: "fr"
+publishedAt: "2026-04-16"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot", "spring-security"]
+readingTime: 7
+excerpt: "Quand un LLM peut appeler vos méthodes Java, la sécurité devient critique. Dans cet article, nous combinons Spring AI et Spring Security pour contrôler l'accès aux outils IA avec @PreAuthorize et une authentification HTTP Basic."
+status: "published"
+---
+
+Dans l'article précédent, nous avons vu comment permettre à un LLM d'appeler des fonctions Java via le [Function Calling](/fr/blog/spring-ai-en-action-function-calling). Mais dans un contexte d'entreprise, une question cruciale se pose : **qui a le droit d'utiliser quel outil ?**
+
+Un utilisateur avec un rôle basique devrait-il pouvoir consulter les soldes bancaires ? Un outil qui modifie des données devrait-il être accessible à tous ? Le module `fc-tools-secure` montre comment combiner **Spring AI et Spring Security** pour sécuriser les outils IA.
+
+## A- L'architecture sécurisée
+
+Le pattern est élégant : au lieu d'exécuter la logique directement dans les fonctions tools, on la **délègue à un service Spring sécurisé** avec `@PreAuthorize`.
+
+```
+LLM → Tool (Function/Method) → DemoService (@PreAuthorize) → Logique métier
+```
+
+Si l'utilisateur authentifié n'a pas le rôle requis, Spring Security bloque l'appel avant même que la logique métier ne s'exécute.
+
+## B- Configuration Spring Security
+
+```java
+@Configuration
+@EnableMethodSecurity
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
+        return http
+                .httpBasic(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth ->
+                    auth.anyRequest().authenticated())
+                .build();
+    }
+
+    @Bean
+    UserDetailsService userDetailsService() {
+        var admin = User.builder()
+                .username("admin")
+                .password("{noop}password")
+                .roles("USER", "ADMIN")
+                .build();
+
+        var user = User.builder()
+                .username("user")
+                .password("{noop}password")
+                .roles("USER")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin, user);
+    }
+}
+```
+
+### Points clés
+
+* `@EnableMethodSecurity` : active la sécurité au niveau des méthodes (`@PreAuthorize`)
+* **HTTP Basic** : authentification simple pour la démo
+* Deux utilisateurs : `admin` (ROLE_ADMIN + ROLE_USER) et `user` (ROLE_USER uniquement)
+
+## C- Le service sécurisé : DemoService
+
+```java
+@Service
+public class DemoService {
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public TollResponse getUserAccountByName(ToolRequest toolRequest) {
+        var name = toolRequest.name();
+        var userAccount = USER_ACCOUNTS.stream()
+                .filter(account ->
+                    account.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+        if (userAccount == null) {
+            return new TollResponse(String.format(
+                "Le compte de %s n'a pas été trouvé", name));
+        }
+        return new TollResponse(String.format(
+            "Le compte de %s a un solde de %d et est de type %s",
+            userAccount.name(), userAccount.sold(),
+            userAccount.accountType()));
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_USER, ROLE_ADMIN')")
+    public String getCurrentDateTime() {
+        return LocalDateTime.now()
+                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public String getCurrentJavaVersion() {
+        return System.getProperty("java.version");
+    }
+}
+```
+
+### Matrice des permissions
+
+| Outil | Rôle requis | admin | user |
+| --- | --- | --- | --- |
+| `getUserAccountByName` | ROLE_ADMIN | OK | KO |
+| `getCurrentDateTime` | ROLE_USER ou ROLE_ADMIN | OK | OK |
+| `getCurrentJavaVersion` | ROLE_ADMIN | OK | KO |
+
+## D- Function as Tool sécurisé
+
+Les beans tools délèguent au `DemoService` sécurisé :
+
+```java
+@Configuration
+public class FunctionAsTools {
+
+    private final DemoService demoService;
+
+    public FunctionAsTools(DemoService demoService) {
+        this.demoService = demoService;
+    }
+
+    @Bean
+    @Description("Get user account by name")
+    public Function<DemoService.ToolRequest, DemoService.TollResponse>
+            getUserAccountByName() {
+        return demoService::getUserAccountByName;
+    }
+
+    @Bean
+    @Description("Get the current date and time")
+    public Supplier<String> getCurrentDateTime() {
+        return demoService::getCurrentDateTime;
+    }
+}
+```
+
+Notez la différence avec la version non sécurisée : ici, les beans sont de simples **références de méthode** (`demoService::getUserAccountByName`) qui délèguent au service protégé.
+
+## E- Method as Tool sécurisé
+
+```java
+@Component
+public class MethodAsTools {
+
+    private final DemoService demoService;
+
+    public MethodAsTools(DemoService demoService) {
+        this.demoService = demoService;
+    }
+
+    @Tool(description = "Get current Java version")
+    String getCurrentJavaVersion() {
+        System.out.printf("Call getCurrentJavaVersion tool%n");
+        return demoService.getCurrentJavaVersion();
+    }
+}
+```
+
+Même pattern : la méthode `@Tool` délègue à `DemoService`, où `@PreAuthorize` vérifie les permissions.
+
+## F- Le contrôleur REST
+
+```java
+@RestController
+@RequestMapping("/chat")
+public class DemoController {
+
+    private final ChatClient chatClient;
+    private final DemoService demoService;
+
+    public DemoController(ChatClient.Builder chatClientBuilder,
+                          DemoService demoService) {
+        this.chatClient = chatClientBuilder.build();
+        this.demoService = demoService;
+    }
+
+    @GetMapping
+    public String ask(String message) {
+        return chatClient.prompt(message)
+                .toolNames("getUserAccountByName",
+                            "getCurrentDateTime")
+                .tools(new MethodAsTools(this.demoService))
+                .call()
+                .content();
+    }
+}
+```
+
+## G- Tester la sécurité
+
+```bash
+# Admin peut tout faire
+curl -u admin:password \
+  "http://localhost:8080/chat?message=Quel+est+le+solde+de+Dubois+?"
+# → "Le compte de Dubois a un solde de 100 de type Courant"
+
+# User ne peut PAS accéder aux comptes (ROLE_ADMIN requis)
+curl -u user:password \
+  "http://localhost:8080/chat?message=Quel+est+le+solde+de+Dubois+?"
+# → AccessDeniedException (403)
+
+# User PEUT demander la date (ROLE_USER suffit)
+curl -u user:password \
+  "http://localhost:8080/chat?message=Quelle+heure+est-il+?"
+# → "Il est actuellement 2026-04-09T14:30:00"
+
+# Sans authentification → 401
+curl "http://localhost:8080/chat?message=Bonjour"
+# → 401 Unauthorized
+```
+
+## H- Pattern de sécurité
+
+Le pattern appliqué ici est réutilisable dans tout projet Spring AI :
+
+```
+1. Créer un @Service avec la logique métier
+2. Annoter chaque méthode avec @PreAuthorize
+3. Créer les tools (Function/Method) qui délèguent au service
+4. Configurer Spring Security (@EnableMethodSecurity)
+```
+
+Ce pattern suit le principe de **séparation des responsabilités** :
+
+* Les **tools** gèrent l'interface avec le LLM (description, paramètres)
+* Le **service** gère la logique métier et la sécurité
+* La **configuration** définit les utilisateurs et les rôles
+
+## Conclusion
+
+La combinaison de Spring AI et Spring Security offre un modèle de sécurité robuste pour les outils IA. L'annotation `@PreAuthorize` au niveau du service garantit que les contrôles d'accès sont appliqués quelle que soit la manière dont l'outil est appelé.
+
+Points clés :
+
+* **Déléguer** la logique au service sécurisé, pas dans les tools
+* `@PreAuthorize` protège chaque méthode individuellement
+* Le LLM ne contourne jamais la sécurité, le contrôle est côté serveur
+* Le pattern est compatible avec OAuth2, JWT ou tout autre mécanisme Spring Security
+
+Dans le prochain article, nous verrons l'**orchestration multi-agents** : comment coordonner plusieurs agents IA spécialisés.
+
+J'espère que cet article vous a été utile. Merci de l'avoir lu.
+
+Pour en savoir plus :
+
+* **Documentation Tools** : [https://docs.spring.io/spring-ai/reference/api/tools.html](https://docs.spring.io/spring-ai/reference/api/tools.html)
+* **Code source du projet** : [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Retrouvez nos vidéos #autourducode sur notre [chaîne YouTube](https://www.youtube.com/@autourducode)
+
+
+---
+
+## Série « Spring AI en Action »
+
+1. [Introduction à Spring AI](/fr/blog/spring-ai-en-action-introduction)
+2. [ChatClient API : Premiers pas avec l'API](/fr/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory : contexte conversationnel](/fr/blog/spring-ai-en-action-chat-memory)
+4. [RAG : Pipeline d'ingestion](/fr/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG : Du Naïf à l'Avancé](/fr/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/fr/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/fr/blog/spring-ai-en-action-tools-security)
+8. [Orchestration multi-agents](/fr/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/fr/blog/spring-ai-en-action-mcp)
