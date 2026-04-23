@@ -9,6 +9,13 @@ import readingTime from "reading-time";
 import { z } from "zod";
 import type { BlogPost } from "../blog/types";
 
+type HastNode = {
+  type: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+};
+
 const BLOG_DIR = path.join(process.cwd(), "src", "content", "blog");
 
 // Zod schema — validates frontmatter at parse time, gives clear errors
@@ -70,6 +77,7 @@ export async function renderMarkdown(source: string) {
         remarkPlugins: [remarkGfm],
         rehypePlugins: [
           rehypeSlug,
+          rehypeResponsiveTables,
           [
             rehypePrettyCode,
             {
@@ -86,6 +94,35 @@ export async function renderMarkdown(source: string) {
     },
   });
   return content;
+}
+
+function rehypeResponsiveTables() {
+  return (tree: HastNode) => {
+    wrapTables(tree);
+  };
+}
+
+function wrapTables(node: HastNode) {
+  if (!node.children?.length) {
+    return;
+  }
+
+  node.children = node.children.map((child) => {
+    wrapTables(child);
+
+    if (child.type === "element" && child.tagName === "table") {
+      return {
+        type: "element",
+        tagName: "div",
+        properties: {
+          className: ["table-wrap"],
+        },
+        children: [child],
+      } satisfies HastNode;
+    }
+
+    return child;
+  });
 }
 
 export async function listBlogDirectories() {

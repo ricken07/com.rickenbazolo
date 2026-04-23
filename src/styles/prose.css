@@ -290,41 +290,93 @@
 }
 
 /* Tables */
-.prose table {
-  width: 100%;
-  border-collapse: collapse;
+.prose .table-wrap {
   margin: 2rem 0;
-  display: block;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-card) 88%, transparent);
+  box-shadow: 0 14px 32px -24px rgba(6, 147, 227, 0.35);
 }
 
-.prose table tbody,
-.prose table thead {
-  display: table;
-  width: 100%;
+.prose table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+}
+
+.prose thead {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+}
+
+.prose tbody {
+  background: transparent;
+}
+
+.prose tr {
+  background: transparent;
 }
 
 .prose th {
-  background: var(--color-accent);
   color: #ffffff;
   font-weight: 700;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1rem;
   text-align: left;
-  border: 1px solid var(--color-accent-hover);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent-hover) 75%, transparent);
+  white-space: normal;
+  vertical-align: top;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 
 .prose td {
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--color-border);
+  padding: 0.875rem 1rem;
+  border-top: 1px solid var(--color-border);
+  vertical-align: top;
+  color: var(--color-muted);
+  background: transparent;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.prose th:first-child {
+  border-top-left-radius: 1rem;
+}
+
+.prose th:last-child {
+  border-top-right-radius: 1rem;
+}
+
+.prose td:not(:last-child),
+.prose th:not(:last-child) {
+  border-right: 1px solid var(--color-border);
+}
+
+.prose td > :last-child,
+.prose th > :last-child {
+  margin-bottom: 0;
+}
+
+.prose td code,
+.prose th code {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .prose tbody tr:hover {
-  background: rgba(6, 147, 227, 0.04);
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 
 .prose tr:nth-child(even) {
-  background: var(--color-card);
+  background: color-mix(in srgb, var(--color-card) 78%, transparent);
 }
 
 /* Séparateur horizontal */
@@ -409,14 +461,14 @@
   }
 
   /* Tableaux sur mobile */
-  .prose table {
+  .prose .table-wrap {
     font-size: 0.875rem;
+    border-radius: 0.875rem;
   }
 
   .prose th,
   .prose td {
-    padding: 0.5rem;
-    min-width: 100px;
+    padding: 0.625rem 0.75rem;
   }
 
   /* Images sur mobile */

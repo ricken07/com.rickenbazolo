@@ -1,0 +1,297 @@
+---
+title: "RAG avec Spring AI : Du Naïf à l'Avancé"
+slug: "spring-ai-en-action-rag-avance"
+language: "fr"
+publishedAt: "2026-04-14"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot", "rag"]
+readingTime: 8
+excerpt: "Après avoir construit le pipeline d'ingestion, il est temps d'interroger nos données. Dans cet article, nous comparons le RAG naive avec recherche par similarité au RAG avancé utilisant la réécriture, l'expansion et la compression de requêtes avec le RetrievalAugmentationAdvisor."
+status: "published"
+---
+
+Dans l'article précédent, nous avons construit le pipeline d'ingestion pour préparer nos données dans une base vectorielle. Maintenant, il est temps de les **interroger**. Mais toutes les approches de retrieval ne se valent pas.
+
+Dans cet article, nous allons comparer deux approches :
+
+* **RAG Naive** : recherche par similarité directe + injection dans le prompt
+* **RAG Avancé** : utilisation de stratégies de pré-retrieval (réécriture, expansion, compression de requêtes)
+
+## A- Le RAG Naive : similarité directe
+
+Le module `naive-rag` implémente l'approche la plus simple : rechercher les documents les plus similaires à la question de l'utilisateur et les injecter directement dans le prompt.
+
+### Code du NaiveService
+
+```java
+@Service
+public class NaiveService {
+
+    private final ChatClient chatClient;
+    private final VectorStore vectorStore;
+
+    public NaiveService(ChatClient.Builder chatClientBuilder,
+                        VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+        this.chatClient = chatClientBuilder
+                .defaultAdvisors(new SimpleLoggerAdvisor())
+                .build();
+    }
+
+    public String rag(String question) {
+        // 1 - Recherche des documents similaires
+        var context = vectorStore.similaritySearch(
+            SearchRequest.builder()
+                .query(question)
+                .similarityThreshold(0.0)
+                .topK(2)
+                .build());
+
+        // 2 - Construction du prompt avec contexte
+        var systemMessage = new SystemPromptTemplate("""
+            Context information is below.
+            CONTEXT: {context}
+            Given the context information and not prior knowledge,
+            answer the question in the same language.
+            QUESTION: {question}
+            """).createMessage(
+                Map.of("question", question, "context", context));
+
+        var userMessage = new UserMessage(question);
+        var prompt = new Prompt(List.of(systemMessage, userMessage));
+
+        return chatClient.prompt(prompt).call().content();
+    }
+}
+```
+
+### Fonctionnement
+
+1. **Recherche par similarité** : `vectorStore.similaritySearch()` compare le vecteur de la question avec les vecteurs stockés et retourne les `topK` documents les plus proches
+2. **Construction du prompt** : les documents trouvés sont injectés dans un `SystemPromptTemplate` comme contexte
+3. **Appel au LLM** : le modèle génère sa réponse en se basant sur le contexte fourni
+
+### Paramètres de recherche
+
+| Paramètre | Description | Valeur |
+| --- | --- | --- |
+| `query` | La question de l'utilisateur | Texte libre |
+| `similarityThreshold` | Seuil minimum de similarité (0.0 à 1.0) | `0.0` (aucun filtre) |
+| `topK` | Nombre maximum de résultats | `2` |
+
+### Limites du RAG Naive
+
+* La qualité dépend **directement** de la formulation de la question
+* Des questions vagues ou mal formulées donnent des résultats médiocres
+* Pas de transformation ou d'optimisation de la requête avant la recherche
+
+## B- Le RAG Avancé : stratégies de pré-retrieval
+
+Le module `advanced-rag` utilise le `RetrievalAugmentationAdvisor` de Spring AI avec trois stratégies de pré-retrieval pour améliorer la qualité des résultats.
+
+### Le RetrievalAugmentationAdvisor
+
+C'est un Advisor dédié au RAG qui orchestre automatiquement :
+
+1. La **transformation** de la requête (pré-retrieval)
+2. La **recherche** dans le vector store
+3. L'**injection** du contexte dans le prompt
+
+### Dépendances supplémentaires
+
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-advisors-vector-store</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-rag</artifactId>
+</dependency>
+```
+
+### Stratégie 1 : Réécriture de requête (RewriteQueryTransformer)
+
+```java
+public String withQueryRewrite(String input) {
+    var advisor = RetrievalAugmentationAdvisor.builder()
+            .queryTransformers(
+                RewriteQueryTransformer.builder()
+                    .chatClientBuilder(chatClient.mutate())
+                    .promptTemplate(new PromptTemplate(rewritePrompt))
+                    .build())
+            .documentRetriever(
+                VectorStoreDocumentRetriever.builder()
+                    .vectorStore(vectorStore)
+                    .build())
+            .build();
+
+    return chatClient.prompt()
+            .advisors(advisor)
+            .user(input)
+            .call()
+            .content();
+}
+```
+
+Le `RewriteQueryTransformer` utilise un LLM pour **reformuler** la question de l'utilisateur en une version plus adaptée à la recherche vectorielle. Par exemple :
+
+```
+Original : "c'est quoi le truc italien avec du riz ?"
+Réécrite : "recette de risotto italien au parmesan"
+```
+
+Le prompt de réécriture est externalisé dans un fichier template `.st` :
+
+```
+Given a user query, rewrite it to provide better results
+when querying a {target}.
+Remove any irrelevant information, and ensure the query
+is concise and specific.
+Original query: {query}
+```
+
+### Stratégie 2 : Expansion de requête (MultiQueryExpander)
+
+```java
+public String withQueryExpansion(String input) {
+    var advisor = RetrievalAugmentationAdvisor.builder()
+            .queryExpander(
+                MultiQueryExpander.builder()
+                    .chatClientBuilder(chatClient.mutate())
+                    .build())
+            .documentRetriever(
+                VectorStoreDocumentRetriever.builder()
+                    .vectorStore(vectorStore)
+                    .build())
+            .build();
+
+    return chatClient.prompt()
+            .advisors(advisor)
+            .user(input)
+            .call()
+            .content();
+}
+```
+
+Le `MultiQueryExpander` génère **plusieurs variantes** de la question originale, effectue la recherche pour chacune, puis fusionne les résultats. Cela augmente la couverture de la recherche :
+
+```
+Original : "recette africaine"
+Variante 1 : "plat traditionnel d'Afrique"
+Variante 2 : "cuisine africaine populaire"
+Variante 3 : "recette typique du continent africain"
+```
+
+### Stratégie 3 : Compression de requête (CompressionQueryTransformer)
+
+```java
+public String withQueryCompression(String input) {
+    var advisor = RetrievalAugmentationAdvisor.builder()
+            .queryTransformers(
+                CompressionQueryTransformer.builder()
+                    .chatClientBuilder(chatClient.mutate())
+                    .build())
+            .documentRetriever(
+                VectorStoreDocumentRetriever.builder()
+                    .vectorStore(vectorStore)
+                    .build())
+            .build();
+
+    return chatClient.prompt()
+            .advisors(advisor)
+            .user(input)
+            .call()
+            .content();
+}
+```
+
+Le `CompressionQueryTransformer` **condense** une conversation multi-tours en une seule requête autonome, utile quand l'utilisateur fait référence à des messages précédents :
+
+```
+Historique : "Parle-moi des plats africains" → "Celui du Sénégal"
+Compressée : "Recette de thiéboudienne du Sénégal"
+```
+
+## C- Comparaison Naive vs Avancé
+
+| Aspect | RAG Naive | RAG Avancé |
+| --- | --- | --- |
+| Transformation requête | Aucune | Réécriture, expansion, compression |
+| Qualité des résultats | Dépend de la formulation | Optimisée automatiquement |
+| Coût (appels LLM) | 1 appel | 2+ appels (transformation + réponse) |
+| Complexité code | Simple | Modérée (mais encapsulée par l'Advisor) |
+| Cas d'usage | Requêtes précises | Requêtes vagues, conversationnelles |
+
+## D- Combinaison de stratégies
+
+Le `RetrievalAugmentationAdvisor` permet de **combiner** plusieurs transformers et expanders :
+
+```java
+var advisor = RetrievalAugmentationAdvisor.builder()
+        .queryTransformers(
+            RewriteQueryTransformer.builder()
+                .chatClientBuilder(chatClient.mutate())
+                .build(),
+            CompressionQueryTransformer.builder()
+                .chatClientBuilder(chatClient.mutate())
+                .build())
+        .queryExpander(
+            MultiQueryExpander.builder()
+                .chatClientBuilder(chatClient.mutate())
+                .build())
+        .documentRetriever(
+            VectorStoreDocumentRetriever.builder()
+                .vectorStore(vectorStore)
+                .build())
+        .build();
+```
+
+Les transformers s'exécutent en séquence (réécriture puis compression), puis l'expander génère les variantes, et enfin le retriever effectue les recherches.
+
+## E- Le pattern chatClient.mutate()
+
+Vous avez peut-être remarqué l'utilisation de `chatClient.mutate()` dans les builders des transformers :
+
+```java
+RewriteQueryTransformer.builder()
+    .chatClientBuilder(chatClient.mutate())
+    .build()
+```
+
+La méthode `mutate()` crée un nouveau `ChatClient.Builder` à partir d'un `ChatClient` existant, héritant de sa configuration. Cela permet aux transformers d'utiliser le même modèle d'IA que le ChatClient principal.
+
+## Conclusion
+
+Le RAG avancé de Spring AI transforme des requêtes vagues en recherches précises, améliorant significativement la qualité des réponses. Les stratégies de pré-retrieval sont encapsulées dans le `RetrievalAugmentationAdvisor`, gardant le code applicatif simple et lisible.
+
+Points clés :
+
+* Le **RAG naïf** fonctionne bien pour des requêtes précises
+* La **réécriture** améliore la formulation pour la recherche vectorielle
+* L'**expansion** élargit la couverture de recherche
+* La **compression** gère les conversations multi-tours
+
+Dans le prochain article, nous verrons le **Function Calling** : quand le LLM appelle directement vos méthodes Java.
+
+J'espère que cet article vous a été utile. Merci de l'avoir lu.
+
+Pour en savoir plus :
+
+* **Documentation RAG** : [https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html](https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html)
+* **Code source du projet** : [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Retrouvez nos vidéos #autourducode sur notre [chaîne YouTube](https://www.youtube.com/@autourducode)
+
+
+---
+
+## Série « Spring AI en Action »
+
+1. [Introduction à Spring AI](/fr/blog/spring-ai-en-action-introduction)
+2. [ChatClient API : Premiers pas avec l'API](/fr/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory : contexte conversationnel](/fr/blog/spring-ai-en-action-chat-memory)
+4. [RAG : Pipeline d'ingestion](/fr/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG : Du Naïf à l'Avancé](/fr/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/fr/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/fr/blog/spring-ai-en-action-tools-security)
+8. [Orchestration multi-agents](/fr/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/fr/blog/spring-ai-en-action-mcp)
