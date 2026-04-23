@@ -1,0 +1,335 @@
+---
+title: "Model Context Protocol (MCP) with Spring AI: Exposing and Consuming Remote Tools"
+slug: "spring-ai-en-action-mcp"
+language: "en"
+publishedAt: "2026-04-12"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot", "mcp"]
+readingTime: 8
+excerpt: "The Model Context Protocol (MCP) is an open protocol that standardizes communication between AI applications and external tools. In this article, we build an MCP Server that exposes a RAG tool and an MCP Host that orchestrates it alongside the GitHub MCP server."
+status: "published"
+---
+
+Until now, our AI tools were defined locally within the same application. But in a real ecosystem, tools can reside in remote services: a specification server, a GitHub API, a database service, etc.
+
+The **Model Context Protocol (MCP)** is an open protocol, initiated by [Anthropic](https://www.anthropic.com/news/model-context-protocol), that standardizes communication between AI applications (hosts) and tool providers (servers). Spring AI offers native MCP support.
+
+In this article, we explore the two sub-modules of the `mcp` module:
+
+* **mcp-server**: exposes a RAG tool via the MCP protocol (stdio)
+* **mcp-host**: orchestrates GPT-4o with multiple MCP servers
+
+## A- MCP Architecture
+
+In an MCP architecture with Spring AI, three main roles interact:
+
+| Role | Description | Example |
+| --- | --- | --- |
+| **Host** | AI application that consumes tools | Our Spring AI application |
+| **Server** | Service that exposes tools | RAG server, GitHub MCP server |
+| **Client** | Communication component in the host | `McpSyncClient` |
+
+## B- The MCP Server: Exposing a RAG Tool
+
+The MCP Server exposes a RAG search tool via the stdio protocol.
+
+### Dependencies
+
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-mcp-server</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-rag</artifactId>
+</dependency>
+```
+
+### Configuration
+
+```yaml
+spring:
+  main:
+    banner-mode: off
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+    vectorstore:
+      pgvector:
+        dimensions: 1536
+        initialize-schema: true
+        table-name: spec_store
+    mcp:
+      server:
+        name: specifications-mcp-server
+        stdio: true
+  datasource:
+    url: jdbc:postgresql://localhost:5438/demo_db
+    username: demo
+    password: demo
+server:
+  port: 0
+logging:
+  pattern:
+    console:
+```
+
+Key configuration points:
+
+* `mcp.server.stdio: true`: the server communicates via stdin/stdout (not HTTP)
+* `server.port: 0`: no HTTP port (stdio communication only)
+* `banner-mode: off` and empty `logging.pattern.console`: avoids polluting stdout
+* `dimensions: 1536`: OpenAI vector dimensions
+
+### The Exposed RAG Tool
+
+```java
+@Component
+public class RagTools {
+
+    @Autowired @Lazy
+    private RagService ragService;
+
+    @Tool(description = "Retrieves extracts from application "
+        + "specifications relevant to a given query.")
+    public String retrievesExtractsFromSpecifications(
+            String input) {
+        return ragService.run(input);
+    }
+}
+```
+
+The `@Tool` annotation exposes the method as an MCP tool. The `RagService` combines query rewriting and multi-query expansion for optimized searches.
+
+### MCP Tool Registration
+
+```java
+@Configuration(proxyBeanMethods = false)
+public class McpServerConfig {
+
+    @Bean
+    ToolCallbackProvider systemToolsProvider(RagTools tools) {
+        return MethodToolCallbackProvider.builder()
+                .toolObjects(tools)
+                .build();
+    }
+}
+```
+
+The `MethodToolCallbackProvider` scans `@Tool`-annotated methods and exposes them via the MCP protocol.
+
+### The Underlying RagService
+
+```java
+@Component
+public class RagService {
+
+    public String run(String input) {
+        var advisor = RetrievalAugmentationAdvisor.builder()
+                .queryTransformers(
+                    RewriteQueryTransformer.builder()
+                        .chatClientBuilder(chatClient.mutate())
+                        .promptTemplate(
+                            new PromptTemplate(rewritePrompt))
+                        .build())
+                .queryExpander(
+                    MultiQueryExpander.builder()
+                        .chatClientBuilder(chatClient.mutate())
+                        .build())
+                .documentRetriever(
+                    VectorStoreDocumentRetriever.builder()
+                        .vectorStore(vectorStore)
+                        .build())
+                .build();
+
+        return chatClient.prompt()
+                .advisors(advisor)
+                .user(input)
+                .call()
+                .content();
+    }
+}
+```
+
+## C- The MCP Host: Orchestrating Multiple Servers
+
+The MCP Host is the main application that consumes tools from multiple MCP servers.
+
+### Dependencies
+
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-mcp-client</artifactId>
+</dependency>
+```
+
+### MCP Server Configuration
+
+Server configuration is in `mcp-servers-config.json`:
+
+```json
+{
+  "mcpServers": {
+    "app-specification": {
+      "command": "java",
+      "args": [
+        "--enable-native-access=ALL-UNNAMED",
+        "-jar",
+        "/path/to/mcp-server-0.1.0-SNAPSHOT.jar"
+      ]
+    },
+    "github": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {}
+    }
+  }
+}
+```
+
+Two MCP servers are configured:
+
+* **app-specification**: our Java RAG server, launched as a jar
+* **github**: GitHub's official MCP server, run via Docker
+
+### Spring Configuration
+
+```yaml
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+    mcp:
+      client:
+        stdio:
+          servers-configuration:
+            classpath:/mcp-servers-config.json
+```
+
+### The Host Controller
+
+```java
+@RestController
+@RequestMapping("/chat")
+public class DemoController {
+
+    private final ChatClient chatClient;
+
+    public DemoController(
+            ChatClient.Builder chatClientBuilder,
+            List<McpSyncClient> mcpSyncClients) {
+        this.chatClient = chatClientBuilder
+                .defaultSystem("""
+                    You are a code assistant and can create
+                    projects on GitHub using the defined
+                    specifications.
+                    """)
+                .defaultToolCallbacks(
+                    SyncMcpToolCallbackProvider.builder()
+                        .mcpClients(mcpSyncClients)
+                        .build())
+                .defaultAdvisors(new SimpleLoggerAdvisor())
+                .build();
+    }
+
+    @GetMapping
+    public String rag(String message) {
+        return chatClient.prompt(message).call().content();
+    }
+}
+```
+
+### Key Points
+
+* `List<McpSyncClient>`: Spring AI auto-configures one MCP client per declared server
+* `SyncMcpToolCallbackProvider`: exposes all MCP server tools to the `ChatClient`
+* The **GPT-4o** model sees all tools (RAG + GitHub) and can combine them
+* The system prompt guides the assistant on its role
+
+## D- Complete Execution Flow
+
+When the user asks a question:
+
+```
+1. "Create a GitHub repo with the project specs"
+         ↓
+2. GPT-4o identifies the needed tools:
+   - retrievesExtractsFromSpecifications (RAG)
+   - create_repository (GitHub MCP)
+         ↓
+3. Spring AI calls the MCP RAG Server via stdio
+   → RAG server searches PGVector
+   → Returns relevant specifications
+         ↓
+4. Spring AI calls the GitHub MCP Server via Docker
+   → Creates the repository with specs
+         ↓
+5. GPT-4o aggregates and generates the final response
+```
+
+## E- Supported MCP Transports
+
+| Transport | Description | Use Case |
+| --- | --- | --- |
+| **Stdio** | Communication via stdin/stdout | Local processes, jars, CLI |
+| **Streamable-HTTP** | HTTP streaming transport for MCP exchanges | Remote services, web integrations |
+| **Stateless Streamable-HTTP** | Stateless HTTP variant for independent requests | Stateless environments, horizontal scaling |
+| **SSE** | Server-Sent Events (HTTP) | Simple server-side event streaming |
+
+The **Stdio** transport is ideal for local servers like in our example, while **Streamable-HTTP**, **Stateless Streamable-HTTP**, and **SSE** cover remote HTTP exposure depending on the required statefulness and streaming model.
+
+## Conclusion
+
+The Model Context Protocol standardizes the AI tool ecosystem. With Spring AI, integrating MCP servers is as simple as adding a JSON configuration file.
+
+Key takeaways:
+
+* An **MCP Server** exposes tools via `@Tool` + `ToolCallbackProvider`
+* An **MCP Host** consumes tools via `McpSyncClient` + `SyncMcpToolCallbackProvider`
+* **Stdio**, **Streamable-HTTP**, **Stateless Streamable-HTTP**, and **SSE** cover the main MCP integration modes
+* Multiple MCP servers (RAG, GitHub, etc.) can be **combined** in a single host
+
+This article concludes the **Spring AI in Action** series. We have covered all framework features: ChatClient, memory, RAG, tools, agents, and MCP. The Spring AI ecosystem gives Java developers the tools needed to build AI applications.
+
+I hope you found this series useful. Thank you for following along.
+
+To learn more:
+
+* **MCP Documentation**: [https://docs.spring.io/spring-ai/reference/api/mcp.html](https://docs.spring.io/spring-ai/reference/api/mcp.html)
+* **Project source code**: [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Find our #autourducode videos on our [YouTube channel](https://www.youtube.com/@autourducode)
+
+
+---
+
+## "Spring AI in Action" Series
+
+1. [Introduction to Spring AI](/en/blog/spring-ai-en-action-introduction)
+2. [ChatClient API: Getting Started with the API](/en/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory: Conversational Context](/en/blog/spring-ai-en-action-chat-memory)
+4. [RAG: Ingestion Pipeline](/en/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG: From Naive to Advanced](/en/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/en/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/en/blog/spring-ai-en-action-tools-security)
+8. [Multi-Agent Orchestration](/en/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/en/blog/spring-ai-en-action-mcp)
