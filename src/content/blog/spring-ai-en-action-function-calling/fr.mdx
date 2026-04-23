@@ -1,0 +1,217 @@
+---
+title: "Function Calling avec Spring AI : Quand le LLM appelle vos méthodes Java"
+slug: "spring-ai-en-action-function-calling"
+language: "fr"
+publishedAt: "2026-04-15"
+tags: ["spring-ai", "ia", "llm", "java", "spring-boot"]
+readingTime: 8
+excerpt: "Le Function Calling permet au LLM d'appeler des fonctions côté serveur pour accéder à des données en temps réel. Spring AI offre deux approches : les fonctions déclarées comme beans Spring (@Bean + @Description) et les méthodes annotées avec @Tool. Découvrons ces deux patterns."
+status: "published"
+---
+
+Les LLM excellent pour comprendre le langage naturel et générer du texte, mais ils ne peuvent pas accéder à des données en temps réel : état d'un compte bancaire, heure actuelle, données métier, etc. Le **Function Calling** (ou Tool Calling) résout ce problème en permettant au modèle de **demander l'exécution de fonctions côté serveur**.
+
+Dans cet article, nous explorons le module `fc-tools` du projet démo, qui illustre deux approches :
+
+* **Function as Tool** : fonctions Spring déclarées comme beans
+* **Method as Tool** : méthodes annotées avec `@Tool`
+
+## A- Comment fonctionne le Function Calling ?
+
+Le flux d'exécution est le suivant :
+
+```
+1. Utilisateur : "Quel est le solde du compte de Dubois ?"
+2. LLM analyse la question et identifie un outil pertinent
+3. LLM retourne : "J'ai besoin d'appeler getUserAccountByName(name='Dubois')"
+4. Spring AI exécute la fonction côté serveur
+5. Résultat : { solde: 100, type: "Courant" }
+6. Spring AI renvoie le résultat au LLM
+7. LLM : "Le compte de Dubois a un solde de 100€ de type Courant."
+```
+
+Le LLM ne se contente pas de répondre — il **orchestre** des appels de fonctions pour accéder à l'information dont il a besoin.
+
+## B- Function as Tool : @Bean + @Description
+
+La première approche consiste à déclarer des fonctions Java comme des beans Spring avec une description que le LLM peut comprendre.
+
+### Configuration des outils
+
+```java
+@Configuration
+public class FunctionAsTools {
+
+    @Bean
+    @Description("Get user account by name")
+    public BiFunction<ToolRequest, ToolContext, TollResponse>
+            getUserAccountByName() {
+        return (toolRequest, ctx) -> {
+            var name = toolRequest.name();
+            var userAccount = USER_ACCOUNTS.stream()
+                    .filter(account ->
+                        account.name().equalsIgnoreCase(name))
+                    .findFirst()
+                    .orElse(null);
+            if (userAccount == null) {
+                return new TollResponse(String.format(
+                    "Le compte de %s n'a pas été trouvé", name));
+            }
+            return new TollResponse(String.format(
+                "Le compte de %s a un solde de %d et est de type %s",
+                userAccount.name(), userAccount.sold(),
+                userAccount.accountType()));
+        };
+    }
+
+    @Bean
+    @Description("Get the current date and time")
+    public Supplier<String> getCurrentDateTime() {
+        return () -> LocalDateTime.now()
+                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    private final List<UserAccount> USER_ACCOUNTS = List.of(
+        new UserAccount(1, "Dubois", 100, "Courant"),
+        new UserAccount(2, "Martin", 200, "Épargne"),
+        new UserAccount(3, "Leroy", 300, "Courant"),
+        new UserAccount(4, "Pierre", 400, "Investissement")
+    );
+
+    public record UserAccount(int id, String name,
+                              int sold, String accountType) {}
+    public record ToolRequest(String name) {}
+    public record TollResponse(String response) {}
+}
+```
+
+### Points clés
+
+* `@Description` : la description est envoyée au LLM pour qu'il comprenne **quand** et **comment** utiliser la fonction
+* `BiFunction<ToolRequest, ToolContext, TollResponse>` : prend une requête et un contexte, retourne une réponse
+* `Supplier<String>` : fonction sans paramètre (ex : obtenir la date courante)
+* Les **records** Java sont utilisés pour sérialiser/désérialiser les paramètres et retours automatiquement
+
+### Le ToolContext
+
+Le `ToolContext` est un objet qui permet de passer du contexte additionnel à la fonction, par exemple des informations sur l'utilisateur authentifié ou des métadonnées de la requête.
+
+## C- Method as Tool : @Tool
+
+La seconde approche utilise l'annotation `@Tool` directement sur des méthodes Java. C'est plus concis et adapté quand les fonctions ne nécessitent pas d'être des beans Spring.
+
+```java
+public class MethodAsTools {
+
+    @Tool(description = "Get current Java version")
+    String getCurrentJavaVersion() {
+        System.out.println("Call getCurrentJavaVersion tool");
+        return System.getProperty("java.version");
+    }
+}
+```
+
+L'annotation `@Tool` est une alternative à `@Bean + @Description`. La description est directement dans l'annotation.
+
+## D- Enregistrement des outils dans le ChatClient
+
+Le contrôleur REST montre comment combiner les deux types d'outils :
+
+```java
+@RestController
+@RequestMapping("/chat")
+public class DemoController {
+
+    private final ChatClient chatClient;
+
+    public DemoController(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
+    }
+
+    @GetMapping
+    public String demo(String message) {
+        return chatClient.prompt(message)
+                .toolNames("getUserAccountByName",
+                            "getCurrentDateTime")
+                .tools(new MethodAsTools())
+                .call()
+                .content();
+    }
+}
+```
+
+### Deux mécanismes d'enregistrement
+
+| Méthode | Type | Enregistrement |
+| --- | --- | --- |
+| `.toolNames(...)` | Function as Tool | Par nom de bean Spring |
+| `.tools(...)` | Method as Tool | Par instance d'objet avec `@Tool` |
+
+Les deux mécanismes peuvent être **combinés** dans le même appel. Le LLM verra l'ensemble des outils disponibles et choisira lesquels utiliser.
+
+## E- Types de fonctions supportés
+
+Spring AI supporte plusieurs signatures de fonctions :
+
+| Type Java | Description | Exemple |
+| --- | --- | --- |
+| `Function<I, O>` | Entrée → Sortie | Recherche de compte |
+| `BiFunction<I, ToolContext, O>` | Entrée + Contexte → Sortie | Recherche avec contexte |
+| `Supplier<O>` | Pas d'entrée → Sortie | Date courante |
+| `Consumer<I>` | Entrée → Pas de sortie | Envoi de notification |
+| `@Tool` méthode | Annotation directe | Version Java |
+
+## F- Tester le Function Calling
+
+```bash
+# Le LLM va appeler getUserAccountByName
+curl "http://localhost:8080/chat?message=Quel+est+le+solde+du+compte+de+Dubois+?"
+
+# Le LLM va appeler getCurrentDateTime
+curl "http://localhost:8080/chat?message=Quelle+heure+est-il+?"
+
+# Le LLM va appeler getCurrentJavaVersion
+curl "http://localhost:8080/chat?message=Quelle+version+de+Java+est+utilisée+?"
+
+# Le LLM peut combiner plusieurs outils
+curl "http://localhost:8080/chat?message=Donne+moi+le+solde+de+Martin+et+la+date+actuelle"
+```
+
+## G- Bonnes pratiques
+
+1. **Descriptions claires** : la description est cruciale, c'est ce que le LLM utilise pour décider quel outil appeler
+2. **Records pour les paramètres** : utilisez des records Java pour une sérialisation/désérialisation automatique et propre
+3. **Gestion d'erreurs** : retournez des messages d'erreur explicites (ex : compte non trouvé) plutôt que des exceptions
+4. **Granularité** : préférez des outils focalisés sur une tâche unique plutôt que des outils couteau suisse
+
+## Conclusion
+
+Le Function Calling est une fonctionnalité puissante qui transforme le LLM d'un simple générateur de texte en un **orchestrateur intelligent** capable d'interagir avec vos systèmes. Spring AI rend cette intégration naturelle grâce à deux approches complémentaires :
+
+* `@Bean + @Description` pour les fonctions enregistrées dans le contexte Spring
+* `@Tool` pour les méthodes annotées directement
+
+Dans le prochain article, nous verrons comment **sécuriser ces outils** avec Spring Security pour contrôler qui peut appeler quelles fonctions.
+
+J'espère que cet article vous a été utile. Merci de l'avoir lu.
+
+Pour en savoir plus :
+
+* **Documentation Tools** : [https://docs.spring.io/spring-ai/reference/api/tools.html](https://docs.spring.io/spring-ai/reference/api/tools.html)
+* **Code source du projet** : [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Retrouvez nos vidéos #autourducode sur notre [chaîne YouTube](https://www.youtube.com/@autourducode)
+
+
+---
+
+## Série « Spring AI en Action »
+
+1. [Introduction à Spring AI](/fr/blog/spring-ai-en-action-introduction)
+2. [ChatClient API : Premiers pas avec l'API](/fr/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory : contexte conversationnel](/fr/blog/spring-ai-en-action-chat-memory)
+4. [RAG : Pipeline d'ingestion](/fr/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG : Du Naïf à l'Avancé](/fr/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/fr/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/fr/blog/spring-ai-en-action-tools-security)
+8. [Orchestration multi-agents](/fr/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/fr/blog/spring-ai-en-action-mcp)
