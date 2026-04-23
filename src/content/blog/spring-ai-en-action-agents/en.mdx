@@ -1,0 +1,328 @@
+---
+title: "Multi-Agent Orchestration with Spring AI"
+slug: "spring-ai-en-action-agents"
+language: "en"
+publishedAt: "2026-04-18"
+tags: ["spring-ai", "ia", "llm", "agent" "java", "spring-boot"]
+readingTime: 9
+excerpt: "What if instead of a single AI agent, you orchestrated several in parallel? In this article, we build a multi-agent workflow with Spring AI: specialized agents execute in parallel via Java Virtual Threads, then an evaluator qualifies the overall result."
+status: "published"
+---
+
+So far, our examples used a single `ChatClient` to interact with the LLM. But some complex tasks benefit from a **multi-agent** approach: multiple specialized agents work in parallel, each with their own instructions and tools, then their results are aggregated and evaluated.
+
+In this article, we explore the `agent/workflow` module of the demo project, which implements a **project draft generator** orchestrating multiple AI agents in parallel.
+
+## A- Workflow Architecture
+
+The execution flow is as follows:
+
+```
+1. User request (project description)
+         ↓
+2. Specialized agent selection
+         ↓
+3. Parallel execution (Virtual Threads)
+   ┌─────────┬──────────────┬──────────────┐
+   │ Namer   │ Summarizer   │ Contextualizer│
+   └─────────┴──────────────┴──────────────┘
+         ↓
+4. Result aggregation
+         ↓
+5. Quality evaluation (Clarity, Completeness, Relevance)
+         ↓
+6. Final response with feedback
+```
+
+## B- The Agent Model
+
+An agent is defined by a record that encapsulates all its properties:
+
+```java
+public record Agent(
+    String name,
+    String systemInstruction,
+    String input,
+    List<String> tools,
+    ChatClient.ChatClientRequestSpec chatClient
+) {}
+```
+
+Each agent has:
+
+* An identifying **name** (e.g., "ProjectNamer")
+* **System instructions** detailing its mission and rules
+* An **input template** with placeholders (e.g., `{projectDescription}`)
+* A list of **tools** it can call
+* A pre-configured **ChatClientRequestSpec**
+
+## C- The Agent Registry: AgentRegistry
+
+The `AgentRegistry` centralizes the definition and construction of all agents:
+
+```java
+@Component
+public class AgentRegistry {
+
+    private final Map<DraftSectionKey, Agent> AGENT_CACHE =
+            new EnumMap<>(DraftSectionKey.class);
+
+    private final ChatClient chatClient;
+
+    public AgentRegistry(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder
+                .defaultAdvisors(new SimpleLoggerAdvisor())
+                .defaultOptions(
+                    ChatOptions.builder().maxTokens(500).build())
+                .build();
+        initializeTemplates();
+        initializeAgents();
+    }
+}
+```
+
+### Specialized Agents
+
+| Agent | Key | Mission | Tools |
+| --- | --- | --- | --- |
+| **ProjectNamer** | PROJECT_NAME | Generate a concise, memorable name | None |
+| **ProjectSummarizer** | PROJECT_SUMMARY | Write an executive summary | `getCountry` |
+| **ProjectContextualizer** | PROJECT_CONTEXT | Analyze the project context | `getCountry`, `getCurrentDateTime` |
+| **ExecutionPlanner** | EXECUTION_PLAN | Create an execution plan | `getCurrentDateTime` |
+
+Each agent has its own detailed **system instructions**:
+
+```java
+AGENT_TEMPLATES.put(DraftSectionKey.PROJECT_NAME,
+    new AgentTemplate("ProjectNamer", """
+        You are an expert in project naming.
+
+        ## Your mission
+        Generate a concise, memorable, and descriptive name.
+
+        ## Rules
+        - The name must be short (5-15 words maximum)
+        - It must reflect the essence of the project
+        - It must be easy to remember
+        - Avoid complex acronyms
+
+        ## Output format
+        Return only the project name.
+        """,
+    "Propose a name for this project: {projectDescription}",
+    List.of(), 800));
+```
+
+### Agent Tools
+
+Agents can use tools declared as Spring beans:
+
+```java
+@Configuration
+public class FunctionAsTools {
+
+    @Bean
+    @Description("Get the current country")
+    public Supplier<String> getCountry() {
+        return () -> "South Africa - ZA";
+    }
+
+    @Bean
+    @Description("Get the current date and time")
+    public Supplier<String> getCurrentDateTime() {
+        return () -> LocalDateTime.now()
+                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+}
+```
+
+## D- Parallel Execution with Virtual Threads
+
+The `ParallelizationWorkflow` orchestrates parallel execution of all agents using Java **Virtual Threads**:
+
+```java
+@Component
+public class ParallelizationlWorkflow {
+
+    public List<AgentResult> executeWorkflow() {
+        try (var executor =
+                Executors.newVirtualThreadPerTaskExecutor()) {
+
+            var futures = agents.stream()
+                .map(agent -> executor.submit(() -> {
+                    log.info("Executing agent: {}",
+                            agent.name());
+
+                    var systemInstruction =
+                        replacePlaceholders(
+                            agent.systemInstruction());
+                    var userMessage =
+                        replacePlaceholders(agent.input());
+
+                    var result = agent.chatClient()
+                            .system(systemInstruction)
+                            .toolNames(agent.tools()
+                                .toArray(new String[0]))
+                            .user(userMessage)
+                            .call()
+                            .content();
+
+                    return new AgentResult(
+                        agent.name(), result);
+                }))
+                .toList();
+
+            return futures.stream()
+                .map(future -> {
+                    try { return future.get(); }
+                    catch (Exception e) {
+                        throw new RuntimeException(
+                            "Error executing agent", e);
+                    }
+                })
+                .toList();
+        }
+    }
+}
+```
+
+### Why Virtual Threads?
+
+* **Lightweight**: thousands of virtual threads can coexist without memory overhead
+* **Simplicity**: same API as classic threads (`executor.submit()`)
+* **True parallelism**: each agent executes in its own thread, LLM calls are made simultaneously
+* `Executors.newVirtualThreadPerTaskExecutor()` creates one virtual thread per task.
+
+## E- Quality Evaluation: DraftGeneration
+
+After agent execution, results are evaluated by an **evaluator agent**:
+
+```java
+@Component
+public class DraftGeneration {
+
+    private static final String EVALUATION_SYSTEM_PROMPT = """
+        You are a content quality evaluation expert.
+
+        ## Your mission
+        Evaluate quality according to three criteria (0-100%):
+        - **Clarity**: Is the content easy to understand?
+        - **Completeness**: Are important aspects covered?
+        - **Relevance**: Is it adapted to the project context?
+
+        ## Output format (raw JSON)
+        {
+            "clarte": "85",
+            "completude": "70",
+            "pertinence": "90",
+            "feedback": "The content is of good quality..."
+        }
+        """;
+
+    public DraftGenerationResult evaluateAndGenerateFeedback(
+            String projectDescription,
+            Map<String, String> sectionContent) {
+
+        var response = chatClient.prompt()
+                .system(EVALUATION_SYSTEM_PROMPT)
+                .user(userMessage)
+                .call()
+                .entity(new MapOutputConverter());
+
+        return DraftGenerationResult.of(
+            aiFeedback, sectionContent,
+            contentQualityAiFeedback);
+    }
+}
+```
+
+### The Structured Result
+
+```java
+public record DraftGenerationResult(
+    String aiFeedback,
+    Map<String, String> sectionContent,
+    Map<String, String> contentQualityAiFeedback
+) {}
+```
+
+The JSON response is parsed using Spring AI's `MapOutputConverter`, which automatically converts the LLM's structured output into a `Map<String, Object>`.
+
+## F- The Orchestrator Service
+
+```java
+@Service
+public class DemoService {
+
+    public DraftGenerationResult generateDraft(String message) {
+        // 1 - Select agents
+        var agents = agentRegistry.getAgents(List.of(
+                DraftSectionKey.PROJECT_NAME,
+                DraftSectionKey.PROJECT_SUMMARY,
+                DraftSectionKey.PROJECT_CONTEXT));
+
+        // 2 - Register and execute in parallel
+        workflow.registerAgents(agents);
+        workflow.registerMetadata(
+            Map.of("projectDescription", message));
+        var result = workflow.executeWorkflow();
+
+        // 3 - Aggregate
+        var sectionContent = result.stream()
+                .map(r -> Map.entry(r.name(), r.result()))
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey, Map.Entry::getValue));
+
+        // 4 - Quality evaluation
+        return draftGeneration
+            .evaluateAndGenerateFeedback(
+                message, sectionContent);
+    }
+}
+```
+
+## G- Testing the Workflow
+
+```bash
+curl "http://localhost:8080/draf-generator?message=Mobile ride-sharing app in South Africa"
+```
+
+The response will contain:
+
+* The **project name** generated by ProjectNamer
+* The **summary** from ProjectSummarizer
+* The **context analysis** from ProjectContextualizer
+* The **quality feedback** with clarity, completeness, and relevance scores
+
+## Conclusion
+
+Multi-agent orchestration is a powerful pattern for decomposing complex tasks into specialized subtasks. With Spring AI, this orchestration becomes natural:
+
+* **Specialized agents** with dedicated instructions and tools
+* **Parallel execution** via Virtual Threads
+* Automated **quality evaluation** by an evaluator agent
+* **Structured results** thanks to output converters
+
+In the next and final article, we will see the **Model Context Protocol (MCP)**: how to expose and consume remote AI tools.
+
+I hope you found this article useful. Thank you for reading.
+
+To learn more:
+
+* **Project source code**: [spring-ai-en-action](https://github.com/ricken07/spring-ai-en-action)
+* Find our #autourducode videos on our [YouTube channel](https://www.youtube.com/@autourducode)
+
+
+---
+
+## "Spring AI in Action" Series
+
+1. [Introduction to Spring AI](/en/blog/spring-ai-en-action-introduction)
+2. [ChatClient API: Getting Started with the API](/en/blog/spring-ai-en-action-chatclient-api)
+3. [Chat Memory: Conversational Context](/en/blog/spring-ai-en-action-chat-memory)
+4. [RAG: Ingestion Pipeline](/en/blog/spring-ai-en-action-rag-ingestion)
+5. [RAG: From Naive to Advanced](/en/blog/spring-ai-en-action-rag-avance)
+6. [Function Calling](/en/blog/spring-ai-en-action-function-calling)
+7. [Tools + Security](/en/blog/spring-ai-en-action-tools-security)
+8. [Multi-Agent Orchestration](/en/blog/spring-ai-en-action-agents)
+9. [Model Context Protocol (MCP)](/en/blog/spring-ai-en-action-mcp)

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAllPosts } from "@/lib/blog/getAllPosts";
 import { locales } from "@/i18n/config";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rickenbazolo.dev";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rickenbazolo.com";
 
 function buildRssFeed(items: string[], locale?: string) {
   const title = locale
@@ -10,8 +10,8 @@ function buildRssFeed(items: string[], locale?: string) {
     : "Ricken Bazolo";
   const description = locale
     ? locale === "fr"
-      ? "Articles techniques sur Java, l'IA et l'architecture logicielle"
-      : "Technical articles on Java, AI and software architecture"
+      ? "Articles techniques sur Java, l'IA et l'ingenieurie logicielle."
+      : "Technical articles on Java, AI and software engineering."
     : "Blog posts and updates from Ricken Bazolo";
 
   return `<?xml version="1.0" encoding="UTF-8" ?>
