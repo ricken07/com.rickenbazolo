@@ -3,7 +3,7 @@ title: "Orchestration multi-agents avec Spring AI"
 slug: "spring-ai-en-action-agents"
 language: "fr"
 publishedAt: "2026-04-18"
-tags: ["spring-ai", "ia", "llm", "agent" "java", "spring-boot"]
+tags: ["spring-ai", "ia", "llm", "agent", "java", "spring-boot"]
 readingTime: 9
 excerpt: "Et si au lieu d'un seul agent IA, vous en orchestriez plusieurs en parallèle ? Dans cet article, nous construisons un workflow multi-agents avec Spring AI : des agents spécialisés s'exécutent en parallèle via les Virtual Threads de Java, puis un évaluateur qualifie le résultat global."
 status: "published"
@@ -15,24 +15,14 @@ Dans cet article, nous explorons le module `agent/workflow` du projet démo, qui
 
 ## A- Architecture du workflow
 
-Le flux d'exécution est le suivant :
+Le workflow suit une séquence simple :
 
-```
-1. Requête utilisateur (description du projet)
-         ↓
-2. Sélection des agents spécialisés
-         ↓
-3. Exécution parallèle (Virtual Threads)
-   ┌─────────┬──────────────┬──────────────┐
-   │ Namer   │ Summarizer   │ Contextualizer│
-   └─────────┴──────────────┴──────────────┘
-         ↓
-4. Agrégation des résultats
-         ↓
-5. Évaluation qualité (Clarté, Complétude, Pertinence)
-         ↓
-6. Réponse finale avec feedback
-```
+1. L'utilisateur soumet une description de projet.
+2. L'application sélectionne les agents spécialisés à exécuter.
+3. Les agents tournent en parallèle via les Virtual Threads.
+4. Les résultats produits sont agrégés.
+5. Un agent évaluateur mesure la qualité du contenu généré.
+6. Une réponse finale est renvoyée avec le résultat et le feedback.
 
 ## B- Le modèle Agent
 
