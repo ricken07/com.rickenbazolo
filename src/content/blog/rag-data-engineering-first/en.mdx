@@ -1,0 +1,142 @@
+---
+title: "RAG in Practice: Why Everything Starts with Data Engineering"
+slug: "rag-data-engineering-first"
+language: "en"
+publishedAt: "2026-05-01"
+tags: ["rag", "llm", "data-engineering", "chunking", "knowledge-management"]
+readingTime: 6
+excerpt: "In a real RAG project, answer quality often depends less on the model than on how documents are collected, cleaned, structured, and split. A field perspective based on a project built on a complex business corpus."
+status: "published"
+---
+
+When people discuss **RAG (Retrieval-Augmented Generation)**, the conversation usually starts with the model. Which LLM should we pick? Which vector database should we use? Which embedding provider gives the best results?
+
+In real projects, the bottleneck is often somewhere else.
+
+On a project built around a **complex document corpus in the energy sector** including technical guides, pricing references, and study reports, one thing became clear very quickly:
+
+> answer quality depends first on how the data is prepared.
+
+The system could retrieve information. But as long as that information was not properly structured, it still struggled to produce reliable answers to precise business questions.
+
+## A- The Real Starting Point of a RAG Project
+
+At the beginning, we followed the classic pipeline many teams start with:
+
+```
+PDF → chunking → embeddings → vector database
+```
+
+This pipeline works. It is enough to get first results quickly. For broad questions, the system even looked reasonably effective.
+
+But as soon as users asked more specific questions, the limits became obvious:
+
+* vague answers
+* confusion between close concepts
+* partial information
+* retrieved context that was poorly used
+
+The issue was not that the system retrieved nothing. The issue was that it retrieved fragments that had been poorly prepared, mixed together, or split without business logic.
+
+That was the turning point.
+
+We stopped seeing RAG as a simple technical stack and started seeing it as a **knowledge engineering pipeline**.
+
+## B- The Model Is Not Always the Bottleneck
+
+In many projects, teams try to improve quality by changing the model or refining the prompt. That can help, but only marginally when the document base itself is weak.
+
+When source data is badly extracted, poorly cleaned, or split in the wrong places, the LLM operates on noisy context. And noisy context almost always leads to:
+
+* hesitant answers
+* artificial links between unrelated documents
+* weak citations
+* lower overall trust in the system
+
+In other words, a good model does not sustainably compensate for a poor data pipeline.
+
+In our case, the biggest improvement did not come from changing the model. It came from rethinking **collection**, **extraction**, **cleaning**, **structuring**, and especially **chunking**.
+
+## C- A Chunk Is Not Just a Piece of Text
+
+This was the core shift in the project.
+
+At first, we treated chunks as technical segments: a certain number of characters or tokens, split in a fairly uniform way. That approach is simple, but it quickly becomes insufficient when the documentation carries real business logic.
+
+So we changed our perspective:
+
+> a chunk is not a piece of text, it is a unit of business meaning.
+
+That distinction changes everything.
+
+Not all documents should be split the same way:
+
+* a technical guide should not be chunked like a pricing reference
+* a business rule should not be chunked like a descriptive record
+* a reasoning flow should not be cut in the middle of a logical dependency
+
+If a chunk contains too many topics, the information becomes blurry.  
+If it is too short, it loses the context that makes it understandable.
+
+Good chunking is therefore not about producing uniformly sized segments. It is about preserving reusable units of knowledge for the system.
+
+## D- Useful Context Is a Balance
+
+Context is not valuable by default. It is valuable when it is **relevant**, **coherent**, and **well-sized**.
+
+In a RAG system, two common extremes appear again and again:
+
+* **too much context**: noise increases and the business signal gets diluted
+* **too little context**: information becomes incomplete or ambiguous
+
+System quality depends on finding the right balance.
+
+And that balance depends far less on prompting than on the quality of the upstream transformation pipeline:
+
+* document collection quality
+* extraction reliability
+* noise removal
+* structural enrichment
+* chunking adapted to each content type
+
+When these steps are well designed, retrieval becomes mechanically more useful. The model receives less irrelevant text and more actionable context.
+
+## E- How This Project Changed My View of RAG
+
+This experience significantly changed the way I think about LLM-based systems.
+
+I no longer see RAG as an augmented search engine.
+
+I see it as a **business knowledge structuring system**.
+
+In that view, documents are not just stored so they can be found later. They are prepared so they become:
+
+* queryable
+* exploitable
+* comparable
+* actionable
+
+RAG therefore begins long before the user asks a question. It begins in the way we transform a raw corpus into reliable knowledge units.
+
+And in many cases, improving that preparation layer creates more value than changing the model.
+
+## Conclusion
+
+If I had to summarize this project in one idea, it would be this:
+
+> in a serious RAG project, data is often more strategic than the model.
+
+The real leverage point is not only the choice of LLM. It is the ability to build a robust pipeline to:
+
+* collect the right sources
+* extract content cleanly
+* structure information
+* produce chunks that preserve business meaning
+
+That discipline is what turns an “acceptable” prototype into a genuinely useful system.
+
+In a second article, I will go further into the **architecture**, **agents**, and **business answer generation** built on top of this kind of pipeline.
+
+And you?
+
+On your RAG projects, did you start with the model or with the data?
