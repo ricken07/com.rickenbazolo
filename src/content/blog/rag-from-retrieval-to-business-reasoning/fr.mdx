@@ -1,0 +1,279 @@
+---
+title: "RAG en pratique : du retrieval au raisonnement métier"
+slug: "rag-from-retrieval-to-business-reasoning"
+language: "fr"
+publishedAt: "2026-05-04"
+tags: ["rag", "llm", "retrieval", "agents", "decision-support"]
+readingTime: 8
+excerpt: "Une fois la donnée préparée, le vrai enjeu consiste à transformer un système RAG capable de retrouver des passages en un système capable de produire des réponses métier exploitables, structurées et justifiées."
+status: "published"
+---
+
+Dans la [première partie](/fr/blog/rag-data-engineering-first), l’idée centrale était simple : la qualité d’un système RAG dépend d’abord de la qualité de l’ingénierie de la donnée. Collecte, extraction, nettoyage, structuration et chunking déterminent la qualité du contexte qui sera fourni au modèle.
+
+Mais une fois cette base en place, une autre question apparaît immédiatement :
+
+> comment passer d’un système qui retrouve de l’information à un système qui produit des réponses métier réellement exploitables ?
+
+Dans notre projet, l’objectif n’était pas seulement de permettre à un utilisateur de poser une question sur un guide technique ou un rapport d’étude. Il fallait aller plus loin : croiser des documents, comprendre des règles techniques, mobiliser des référentiels de prix, puis produire des estimations, des structures de devis ou des éléments d’aide à la décision.
+
+C’est ce changement d’ambition qui transforme profondément la manière de concevoir le RAG.
+
+## A- Les limites du RAG classique
+
+Un RAG classique suit souvent une séquence relativement simple :
+
+1. l’utilisateur pose une question ;
+2. le système recherche les passages les plus proches dans la base vectorielle ;
+3. ces passages sont injectés dans le prompt ;
+4. le modèle génère une réponse.
+
+Cette approche fonctionne pour des cas simples :
+
+* retrouver une définition ;
+* résumer un passage ;
+* répondre à une question factuelle ;
+* expliquer un extrait documentaire.
+
+Mais dans un contexte métier plus exigeant, elle atteint rapidement ses limites.
+
+Dans notre cas, certaines demandes supposaient non seulement de retrouver une information, mais surtout de **composer une réponse à partir de plusieurs éléments hétérogènes**. Par exemple :
+
+* comprendre une règle technique ;
+* vérifier une condition d’application ;
+* relier un équipement à un type d’ouvrage ;
+* retrouver un prix unitaire ;
+* proposer une estimation ;
+* expliciter les hypothèses retenues.
+
+À ce niveau, retrouver un bon paragraphe ne suffit plus. Il faut organiser la connaissance.
+
+Le RAG classique répond surtout à la question :
+
+> quels passages sont les plus proches de la demande ?
+
+Un RAG orienté métier doit répondre à une question plus difficile :
+
+> quelles informations sont nécessaires pour produire une réponse fiable, structurée et actionnable ?
+
+## B- Le passage du retrieval à l’orchestration
+
+La première évolution consiste à ne plus considérer le retrieval comme l’ensemble du système, mais comme une brique parmi d’autres.
+
+Le retrieval sert à récupérer du contexte. Mais ce contexte doit ensuite être :
+
+* filtré ;
+* hiérarchisé ;
+* structuré ;
+* parfois complété par d’autres sources.
+
+Dans notre démarche, le système a progressivement évolué vers une orchestration en plusieurs étapes :
+
+1. comprendre la demande utilisateur ;
+2. identifier le type de réponse attendu ;
+3. sélectionner les bonnes sources documentaires ;
+4. récupérer les éléments pertinents ;
+5. organiser ces éléments avant de les transmettre au modèle.
+
+Ce changement est majeur.
+
+On ne demande plus au modèle de faire seul tout le travail à partir d’un ensemble brut de passages récupérés. On construit d’abord un **contexte exploitable**, puis on lui demande de raisonner à partir de ce contexte.
+
+C’est à ce moment que le RAG commence à devenir un véritable outil métier.
+
+## C- Retrouver moins, mais retrouver mieux
+
+Dans les premières expérimentations, il est tentant d’envoyer beaucoup de chunks au modèle pour “donner plus de contexte”. En pratique, cela produit souvent l’effet inverse.
+
+Plus on ajoute de passages, plus on augmente le bruit :
+
+* redondance ;
+* niveaux de précision hétérogènes ;
+* passages pertinents mélangés à d’autres beaucoup moins utiles ;
+* perte du signal métier.
+
+Le modèle peut alors produire une réponse convaincante dans la forme, mais faible dans le fond.
+
+Nous avons donc retenu un principe simple :
+
+> retrouver moins, mais retrouver mieux.
+
+Cela suppose d’exploiter les métadonnées produites lors de la première phase du pipeline. Tous les documents n’ont pas la même valeur selon la tâche :
+
+* un guide technique ;
+* un référentiel de prix ;
+* un rapport d’étude ;
+* un document institutionnel ou contractuel.
+
+Par exemple :
+
+* une question sur une règle technique doit prioriser les documents normatifs et les guides ;
+* une question sur une estimation doit croiser la documentation technique avec les référentiels de prix ;
+* une question sur les rôles ou responsabilités doit remonter davantage de documents institutionnels ou contractuels.
+
+Le retrieval ne cherche alors plus seulement des passages proches sur le plan sémantique. Il cherche des passages **pertinents pour une tâche métier précise**.
+
+## D- Construire un contexte structuré
+
+L’un des enseignements les plus importants du projet est le suivant :
+
+> le contexte transmis au modèle ne doit pas être une simple concaténation de chunks.
+
+Quand on envoie plusieurs extraits bruts au modèle, on lui laisse la responsabilité de reconstruire les liens entre eux. Cela peut suffire dans des cas simples. Dans des cas métier, cela devient fragile.
+
+Nous avons donc introduit l’idée de **contexte structuré**.
+
+Un contexte structuré n’empile pas seulement des passages. Il organise l’information en fonction de la tâche à réaliser.
+
+Pour une estimation ou un début de devis, le contexte peut par exemple être découpé en blocs :
+
+* paramètres du besoin ;
+* éléments techniques applicables ;
+* composants à considérer ;
+* prix unitaires disponibles ;
+* hypothèses retenues ;
+* limites de l’estimation.
+
+Le modèle reçoit alors une représentation plus claire du problème. Il n’a plus à reconstruire seul la logique métier à partir de fragments dispersés.
+
+Cette structuration réduit la charge cognitive du modèle et permet généralement d’obtenir des réponses :
+
+* plus stables ;
+* plus lisibles ;
+* plus faciles à vérifier ;
+* mieux justifiées.
+
+## E- Le raisonnement guidé
+
+Une autre évolution importante consiste à guider le raisonnement du modèle au lieu de lui laisser une totale liberté.
+
+Dans un RAG simple, on fournit une question et un contexte, puis on attend une réponse. Dans un système métier, il est souvent préférable d’encadrer la manière dont le modèle exploite ce contexte.
+
+Cela peut passer par une séquence explicite :
+
+1. reformuler le besoin ;
+2. identifier les informations disponibles ;
+3. lister les hypothèses ;
+4. signaler les informations manquantes ;
+5. proposer une structure de calcul ou d’analyse ;
+6. produire une réponse claire avec ses limites.
+
+Cette approche est particulièrement utile pour des résultats sensibles :
+
+* estimation budgétaire ;
+* synthèse de conformité ;
+* analyse de documents techniques ;
+* aide à la décision.
+
+Dans ces scénarios, la réponse ne doit pas seulement être fluide. Elle doit être :
+
+* traçable ;
+* justifiée ;
+* vérifiable ;
+* exploitable.
+
+Le raisonnement guidé réduit les réponses trop rapides, trop générales ou trop affirmatives. Il pousse le système à distinguer ce qui est certain, ce qui est déduit et ce qui reste à confirmer.
+
+## F- Exemple métier : vers la génération de devis
+
+L’un des cas d’usage les plus intéressants dans notre projet concerne la génération d’éléments de devis à partir de documents existants.
+
+Le besoin paraît simple :
+
+> à partir de paramètres fournis par l’utilisateur, de rapports d’étude et d’un référentiel de prix, produire une estimation structurée.
+
+En réalité, cela suppose plusieurs opérations :
+
+1. comprendre le besoin ;
+2. identifier les paramètres utiles ;
+3. retrouver les éléments techniques applicables ;
+4. repérer les composants concernés ;
+5. chercher les prix unitaires correspondants ;
+6. associer ces prix à des quantités estimées ;
+7. produire une synthèse cohérente.
+
+On n’est plus dans une simple recherche documentaire.
+
+On est dans une **composition métier**.
+
+Le système doit combiner :
+
+* de la connaissance technique ;
+* de la donnée économique ;
+* une logique d’assemblage ;
+* une capacité d’explication.
+
+Le modèle ne doit ni inventer les prix, ni supposer les règles. Il doit s’appuyer sur les éléments retrouvés et signaler les limites si des informations manquent.
+
+Dans ce type de scénario, le RAG devient un support de production métier. Il ne remplace pas l’expert, mais il prépare une première structure exploitable qui accélère son travail.
+
+## G- Vers une architecture agentique
+
+À ce stade, l’architecture évolue naturellement vers une approche plus agentique.
+
+Il ne s’agit plus d’un seul appel au modèle, mais d’une succession d’étapes spécialisées, chacune avec sa responsabilité :
+
+* analyser la demande ;
+* identifier les sources à interroger ;
+* récupérer et filtrer les chunks ;
+* structurer le contexte ;
+* produire une réponse ou une estimation ;
+* contrôler la cohérence finale.
+
+Cette approche modulaire est beaucoup plus robuste qu’un pipeline monolithique.
+
+Dans un environnement Java avec Spring AI, cette logique peut s’appuyer sur plusieurs briques :
+
+* des **advisors** pour la gestion du contexte ;
+* des **tools** ou du **function calling** pour exécuter des opérations déterministes ;
+* des chaînes de traitement pour séparer les étapes ;
+* une mémoire contrôlée pour conserver certains éléments utiles ;
+* des prompts spécialisés pour cadrer chaque phase.
+
+L’objectif n’est pas de multiplier les composants sans raison. L’objectif est de séparer clairement les responsabilités.
+
+Le retrieval ne doit pas faire le raisonnement.  
+Le raisonnement ne doit pas inventer la donnée.  
+La génération ne doit pas masquer les incertitudes.
+
+Chaque brique doit contribuer à rendre le système plus fiable.
+
+## H- Le rôle réel du LLM
+
+Ce type de projet aide aussi à mieux comprendre le rôle réel du LLM.
+
+Le modèle n’est pas là pour porter seul toute la logique métier. Il n’est pas là pour remplacer les règles, les référentiels, les calculs ou les responsabilités humaines.
+
+Son rôle est plutôt de :
+
+* interpréter ;
+* organiser ;
+* reformuler ;
+* expliquer ;
+* générer une réponse lisible à partir d’un contexte maîtrisé.
+
+La donnée apporte le contenu.  
+Le pipeline apporte la structure.  
+L’orchestration apporte la logique.  
+Le modèle apporte la capacité de langage et de synthèse.
+
+Lorsque ces rôles sont mélangés, le système devient fragile. Lorsqu’ils sont bien séparés, le RAG devient plus fiable et plus utile.
+
+## Conclusion
+
+Le RAG ne s’arrête pas au retrieval.
+
+La récupération d’information est une étape nécessaire, mais insuffisante. Pour produire de la valeur métier, il faut aller plus loin :
+
+* structurer le contexte ;
+* guider le raisonnement ;
+* orchestrer les étapes ;
+* maîtriser la génération finale.
+
+La [première partie](/fr/blog/rag-data-engineering-first) montrait que tout commence par l’ingénierie de la donnée. Cette deuxième partie montre que la suite consiste à transformer cette donnée bien préparée en **raisonnement métier exploitable**.
+
+C’est ce passage qui fait la différence entre un prototype intéressant et un système réellement utile.
+
+Un RAG efficace ne se contente pas de retrouver des passages. Il aide à construire une réponse. Il organise la connaissance. Il prépare le travail de l’expert. Il rend les documents actionnables.
+
+Et c’est précisément là que se situe sa vraie valeur.

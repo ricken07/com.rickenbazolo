@@ -1,0 +1,279 @@
+---
+title: "RAG in Practice : From Retrieval to Business Reasoning"
+slug: "rag-from-retrieval-to-business-reasoning"
+language: "en"
+publishedAt: "2026-05-04"
+tags: ["rag", "llm", "retrieval", "agents", "decision-support"]
+readingTime: 8
+excerpt: "Once the data layer is in place, the real challenge is turning a RAG system that retrieves passages into one that produces structured, useful, and justifiable business answers."
+status: "published"
+---
+
+In the [first part](/en/blog/rag-data-engineering-first), the core idea was straightforward: the quality of a RAG system depends first on data engineering. Collection, extraction, cleaning, structuring, and chunking define the quality of the context later given to the model.
+
+But once that foundation exists, another question naturally appears:
+
+> how do you move from a system that retrieves information to a system that produces truly usable business answers?
+
+In our project, the goal was not just to let users ask questions about a technical guide or a study report. The ambition was broader: cross-reference documents, understand technical rules, mobilize pricing references, and eventually produce estimates, quotation structures, or decision-support material.
+
+That shift in ambition changes the way RAG must be designed.
+
+## A- The Limits of Classic RAG
+
+A classic RAG pipeline often follows a simple sequence:
+
+1. the user asks a question;
+2. the system retrieves the closest passages from the vector database;
+3. those passages are injected into the prompt;
+4. the model generates an answer.
+
+This works well for relatively simple use cases:
+
+* finding a definition;
+* summarizing a passage;
+* answering a factual question;
+* explaining something explicitly present in a document.
+
+But in a more demanding business setting, this approach quickly reaches its limits.
+
+In our case, some requests did not only require finding information. They required **building an answer from several heterogeneous elements**. For example:
+
+* understanding a technical rule;
+* checking an application condition;
+* linking a piece of equipment to a type of work;
+* finding a unit price;
+* proposing an estimate;
+* making the underlying assumptions explicit.
+
+At that point, finding a good paragraph is no longer enough. What matters is organizing knowledge.
+
+Classic RAG mostly answers this question:
+
+> which passages are closest to the request?
+
+A business-oriented RAG system must answer a harder one:
+
+> which pieces of information are needed to produce a reliable, structured, and actionable answer?
+
+## B- From Retrieval to Orchestration
+
+The first major shift is to stop treating retrieval as the whole system and start treating it as one building block among others.
+
+Retrieval gives you context. But that context must then be:
+
+* filtered;
+* prioritized;
+* structured;
+* sometimes complemented with other sources.
+
+In our approach, the system gradually evolved into a multi-step orchestration:
+
+1. understand the user request;
+2. identify the expected answer type;
+3. select the right document sources;
+4. retrieve the relevant elements;
+5. organize those elements before passing them to the model.
+
+This is a major design shift.
+
+The model is no longer expected to do all the work alone from a raw set of retrieved passages. The system first builds an **exploitable context**, then asks the model to reason from that context.
+
+That is when RAG starts becoming a genuine business tool.
+
+## C- Retrieve Less, but Retrieve Better
+
+In early experiments, it is tempting to send many chunks to the model in order to “provide more context.” In practice, this often creates the opposite effect.
+
+The more passages you add, the more noise you introduce:
+
+* redundancy;
+* mixed precision levels;
+* relevant passages diluted by less useful ones;
+* business signal loss.
+
+The model may then produce an answer that sounds correct, while remaining weak in substance.
+
+So we adopted a simple principle:
+
+> retrieve less, but retrieve better.
+
+That means relying on the metadata produced during the first phase of the pipeline. Not all documents have the same value for the same task:
+
+* a technical guide;
+* a pricing reference;
+* a study report;
+* an institutional or contractual document.
+
+For example:
+
+* a technical-rule question should prioritize guides and normative documents;
+* an estimation question should combine technical documentation with pricing references;
+* a question about responsibilities should favor institutional or contractual sources.
+
+Retrieval therefore stops being only a semantic-nearest-neighbor exercise. It becomes a search for the information that is **most relevant to a specific business task**.
+
+## D- Building Structured Context
+
+One of the strongest lessons from the project was this:
+
+> the context sent to the model should not be a simple concatenation of chunks.
+
+When several raw excerpts are sent together, the model is left to reconstruct the relationships between them. That may be acceptable in simple cases. In business scenarios, it becomes fragile.
+
+So we introduced the notion of **structured context**.
+
+Structured context does not just stack passages. It organizes information according to the task to be performed.
+
+For an estimate or an initial quotation draft, the context can be organized into blocks such as:
+
+* request parameters;
+* applicable technical elements;
+* components to consider;
+* available unit prices;
+* retained assumptions;
+* estimation limits.
+
+The model then receives a clearer representation of the problem. It no longer has to reconstruct business logic alone from scattered fragments.
+
+That structure reduces the model’s cognitive load and typically leads to answers that are:
+
+* more stable;
+* more readable;
+* easier to verify;
+* better justified.
+
+## E- Guided Reasoning
+
+Another important evolution is to guide the model’s reasoning instead of leaving it completely unconstrained.
+
+In a simple RAG setup, you provide a question and some context, then wait for an answer. In a business system, it is often better to guide how the model should use that context.
+
+That can be done through an explicit sequence:
+
+1. restate the need;
+2. identify the available information;
+3. list the assumptions;
+4. point out missing elements;
+5. propose a calculation or analysis structure;
+6. produce a clear answer with explicit limits.
+
+This is especially useful for sensitive outputs:
+
+* budget estimation;
+* compliance summary;
+* technical document analysis;
+* decision support.
+
+In these cases, the answer must not only be fluent. It must be:
+
+* traceable;
+* justified;
+* verifiable;
+* usable.
+
+Guided reasoning reduces answers that are too fast, too generic, or too assertive. It encourages the system to separate what is certain, what is inferred, and what still needs confirmation.
+
+## F- A Business Example: Toward Quote Generation
+
+One of the most interesting use cases in our project involved generating quotation elements from existing documents.
+
+The need sounds simple:
+
+> based on user parameters, study reports, and a pricing reference, produce a structured estimate.
+
+In reality, this requires several operations:
+
+1. understand the request;
+2. identify useful parameters;
+3. retrieve the applicable technical elements;
+4. identify the relevant components;
+5. find the matching unit prices;
+6. link those prices to estimated quantities;
+7. produce a coherent synthesis.
+
+This is no longer simple document retrieval.
+
+It is **business composition**.
+
+The system must combine:
+
+* technical knowledge;
+* economic data;
+* assembly logic;
+* explanation capabilities.
+
+The model must neither invent prices nor assume rules. It must rely on retrieved elements and clearly indicate the limits whenever information is missing.
+
+In this kind of scenario, RAG becomes a business production support tool. It does not replace the expert, but it prepares a first exploitable structure that accelerates expert work.
+
+## G- Toward an Agentic Architecture
+
+At this stage, the architecture naturally evolves toward a more agentic approach.
+
+It is no longer a single model call, but a succession of specialized steps, each with a clear responsibility:
+
+* analyze the request;
+* identify the sources to query;
+* retrieve and filter chunks;
+* structure the context;
+* produce an answer or an estimate;
+* check final consistency.
+
+This modular approach is far more robust than a monolithic pipeline.
+
+In a Java environment with Spring AI, this logic can be implemented through several building blocks:
+
+* **advisors** for context management;
+* **tools** or **function calling** for deterministic operations;
+* processing chains to separate stages;
+* controlled memory to preserve selected useful elements;
+* specialized prompts for each phase.
+
+The goal is not to multiply components for the sake of it. The goal is to separate responsibilities clearly.
+
+Retrieval should not perform the reasoning.  
+Reasoning should not invent the data.  
+Generation should not hide uncertainty.
+
+Each block should contribute to making the system more reliable.
+
+## H- The Real Role of the LLM
+
+Projects like this also help clarify the real role of the LLM.
+
+The model is not there to carry all the business logic by itself. It is not there to replace rules, references, calculations, or human responsibility.
+
+Its role is rather to:
+
+* interpret;
+* organize;
+* reformulate;
+* explain;
+* generate a readable answer from controlled context.
+
+The data provides the content.  
+The pipeline provides the structure.  
+The orchestration provides the logic.  
+The model provides language and synthesis.
+
+When these roles are blurred, the system becomes fragile. When they are clearly separated, RAG becomes much more reliable and useful.
+
+## Conclusion
+
+RAG does not stop at retrieval.
+
+Information retrieval is a necessary step, but not a sufficient one. To create real business value, you need to go further:
+
+* structure the context;
+* guide the reasoning;
+* orchestrate the stages;
+* control final generation.
+
+The [first part](/en/blog/rag-data-engineering-first) showed that everything starts with data engineering. This second part shows that the next step is turning well-prepared data into **usable business reasoning**.
+
+That transition is what separates an interesting prototype from a genuinely useful system.
+
+An effective RAG system does not just retrieve passages. It helps build an answer. It organizes knowledge. It prepares expert work. It makes documents actionable.
+
+And that is where its real value lies.
