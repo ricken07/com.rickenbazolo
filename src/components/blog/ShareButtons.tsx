@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackEvent } from "@/lib/analytics/ga";
 
 interface ShareButtonsProps {
   url: string;
@@ -20,6 +21,10 @@ export function ShareButtons({ url, title, locale }: ShareButtonsProps) {
 
   async function handleCopy() {
     await navigator.clipboard.writeText(url);
+    trackEvent("share_copy_link", {
+      article_title: title,
+      locale,
+    });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -35,6 +40,7 @@ export function ShareButtons({ url, title, locale }: ShareButtonsProps) {
         href={`https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`}
         target="_blank"
         rel="noreferrer"
+        onClick={() => trackEvent("share_click", { platform: "x", article_title: title, locale })}
         className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/80 px-3 py-1.5 text-xs font-semibold text-muted-foreground transition hover:border-[#0693e3]/50 hover:text-[#0693e3]"
         aria-label="Share on X"
       >
@@ -49,6 +55,7 @@ export function ShareButtons({ url, title, locale }: ShareButtonsProps) {
         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
         target="_blank"
         rel="noreferrer"
+        onClick={() => trackEvent("share_click", { platform: "linkedin", article_title: title, locale })}
         className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/80 px-3 py-1.5 text-xs font-semibold text-muted-foreground transition hover:border-[#0693e3]/50 hover:text-[#0693e3]"
         aria-label="Share on LinkedIn"
       >

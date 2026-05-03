@@ -12,3 +12,8 @@ Personal blog — bilingual FR/EN. This repository powers my personal website an
 - Tag filtering, client-side search, archives by year/month
 - International navigation under /[locale] (fr / en)
 - Theme toggle with preference persistence
+
+## Google Analytics
+- Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 measurement ID to enable analytics.
+- When configured, the app asks for consent before loading Google Analytics.
+- After consent, the app sends page views on App Router navigations and tracks article share actions.

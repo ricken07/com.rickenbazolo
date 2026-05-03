@@ -4,6 +4,7 @@ const NAMESPACES = [
   "common",
   "home",
   "blog",
+  "analytics",
   "speaking",
   "gad-digital",
   "opensource",

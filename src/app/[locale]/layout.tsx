@@ -1,15 +1,19 @@
 // src/app/[locale]/layout.tsx
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { locales } from "@/i18n/config";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { GoogleAnalyticsWithConsent } from "@/components/analytics/GoogleAnalyticsWithConsent";
 
 const siteName = "Ricken Bazolo";
 const baseUrl = "https://rickenbazolo.dev";
+const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const consentCookieName = "ricken-analytics-consent";
 const localeDescriptions: Record<string, string> = {
     fr: "Blog personnel bilingue (FR/EN) de Ricken Bazolo : Java, IA, open source et produits Gad Digital.",
     en: "Ricken Bazolo's bilingual (FR/EN) blog: Java, AI, open source, and Gad Digital products.",
@@ -76,6 +80,12 @@ export default async function LocaleLayout({
     params: Promise<{ locale: string }>;
 }) {
     const { locale } = await params;
+    const cookieStore = await cookies();
+    const initialConsent = cookieStore.get(consentCookieName)?.value === "granted"
+        ? "granted"
+        : cookieStore.get(consentCookieName)?.value === "denied"
+            ? "denied"
+            : null;
 
     if (!locales.includes(locale as (typeof locales)[number])) {
         notFound();
@@ -85,6 +95,7 @@ export default async function LocaleLayout({
 
     return (
         <NextIntlClientProvider>
+            <GoogleAnalyticsWithConsent measurementId={gaMeasurementId} initialConsent={initialConsent} />
             <a href="#main-content" className="skip-to-content">
                 {locale === "fr" ? "Aller au contenu principal" : "Skip to main content"}
             </a>
