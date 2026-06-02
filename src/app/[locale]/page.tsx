@@ -66,8 +66,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
               <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted md:text-xl">
                 {locale === "fr"
-                  ? "Je suis Ricken Bazolo, Consultant IT, auteur, speaker, contributeur open source et fondateur de Gad Digital. Avec plus de 10 ans d’expérience professionnelle, je conçois des applications et plateformes numériques robustes, avec une expertise forte en architecture logicielle, Java, IA appliquée et développement fullstack."
-                  : "I am Ricken Bazolo, IT Consultant, author, speaker, open source contributor and founder of Gad Digital. With over 10 years of professional experience, I design robust digital applications and platforms, with strong expertise in software architecture, Java, applied AI and fullstack development."}
+                  ? "Je suis Ricken Bazolo, Consultant IT, auteur, speaker, contributeur open source et fondateur de Gad Digital. Avec plus de 10 ans d’expérience professionnelle, je conçois des applications et plateformes numériques robustes, avec une expertise forte en architecture logicielle, Java, développement fullstack, ainsi que les agents IA et systèmes agentiques."
+                  : "I am Ricken Bazolo, IT Consultant, author, speaker, open source contributor and founder of Gad Digital. With over 10 years of professional experience, I design robust digital applications and platforms, with strong expertise in software architecture, Java, fullstack development, as well as AI agents and agentic systems."}
               </p>
             </div>
 

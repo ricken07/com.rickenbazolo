@@ -215,14 +215,14 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
               {locale === "fr" ? (
                 <>
                   <p>Je suis Ricken Bazolo, tech entrepreneur, architecte logiciel, Consultant IT, auteur, speaker, contributeur open source et fondateur de Gad Digital.</p>
-                  <p>Avec plus de 10 ans d’expérience professionnelle dans le développement logiciel, j’ai construit une expertise autour de Java, l’architecture logicielle, les plateformes numériques, le développement fullstack et l’intelligence artificielle appliquée aux applications métier.</p>
-                  <p>Mon parcours m’a conduit à travailler sur des systèmes d’entreprise, des applications web et mobiles, des architectures backend, des solutions IA et des produits numériques. J’accorde une importance particulière à la qualité logicielle, à la maintenabilité, à la transmission des connaissances et à la création de solutions utiles.</p>
+                  <p>Avec plus de 10 ans d’expérience professionnelle dans le développement logiciel, j’ai construit une expertise autour de Java, l’architecture logicielle, les plateformes numériques, le développement fullstack, ainsi que les agents IA et systèmes agentiques.</p>
+                  <p>Mon parcours m’a conduit à travailler sur des systèmes d’entreprise, des applications web et mobiles, des architectures backend, des solutions autour des agents IA et systèmes agentiques, ainsi que des produits numériques. J’accorde une importance particulière à la qualité logicielle, à la maintenabilité, à la transmission des connaissances et à la création de solutions utiles.</p>
                 </>
               ) : (
                 <>
                   <p>I am Ricken Bazolo, tech entrepreneur, software architect, IT Consultant, author, speaker, open source contributor and founder of Gad Digital.</p>
-                  <p>With over 10 years of professional experience in software development, I have built expertise around Java, software architecture, digital platforms, fullstack development and artificial intelligence applied to business applications.</p>
-                  <p>My journey has led me to work on enterprise systems, web and mobile applications, backend architectures, AI solutions and digital products. I attach particular importance to software quality, maintainability, knowledge sharing and creating useful solutions.</p>
+                  <p>With over 10 years of professional experience in software development, I have built expertise around Java, software architecture, digital platforms, fullstack development, as well as AI agents and agentic systems.</p>
+                  <p>My journey has led me to work on enterprise systems, web and mobile applications, backend architectures, AI agents and agentic systems solutions, as well as digital products. I attach particular importance to software quality, maintainability, knowledge sharing and creating useful solutions.</p>
                 </>
               )}
             </div>
