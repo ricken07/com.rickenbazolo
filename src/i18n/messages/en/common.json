@@ -1,12 +1,14 @@
 {
   "nav": {
+    "home": "Home",
     "blog": "Blog",
-    "opensource": "Open Source",
     "speaking": "Speaking",
-    "about": "About"
+    "about": "About",
+    "gad-digital": "Gad Digital"
   },
   "footer": {
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "description": "Tech entrepreneur, software architect, IT Consultant, author, speaker, open source contributor and founder of Gad Digital."
   },
   "notFound": {
     "label": "Page not found",

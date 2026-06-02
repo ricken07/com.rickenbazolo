@@ -14,8 +14,9 @@ interface SiteHeaderProps {
 
 const NAV_ITEMS = [
   { key: "about", href: "/about" },
-  { key: "speaking", href: "/speaking" },
   { key: "blog", href: "/blog" },
+  { key: "speaking", href: "/speaking" },
+  { key: "gad-digital", href: "/gad-digital" },
 ];
 
 export function SiteHeader({ locale }: SiteHeaderProps) {

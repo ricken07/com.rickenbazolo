@@ -1,6 +1,7 @@
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import Link from "next/link";
+import Image from "next/image";
 import { unstable_noStore as noStore } from "next/cache";
 import { Container } from "@/components/layout/Container";
 import { getAllPosts } from "@/lib/blog/getAllPosts";
@@ -15,7 +16,7 @@ const heroSocials = [
   { name: "GitHub", href: "https://github.com/rickenbazolo", icon: GitHubIcon },
   { name: "LinkedIn", href: "https://www.linkedin.com/in/rickenbazolo", icon: LinkedinIcon },
   { name: "X", href: "https://x.com/rickenbazolo", icon: XIcon },
-  { name: "Bluesky", href: "https://bsky.app/profile/rickenbazolo.dev", icon: BlueskyIcon },
+  { name: "Bluesky", href: "https://bsky.app/profile/ricken07.bsky.social", icon: BlueskyIcon },
   { name: "YouTube", href: "https://www.youtube.com/@rickenbazolo", icon: YoutubeIcon },
 ];
 
@@ -48,25 +49,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="relative z-10 mx-auto max-w-4xl space-y-8 text-center">
             <div className="fade-in-up space-y-4">
               <p className="text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground">
-                {locale === "fr" ? "Java, IA, plateforme" : "Java, AI, platform"}
+                {locale === "fr" ? "Expertise & Transmission" : "Expertise & Sharing"}
               </p>
 
               <h1 className="font-heading text-5xl font-bold leading-tight text-foreground md:text-7xl">
                 {locale === "fr" ? (
                   <>
-                    Technologue <span className="text-accent">Java & IA</span>
+                    Tech entrepreneur & <span className="text-accent">architecte logiciel</span>
                   </>
                 ) : (
                   <>
-                    Java & AI <span className="text-accent">Technologist</span>
+                    Tech entrepreneur & <span className="text-accent">software architect</span>
                   </>
                 )}
               </h1>
 
-              <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
+              <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted md:text-xl">
                 {locale === "fr"
-                  ? "Technologue Java senior, développeur full-stack et tech entrepreneur. Je conçois des architectures modernes, intègre des LLM dans les applications métier et accompagne les développeurs à travers la formation et le mentoring."
-                  : "Senior Java technologist, full-stack developer and tech entrepreneur. I design modern architectures, integrate LLMs into business applications, and support developers through training and mentoring."}
+                  ? "Je suis Ricken Bazolo, Consultant IT, auteur, speaker, contributeur open source et fondateur de Gad Digital. Avec plus de 10 ans d’expérience professionnelle, je conçois des applications et plateformes numériques robustes, avec une expertise forte en architecture logicielle, Java, IA appliquée et développement fullstack."
+                  : "I am Ricken Bazolo, IT Consultant, author, speaker, open source contributor and founder of Gad Digital. With over 10 years of professional experience, I design robust digital applications and platforms, with strong expertise in software architecture, Java, applied AI and fullstack development."}
               </p>
             </div>
 
@@ -76,17 +77,24 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 href={`/${locale}/blog`}
                 className="group inline-flex items-center gap-2 rounded-full bg-[#0693e3] px-8 py-3.5 font-semibold text-white shadow-md shadow-[#0693e3]/25 transition hover:scale-[1.01] hover:bg-[#0576c2] hover:shadow-lg hover:shadow-[#0693e3]/30"
               >
-                {locale === "fr" ? "Lire le blog" : "Read the blog"}
+                {locale === "fr" ? "Lire mes articles" : "Read my articles"}
                 <svg className="h-4 w-4 transition group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
 
               <Link
-                href={`/${locale}/about`}
+                href={`/${locale}/speaking`}
                 className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/70 px-8 py-3 font-semibold text-foreground backdrop-blur-sm transition hover:border-accent/40 hover:bg-card"
               >
-                {locale === "fr" ? "En savoir plus" : "Learn more"}
+                {locale === "fr" ? "Voir mes conférences" : "See my talks"}
+              </Link>
+
+              <Link
+                href={`/${locale}/gad-digital`}
+                className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/70 px-8 py-3 font-semibold text-foreground backdrop-blur-sm transition hover:border-accent/40 hover:bg-card"
+              >
+                {locale === "fr" ? "Découvrir Gad Digital" : "Discover Gad Digital"}
               </Link>
             </div>
 
@@ -105,6 +113,186 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 </a>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* DOMAINES D'EXPERTISE */}
+        <section className="space-y-12">
+          <div className="mx-auto max-w-3xl space-y-4 text-center">
+            <h2 className="font-heading text-3xl font-bold md:text-4xl">
+              {locale === "fr" ? "Domaines d’expertise" : "Areas of Expertise"}
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              {locale === "fr"
+                ? "Mon expertise se situe à l’intersection de l’ingénierie logicielle, de l’architecture des systèmes, du développement fullstack, de l’intelligence artificielle appliquée et de la transmission technique."
+                : "My expertise lies at the intersection of software engineering, systems architecture, fullstack development, applied artificial intelligence, and technical sharing."}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                title: locale === "fr" ? "Architecture logicielle" : "Software Architecture",
+                description: locale === "fr"
+                  ? "Conception d’applications robustes, architectures modulaires, APIs, backend Java, Spring, Quarkus, architecture hexagonale, microservices et systèmes d’entreprise."
+                  : "Design of robust applications, modular architectures, APIs, Java backend, Spring, Quarkus, hexagonal architecture, microservices and enterprise systems.",
+                icon: "🏗️"
+              },
+              {
+                title: locale === "fr" ? "IA appliquée" : "Applied AI",
+                description: locale === "fr"
+                  ? "Intégration des LLM, du RAG, des agents IA, de Spring AI et des systèmes conversationnels dans des applications métier concrètes."
+                  : "Integration of LLMs, RAG, AI agents, Spring AI and conversational systems into concrete business applications.",
+                icon: "🤖"
+              },
+              {
+                title: locale === "fr" ? "Développement fullstack" : "Fullstack Development",
+                description: locale === "fr"
+                  ? "Développement d’applications web, mobiles et backend avec une approche orientée qualité, maintenabilité, performance et valeur métier."
+                  : "Web, mobile and backend application development with an approach oriented towards quality, maintainability, performance and business value.",
+                icon: "💻"
+              },
+              {
+                title: locale === "fr" ? "Transmission technique" : "Technical Sharing",
+                description: locale === "fr"
+                  ? "Articles, conférences, formations et contenus pédagogiques autour de l’ingénierie logicielle et de l’IA appliquée."
+                  : "Articles, conferences, training and educational content around software engineering and applied AI.",
+                icon: "📚"
+              }
+            ].map((expertise) => (
+              <div key={expertise.title} className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card p-8 transition hover:-translate-y-1 hover:border-accent/40 hover:shadow-md">
+                <div className="mb-4 text-4xl">{expertise.icon}</div>
+                <h3 className="mb-3 font-heading text-xl font-bold">{expertise.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{expertise.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* MISSIONS, CONTRIBUTIONS & TRANSMISSION */}
+        <section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/30 px-8 py-12 md:px-16 md:py-20">
+          <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#273171]/5 blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[#0693e3]/5 blur-3xl" />
+
+          <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div className="space-y-6">
+              <h2 className="font-heading text-3xl font-bold md:text-4xl">
+                {locale === "fr" ? "Missions, contributions & transmission" : "Missions, Contributions & Sharing"}
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                {locale === "fr"
+                  ? "Mon parcours s’est construit entre missions en entreprise, contributions open source, formation technique et projets entrepreneuriaux. J’interviens à la fois comme consultant IT, architecte logiciel, développeur fullstack, formateur, speaker et fondateur de Gad Digital."
+                  : "My path has been built between corporate missions, open source contributions, technical training and entrepreneurial projects. I intervene as an IT consultant, software architect, fullstack developer, trainer, speaker and founder of Gad Digital."}
+              </p>
+              <Link
+                href={`/${locale}/about`}
+                className="inline-flex items-center gap-2 font-semibold text-accent transition hover:translate-x-1"
+              >
+                {locale === "fr" ? "En savoir plus sur mon parcours" : "Learn more about my background"}
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
+
+            <div className="grid gap-6">
+              {[
+                {
+                  title: locale === "fr" ? "Missions en entreprise" : "Corporate Missions",
+                  text: locale === "fr"
+                    ? "Accompagnement d’entreprises dans des secteurs variés : services financiers, fintech, jeux, éducation, services publics, industrie et santé."
+                    : "Supporting companies in various sectors: financial services, fintech, games, education, public services, industry and health."
+                },
+                {
+                  title: locale === "fr" ? "Contributions open source" : "Open Source Contributions",
+                  text: locale === "fr"
+                    ? "Participation active à des projets Java et IA (Spring AI) et publication de bibliothèques comme Toon4j."
+                    : "Active participation in Java and AI projects (Spring AI) and publication of libraries like Toon4j."
+                },
+                {
+                  title: locale === "fr" ? "Formation & jeunesse" : "Training & Youth",
+                  text: locale === "fr"
+                    ? "Mentoring de développeurs et initiation des jeunes à la robotique, domotique et aux systèmes embarqués."
+                    : "Mentoring developers and introducing young people to robotics, home automation and embedded systems."
+                }
+              ].map((item) => (
+                <div key={item.title} className="rounded-xl border border-border/40 bg-background/50 p-6 backdrop-blur-sm">
+                  <h3 className="mb-2 font-heading font-bold">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION LIVRE */}
+        <section className="overflow-hidden rounded-3xl bg-[#1a1d2e] text-white">
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="flex flex-col justify-center p-8 md:p-16">
+              <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider">
+                Auteur
+              </div>
+              <h2 className="mb-6 font-heading text-3xl font-bold md:text-4xl">
+                Ultimate Java Design Patterns
+              </h2>
+              <p className="mb-8 text-lg text-slate-300">
+                {locale === "fr"
+                  ? "Publié chez Orange AVA, ce livre est consacré aux design patterns Java, à l’architecture logicielle moderne et à la conception d’applications robustes, maintenables et évolutives."
+                  : "Published by Orange AVA, this book is dedicated to Java design patterns, modern software architecture and the design of robust, maintainable and scalable applications."}
+              </p>
+              <Link
+                href="https://orangeava.com/products/ultimate-java-design-patterns"
+                target="_blank"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-8 py-3.5 font-semibold text-[#1a1d2e] transition hover:scale-[1.02] hover:bg-slate-100"
+              >
+                {locale === "fr" ? "Voir le livre" : "View the book"}
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </Link>
+            </div>
+            <div className="relative h-96 md:h-auto">
+               <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent" />
+               <div className="flex h-full items-center justify-center p-8">
+                  {/* Couverture du livre */}
+                  <div className="relative aspect-[3/4] w-64 rotate-3 rounded-lg shadow-2xl transition group-hover:rotate-0">
+                    <Image
+                      src="/book_cover_a.png"
+                      alt="Ultimate Java Design Patterns Cover"
+                      fill
+                      className="rounded-lg object-cover"
+                    />
+                  </div>
+               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION GAD DIGITAL */}
+        <section className="relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-br from-background via-card to-card p-8 md:p-16">
+          <div className="relative z-10 mx-auto max-w-3xl space-y-4 text-center">
+            <div className="relative mx-auto h-48 w-48 items-center justify-center overflow-hidden">
+               <Image
+                 src="/logo_gd_a.png"
+                 alt="Gad Digital Logo"
+                 fill
+                 className="object-contain"
+               />
+            </div>
+            <h2 className="font-heading text-3xl font-bold md:text-4xl">
+              {locale === "fr" ? "Fondateur de Gad Digital" : "Founder of Gad Digital"}
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              {locale === "fr"
+                ? "Gad Digital est l’entreprise technologique que j’ai fondée pour transformer mon expertise en solutions, produits et accompagnements concrets. À travers Gad Digital, je porte des initiatives autour du développement de solutions numériques, de l’IA appliquée et de la formation technique."
+                : "Gad Digital is the technology company I founded to transform my expertise into concrete solutions, products and support. Through Gad Digital, I lead initiatives around digital solution development, applied AI and technical training."}
+            </p>
+            <Link
+              href={`/${locale}/gad-digital`}
+              className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-8 py-3.5 font-semibold text-accent transition hover:bg-accent/10"
+            >
+              {locale === "fr" ? "Découvrir Gad Digital" : "Discover Gad Digital"}
+            </Link>
           </div>
         </section>
 

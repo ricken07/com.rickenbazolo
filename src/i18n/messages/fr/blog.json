@@ -1,6 +1,6 @@
 {
   "title": "Articles",
-  "description": "Mes notes sur Java, l'architecture, le cloud et l'IA. Filtrez par mois ou par tags pour retrouver rapidement un sujet.",
+  "description": "J’écris sur Java, l’architecture logicielle, les design patterns, l’intelligence artificielle appliquée, le RAG, les agents IA et l’ingénierie logicielle. À travers mes articles, je partage des retours d’expérience, des analyses techniques et des approches concrètes pour concevoir des applications robustes, maintenables et utiles.",
   "searchPlaceholder": "Rechercher un article",
   "empty": "Aucun article publié pour le moment",
   "prev": "Précédent",

@@ -4,7 +4,11 @@ import Link from "next/link";
 import { Container } from "./Container";
 import { useTranslations } from "next-intl";
 
-export function SiteFooter() {
+interface SiteFooterProps {
+  locale: string;
+}
+
+export function SiteFooter({ locale }: SiteFooterProps) {
   const t = useTranslations("common");
   const year = new Date().getFullYear();
 
@@ -17,24 +21,63 @@ export function SiteFooter() {
   ];
 
   return (
-    <footer className="border-t border-border bg-card py-10 text-sm text-muted-foreground">
-      <Container className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <p>
-          © {year} Ricken Bazolo · {t("footer.rights")}
-        </p>
-        <div className="flex items-center gap-2">
-          {socials.map(({ name, href, icon: Icon }) => (
-            <Link
-              key={name}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={name}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-card/70 text-muted-foreground transition hover:-translate-y-0.5 hover:border-accent hover:text-accent"
-            >
-              <Icon className="h-4 w-4" />
-            </Link>
-          ))}
+    <footer className="border-t border-border bg-card/30 py-12 text-sm text-muted-foreground">
+      <Container className="space-y-12">
+        <div className="grid gap-12 lg:grid-cols-2">
+           <div className="space-y-6">
+              <Link href={`/${locale}`} className="font-heading text-xl font-bold text-foreground">
+                Ricken Bazolo
+              </Link>
+              <p className="max-w-md leading-relaxed">
+                {t("footer.description")}
+              </p>
+              <div className="flex items-center gap-3">
+                {socials.map(({ name, href, icon: Icon }) => (
+                  <Link
+                    key={name}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={name}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/70 bg-background/50 text-muted-foreground transition hover:border-accent hover:text-accent"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </Link>
+                ))}
+              </div>
+           </div>
+
+           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+              <div className="space-y-4">
+                 <p className="font-bold text-foreground">Navigation</p>
+                 <nav className="flex flex-col gap-2">
+                    <Link href={`/${locale}/about`} className="hover:text-accent">{locale === "fr" ? "À propos" : "About"}</Link>
+                    <Link href={`/${locale}/blog`} className="hover:text-accent">Blog</Link>
+                    <Link href={`/${locale}/speaking`} className="hover:text-accent">{locale === "fr" ? "Conférences" : "Speaking"}</Link>
+                    <Link href={`/${locale}/gad-digital`} className="hover:text-accent">Gad Digital</Link>
+                 </nav>
+              </div>
+              <div className="space-y-4">
+                 <p className="font-bold text-foreground">Ressources</p>
+                 <nav className="flex flex-col gap-2">
+                    <Link href="https://github.com/ricken07" target="_blank" className="hover:text-accent">GitHub</Link>
+                    <Link href="https://www.linkedin.com/in/rickenbazolo/" target="_blank" className="hover:text-accent">LinkedIn</Link>
+                    <Link href="https://orangeava.com/products/ultimate-java-design-patterns" target="_blank" className="hover:text-accent">{locale === "fr" ? "Livre" : "Book"}</Link>
+                 </nav>
+              </div>
+              <div className="space-y-4">
+                 <p className="font-bold text-foreground">Contact</p>
+                 <nav className="flex flex-col gap-2">
+                    <a href="mailto:contact@rickenbazolo.com" className="hover:text-accent">Email</a>
+                 </nav>
+              </div>
+           </div>
+        </div>
+
+        <div className="flex flex-col gap-4 border-t border-border/60 pt-8 md:flex-row md:items-center md:justify-between">
+          <p>
+            © {year} Ricken Bazolo · {t("footer.rights")}
+          </p>
         </div>
       </Container>
     </footer>

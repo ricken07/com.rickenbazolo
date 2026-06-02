@@ -37,24 +37,23 @@ export function NewsletterForm({ locale }: NewsletterFormProps) {
     setStatus("submitting");
 
     try {
-      // TODO: Remplacer par votre endpoint réel (Mailchimp, ConvertKit, etc.)
-      // Pour l'instant, simulation d'un délai
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Exemple d'appel API :
-      // const response = await fetch('/api/newsletter/subscribe', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, name, locale }),
-      // });
-      // if (!response.ok) throw new Error('Subscription failed');
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || t("errors.generic"));
+      }
 
       setStatus("success");
       setEmail("");
       setName("");
     } catch (error) {
       setStatus("error");
-      setErrorMessage(t("errors.generic"));
+      setErrorMessage(error instanceof Error ? error.message : t("errors.generic"));
     }
   };
 

@@ -10,9 +10,8 @@ function buildRssFeed(items: string[], locale?: string) {
     : "Ricken Bazolo";
   const description = locale
     ? locale === "fr"
-      ? "Articles techniques sur Java, l'IA et l'ingenieurie logicielle."
-      : "Technical articles on Java, AI and software engineering."
-    : "Blog posts and updates from Ricken Bazolo";
+      ? "Articles techniques sur Java, l'IA et l'ingénierie logicielle."
+      : "Technical articles on Java, AI and software engineering."    : "Blog posts and updates from Ricken Bazolo";
 
   return `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">

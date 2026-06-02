@@ -1,9 +1,9 @@
 {
-  "title": "Prises de parole",
-  "intro": "Sélection d'interventions autour de l'IA et de l'ingenieurie logicielle.",
+  "title": "Conférences & interventions",
+  "intro": "J’interviens dans des conférences, meetups et événements techniques autour de Java, architecture logicielle, IA générative, RAG, agents IA et design patterns. Mes interventions visent à rendre les sujets techniques accessibles, concrets et directement applicables par les développeurs, architectes et équipes produit.",
   "meta": {
-    "title": "Prises de parole",
-    "description": "Événements à venir et interventions passées de Ricken Bazolo autour de Java, de l'ingenieurie logicielle et de l'IA appliquée."
+    "title": "Conférences & interventions",
+    "description": "Événements à venir et interventions passées de Ricken Bazolo autour de Java, de l'ingénierie logicielle et de l'IA appliquée."
   },
   "eyebrow": "Conférences",
   "upcoming": {
@@ -17,8 +17,24 @@
     }
   },
   "past": {
-    "title": "Événements passés",
+    "title": "Interventions passées",
     "description": "Conférences et sessions déjà animées.",
     "label": "Conférencier"
+  },
+  "topics": {
+    "title": "Sujets d’intervention",
+    "intro": "J’interviens principalement sur des sujets liés à Java, l’architecture logicielle, l’IA appliquée et la transmission de bonnes pratiques d’ingénierie logicielle.",
+    "items": [
+      "Spring AI en action",
+      "Intégrer les LLM dans les applications Java",
+      "RAG pour applications métier",
+      "Function Calling et outils IA",
+      "MCP et agents IA",
+      "Design patterns Java modernes",
+      "Architecture hexagonale avec Spring Boot et Quarkus",
+      "IA générative pour développeurs Java",
+      "Sécuriser les applications IA",
+      "Architecture logicielle et maintenabilité"
+    ]
   }
 }

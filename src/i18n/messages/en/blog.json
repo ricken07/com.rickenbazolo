@@ -1,6 +1,6 @@
 {
   "title": "Articles",
-  "description": "Notes on Java, architecture, cloud, and AI. Filter by month or tags to jump to a topic quickly.",
+  "description": "I write about Java, software architecture, design patterns, applied artificial intelligence, RAG, AI agents and software engineering. Through my articles, I share feedback, technical analyzes and concrete approaches to design robust, maintainable and useful applications.",
   "searchPlaceholder": "Search a post",
   "empty": "No articles yet",
   "prev": "Prev",

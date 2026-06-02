@@ -1,8 +1,8 @@
 {
-  "title": "Speaking",
-  "intro": "A curated selection of talks about AI and software engineering.",
+  "title": "Conferences & Interventions",
+  "intro": "I speak at conferences, meetups and technical events about Java, software architecture, generative AI, RAG, AI agents and design patterns. My talks aim to make technical topics accessible, concrete and directly applicable by developers, architects and product teams.",
   "meta": {
-    "title": "Speaking",
+    "title": "Conferences & Interventions",
     "description": "Upcoming events and past talks by Ricken Bazolo on Java, software engineering, and applied AI."
   },
   "eyebrow": "Speaking",
@@ -17,8 +17,24 @@
     }
   },
   "past": {
-    "title": "Past events",
+    "title": "Past interventions",
     "description": "Conferences and sessions already delivered.",
     "label": "Speaker"
+  },
+  "topics": {
+    "title": "Speaking Topics",
+    "intro": "I mainly speak on topics related to Java, software architecture, applied AI and sharing software engineering best practices.",
+    "items": [
+      "Spring AI in action",
+      "Integrating LLMs into Java applications",
+      "RAG for business applications",
+      "Function Calling and AI tools",
+      "MCP and AI agents",
+      "Modern Java design patterns",
+      "Hexagonal architecture with Spring Boot and Quarkus",
+      "Generative AI for Java developers",
+      "Securing AI applications",
+      "Software architecture and maintainability"
+    ]
   }
 }
