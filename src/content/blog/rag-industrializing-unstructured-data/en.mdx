@@ -2,7 +2,7 @@
 title: "RAG in practice: Industrializing unstructured data for AI use cases"
 slug: "rag-industrializing-unstructured-data"
 language: "en"
-publishedAt: "2026-05-10"
+publishedAt: "2026-07-17"
 tags: ["rag", "llm", "data-governance", "data-quality", "knowledge-management", "industrialization"]
 readingTime: 10
 excerpt: "Corpus quality, security, governance, indexing, and evaluation: The foundations needed to move from AI POCs to reliable and sustainable use cases."
@@ -35,8 +35,18 @@ The challenge is not merely to index documents to feed an AI assistant. The chal
 
 A typical first RAG POC follows fairly simple logic:
 
-```text
-Documents → chunking → embeddings → vector database → generated response
+```mermaid
+flowchart LR
+    A["Documents"] --> B["Chunking"]
+    B --> C["Embeddings"]
+    C --> D["Vector Database"]
+    D --> E["Generated Response"]
+    
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style D fill:#e1f5ff
+    style E fill:#fff3e0
 ```
 
 This approach allows you to quickly obtain visible results. You can query some documents, find relevant passages, generate an answer with citations, and demonstrate the system's potential value.
@@ -166,13 +176,32 @@ It may be less effective at finding an exact identifier, code, acronym, contract
 
 This is why an industrial indexing strategy must often combine multiple approaches:
 
-```text
-Lexical search
-+ Vector search
-+ Metadata
-+ Security filters
-+ Reranking
-+ Business selection rules
+```mermaid
+graph TB
+    Query["User Query"]
+    
+    Query --> Lex["Lexical Search"]
+    Query --> Vec["Vector Search"]
+    Query --> Meta["Metadata"]
+    Query --> Sec["Security Filters"]
+    Query --> Rank["Reranking"]
+    Query --> Rules["Business Selection Rules"]
+    
+    Lex --> Result["Combined Results"]
+    Vec --> Result
+    Meta --> Result
+    Sec --> Result
+    Rank --> Result
+    Rules --> Result
+    
+    style Query fill:#e1f5ff
+    style Lex fill:#f3e5f5
+    style Vec fill:#f3e5f5
+    style Meta fill:#f3e5f5
+    style Sec fill:#f3e5f5
+    style Rank fill:#f3e5f5
+    style Rules fill:#f3e5f5
+    style Result fill:#fff3e0
 ```
 
 Lexical search finds exact matches.
@@ -337,22 +366,39 @@ A platform capable of ingesting, qualifying, structuring, indexing, securing, se
 
 At this point, we can represent the target more completely:
 
-```text
-Document sources
-→ Collection
-→ Extraction
-→ Normalization
-→ Qualification
-→ Enrichment
-→ Business chunking
-→ Hybrid indexing
-→ Security filtering
-→ Retrieval
-→ Context structuring
-→ Augmented generation
-→ Evaluation
-→ Observability
-→ Continuous governance
+```mermaid
+flowchart TD
+    A["📄 Document Sources"] 
+    --> B["🔍 Collection"]
+    --> C["📋 Extraction"]
+    --> D["🧹 Normalization"]
+    --> E["✓ Qualification"]
+    --> F["➕ Enrichment"]
+    --> G["✂️ Business Chunking"]
+    --> H["🗂️ Hybrid Indexing"]
+    --> I["🔐 Security Filtering"]
+    --> J["🎯 Retrieval"]
+    --> K["🏗️ Context Structuring"]
+    --> L["✨ Augmented Generation"]
+    --> M["📊 Evaluation"]
+    --> N["📈 Observability"]
+    --> O["⚖️ Continuous Governance"]
+    
+    style A fill:#e1f5ff
+    style B fill:#f3e5f5
+    style C fill:#f3e5f5
+    style D fill:#f3e5f5
+    style E fill:#f3e5f5
+    style F fill:#f3e5f5
+    style G fill:#f3e5f5
+    style H fill:#f3e5f5
+    style I fill:#ffe0b2
+    style J fill:#f3e5f5
+    style K fill:#f3e5f5
+    style L fill:#fff3e0
+    style M fill:#ffe0b2
+    style N fill:#ffe0b2
+    style O fill:#ffe0b2
 ```
 
 This chain shows something important: the LLM is just one component of the system.
