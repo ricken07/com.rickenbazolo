@@ -8,13 +8,13 @@ Voici le **document de spécification clair, propre et finalisé**, intégrant :
 
 ---
 
-# 📘 **Spécification Fonctionnelle & Technique – Blog Personnel de Ricken Bazolo**
+# Spécification Fonctionnelle & Technique – Blog Personnel de Ricken Bazolo
 
 *(Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Markdown/MDX · i18n FR/EN)*
 
 ---
 
-## 🏗️ **1. Stack Technique**
+## **1. Stack Technique**
 
 * **Next.js 16.0.5** (App Router)
 * **React 19.2.0**
@@ -32,7 +32,7 @@ Voici le **document de spécification clair, propre et finalisé**, intégrant :
 
 ---
 
-# 🎯 **2. Objectifs & Positionnement**
+# **2. Objectifs & Positionnement**
 
 ## 2.1. Objectif
 
@@ -62,7 +62,7 @@ Créer un **site personnel bilingue** (FR/EN), moderne, rapide et agréable à l
 
 ---
 
-# 🧭 **3. Architecture Fonctionnelle des Pages**
+# **3. Architecture Fonctionnelle des Pages**
 
 > Toutes les pages existent **une seule fois** dans le code.
 > L’internationalisation se fait via `[locale]` + fichiers de messages.
@@ -223,7 +223,7 @@ Outils pratiques :
 
 ---
 
-# 🌍 **4. Internationalisation (i18n) sans duplication**
+# **4. Internationalisation (i18n) sans duplication**
 
 ## 4.1. Structure des pages
 
@@ -284,7 +284,7 @@ Chaque fichier = une version de langue
 
 ---
 
-# 🧩 **5. Widget Archives par Date**
+# **5. Widget Archives par Date**
 
 ## 5.1. Objectif
 
@@ -348,7 +348,7 @@ Ce composant est **client-side** (`"use client"`).
 
 ---
 
-# 📁 **6. Structure Technique Finale**
+# **6. Structure Technique Finale**
 
 ```
 app/
@@ -385,7 +385,7 @@ api/
 
 ---
 
-# 📦 **7. Types TypeScript**
+# **7. Types TypeScript**
 
 ## 7.1. Base
 
@@ -462,7 +462,7 @@ export interface OpenSourceProject {
 
 ---
 
-# 🎨 **8. Design System (Tailwind CSS 4)**
+# **8. Design System (Tailwind CSS 4)**
 
 ## Style général
 
@@ -484,7 +484,7 @@ export interface OpenSourceProject {
 
 ---
 
-# 🔍 **9. SEO & Performance**
+# **9. SEO & Performance**
 
 ## SEO
 
@@ -506,7 +506,7 @@ export interface OpenSourceProject {
 
 ---
 
-# 🗺️ **10. Roadmap**
+# **10. Roadmap**
 
 ### Phase 1 – MVP
 
