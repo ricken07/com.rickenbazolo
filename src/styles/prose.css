@@ -233,6 +233,70 @@
   box-shadow: 0 4px 10px rgba(6, 147, 227, 0.12);
 }
 
+/* ── Mermaid diagrams ──────────────────────────────────────────────── */
+/* Diagrams render with a fixed light mermaid theme, so the card keeps a
+   light surface regardless of the site's dark/light mode for contrast. */
+.prose .mermaid-diagram {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  background-color: #f6f8fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose .mermaid-diagram svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.prose .mermaid-diagram.loading .loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem 0;
+  color: #57606a;
+  font-size: 0.925rem;
+}
+
+.prose .mermaid-diagram .spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(6, 147, 227, 0.25);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: mermaid-spin 0.8s linear infinite;
+}
+
+@keyframes mermaid-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.prose .mermaid-diagram.error {
+  background-color: #fff5f5;
+  border-color: #f3aeae;
+}
+
+.prose .mermaid-diagram.error .error-message {
+  color: #b42318;
+  font-size: 0.925rem;
+}
+
+.prose .mermaid-diagram.error .error-message details {
+  margin-top: 0.5rem;
+  color: #8c2a20;
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+}
+
 /* Blockquotes avec accent cyan */
 .prose blockquote {
   border-left: 4px solid var(--color-accent);

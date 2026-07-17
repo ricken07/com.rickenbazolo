@@ -5,9 +5,11 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypePrettyCode from "rehype-pretty-code";
+import { rehypeMermaid } from "react-markdown-mermaid";
 import readingTime from "reading-time";
 import { z } from "zod";
 import type { BlogPost } from "../blog/types";
+import { MermaidDiagram } from "@/components/blog/MermaidDiagram";
 
 type HastNode = {
   type: string;
@@ -78,6 +80,9 @@ export async function renderMarkdown(source: string) {
         rehypePlugins: [
           rehypeSlug,
           rehypeResponsiveTables,
+          // Must run before rehypePrettyCode so mermaid fences are swapped for
+          // a <MermaidBlock> element instead of being syntax-highlighted as text.
+          rehypeMermaid,
           [
             rehypePrettyCode,
             {
@@ -91,6 +96,9 @@ export async function renderMarkdown(source: string) {
           ],
         ],
       },
+    },
+    components: {
+      MermaidBlock: MermaidDiagram,
     },
   });
   return content;
