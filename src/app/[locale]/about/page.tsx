@@ -207,22 +207,22 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                  {locale === "fr" ? "À propos de Ricken Bazolo" : "About Ricken Bazolo"}
                </h1>
                <p className="text-xl font-medium text-accent">
-                 {locale === "fr" ? "Tech entrepreneur & architecte logiciel" : "Tech Entrepreneur & Software Architect"}
+                 {locale === "fr" ? "Consultant IT, architecte logiciel et technologue Java senior" : "IT Consultant, Software Architect and Senior Java Technologist"}
                </p>
             </div>
 
             <div className="prose prose-lg dark:prose-invert text-muted-foreground">
               {locale === "fr" ? (
                 <>
-                  <p>Je suis Ricken Bazolo, tech entrepreneur, architecte logiciel, Consultant IT, auteur, speaker, contributeur open source et fondateur de Gad Digital.</p>
-                  <p>Avec plus de 10 ans d’expérience professionnelle dans le développement logiciel, j’ai construit une expertise autour de Java, l’architecture logicielle, les plateformes numériques, le développement fullstack, ainsi que les agents IA et systèmes agentiques.</p>
-                  <p>Mon parcours m’a conduit à travailler sur des systèmes d’entreprise, des applications web et mobiles, des architectures backend, des solutions autour des agents IA et systèmes agentiques, ainsi que des produits numériques. J’accorde une importance particulière à la qualité logicielle, à la maintenabilité, à la transmission des connaissances et à la création de solutions utiles.</p>
+                    <p>Je suis Ricken Bazolo, consultant IT, architecte logiciel et technologue Java senior. Depuis plus de 10 ans, j’interviens dans la conception, la modernisation et l’industrialisation de systèmes logiciels. Mon parcours couvre l’architecture, le développement logiciel, la performance, le cloud et le leadership technique, dans des secteurs tels que la banque, l’assurance, la fintech, l’éducation, les services publics et l’industrie.</p>
+                    <p>Mon approche associe ingénierie logicielle, pragmatisme et compréhension des enjeux métier. J’accompagne les organisations dans leurs choix techniques, l’évolution de leurs plateformes, l’amélioration de la qualité logicielle et la structuration de leurs processus de delivery. J’interviens également sur l’intégration de l’IA générative dans les activités métier et les pratiques de conception, de développement, de modernisation et de livraison des logiciels.</p>
+                    <p>Auteur de Ultimate Java Design Patterns, formateur, speaker et JUG Leader, je partage régulièrement mon expérience à travers des articles, des conférences, des formations, du mentoring et des contributions ponctuelles à l’open source. Je suis également le fondateur de Gad Digital, une entreprise technologique à travers laquelle je développe des produits, des solutions numériques et des services en ingénierie logicielle et en intelligence artificielle appliquée.</p>
                 </>
               ) : (
                 <>
-                  <p>I am Ricken Bazolo, tech entrepreneur, software architect, IT Consultant, author, speaker, open source contributor and founder of Gad Digital.</p>
-                  <p>With over 10 years of professional experience in software development, I have built expertise around Java, software architecture, digital platforms, fullstack development, as well as AI agents and agentic systems.</p>
-                  <p>My journey has led me to work on enterprise systems, web and mobile applications, backend architectures, AI agents and agentic systems solutions, as well as digital products. I attach particular importance to software quality, maintainability, knowledge sharing and creating useful solutions.</p>
+                    <p>I am Ricken Bazolo, an IT consultant, software architect and senior Java technologist. For more than 10 years, I have worked on the design, modernization and industrialization of software systems. My background covers software architecture, software development, performance, cloud platforms and technical leadership across industries including banking, insurance, fintech, education, public services and manufacturing.</p>
+                    <p>My approach combines software engineering, pragmatism and a strong understanding of business challenges. I support organizations in making technical decisions, evolving their platforms, improving software quality and structuring their delivery processes. I also work on integrating generative AI into business activities and into the design, development, modernization and delivery of software.</p>
+                    <p>As the author of Ultimate Java Design Patterns, a trainer, speaker and JUG Leader, I regularly share my experience through articles, conferences, training, mentoring and occasional open-source contributions. I am also the founder of Gad Digital, a technology company through which I develop digital products, business solutions and services in software engineering and applied artificial intelligence.</p>
                 </>
               )}
             </div>
@@ -260,8 +260,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             </h2>
             <p className="text-lg leading-relaxed text-muted-foreground">
               {locale === "fr"
-                ? "En tant que Consultant IT, j’interviens auprès d’entreprises et d’organisations pour concevoir, développer, moderniser et faire évoluer des solutions numériques. Mes missions couvrent l’architecture logicielle, le développement backend et fullstack, l’intégration d’API, la qualité logicielle, l’accompagnement technique des équipes et l’intégration de l’IA."
-                : "As an IT Consultant, I work with companies and organizations to design, develop, modernize and evolve digital solutions. My missions cover software architecture, backend and fullstack development, API integration, software quality, technical team support and AI integration."}
+                ? "J’accompagne les entreprises et les organisations dans la conception, la modernisation et l’évolution de leurs applications et plateformes numériques. Mes interventions portent principalement sur l’architecture logicielle, la qualité des systèmes, les choix techniques, le leadership technique et l’amélioration des processus de delivery. J’interviens également dans l’intégration de l’IA générative au service des activités métier et de l’ingénierie logicielle."
+                : "I support companies and organizations in designing, modernizing and evolving their digital applications and platforms. My work primarily focuses on software architecture, system quality, technical decision-making, technical leadership and the improvement of software delivery processes. I also support the integration of generative AI into business activities and software engineering."}
             </p>
           </div>
         </section>

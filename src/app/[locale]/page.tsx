@@ -55,19 +55,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <h1 className="font-heading text-5xl font-bold leading-tight text-foreground md:text-7xl">
                 {locale === "fr" ? (
                   <>
-                    Tech entrepreneur & <span className="text-accent">architecte logiciel</span>
+                    Technologue Java senior & <span className="text-accent">architecte logiciel</span>
                   </>
                 ) : (
                   <>
-                    Tech entrepreneur & <span className="text-accent">software architect</span>
+                    Senior Java Technologist & <span className="text-accent">Software Architect</span>
                   </>
                 )}
               </h1>
 
               <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted md:text-xl">
                 {locale === "fr"
-                  ? "Je suis Ricken Bazolo, Consultant IT, auteur, speaker, contributeur open source et fondateur de Gad Digital. Avec plus de 10 ans d’expérience professionnelle, je conçois des applications et plateformes numériques robustes, avec une expertise forte en architecture logicielle, Java, développement fullstack, ainsi que les agents IA et systèmes agentiques."
-                  : "I am Ricken Bazolo, IT Consultant, author, speaker, open source contributor and founder of Gad Digital. With over 10 years of professional experience, I design robust digital applications and platforms, with strong expertise in software architecture, Java, fullstack development, as well as AI agents and agentic systems."}
+                  ? "Consultant IT, auteur et entrepreneur tech, j’accompagne les organisations dans la conception, la modernisation et l’évolution de leurs systèmes logiciels, ainsi que dans l’intégration de l’IA générative au service du business et du delivery. Je partage également mon expérience à travers mes articles, mes formations, mes conférences et mon engagement dans les communautés techniques."
+                  : "As an IT consultant, author and tech entrepreneur, I support organizations in designing, modernizing and evolving their software systems, as well as integrating generative AI into business activities and software delivery. I also share my experience through articles, training, conferences and active involvement in technical communities."}
               </p>
             </div>
 
@@ -136,28 +136,28 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 description: locale === "fr"
                   ? "Conception d’applications robustes, architectures modulaires, APIs, backend Java, Spring, Quarkus, architecture hexagonale, microservices et systèmes d’entreprise."
                   : "Design of robust applications, modular architectures, APIs, Java backend, Spring, Quarkus, hexagonal architecture, microservices and enterprise systems.",
-                icon: "🏗️"
+                icon: ""
               },
               {
                 title: locale === "fr" ? "IA appliquée" : "Applied AI",
                 description: locale === "fr"
                   ? "Intégration des LLM, du RAG, des agents IA, de Spring AI et des systèmes conversationnels dans des applications métier concrètes."
                   : "Integration of LLMs, RAG, AI agents, Spring AI and conversational systems into concrete business applications.",
-                icon: "🤖"
+                icon: ""
               },
               {
                 title: locale === "fr" ? "Développement fullstack" : "Fullstack Development",
                 description: locale === "fr"
                   ? "Développement d’applications web, mobiles et backend avec une approche orientée qualité, maintenabilité, performance et valeur métier."
                   : "Web, mobile and backend application development with an approach oriented towards quality, maintainability, performance and business value.",
-                icon: "💻"
+                icon: ""
               },
               {
                 title: locale === "fr" ? "Transmission technique" : "Technical Sharing",
                 description: locale === "fr"
                   ? "Articles, conférences, formations et contenus pédagogiques autour de l’ingénierie logicielle et de l’IA appliquée."
                   : "Articles, conferences, training and educational content around software engineering and applied AI.",
-                icon: "📚"
+                icon: ""
               }
             ].map((expertise) => (
               <div key={expertise.title} className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card p-8 transition hover:-translate-y-1 hover:border-accent/40 hover:shadow-md">
