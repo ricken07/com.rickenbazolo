@@ -4,7 +4,7 @@ import { OpenSourceProjectCard } from "@/components/projects/OpenSourceProjectCa
 import { getOpenSourceProjects } from "@/lib/opensource/getOpenSourceProjects";
 
 export default async function OpenSourcePage({ params }: { params: { locale: string } }) {
-  const { locale } = await params;
+  const { locale } = params;
   const t = await getTranslations({ locale, namespace: "opensource" });
   const projects = await getOpenSourceProjects(locale);
 
