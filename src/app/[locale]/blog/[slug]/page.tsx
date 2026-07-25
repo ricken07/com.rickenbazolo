@@ -233,8 +233,8 @@ export default async function BlogPostPage({
 
           {/* Two-column layout: article + TOC sidebar */}
           <div className="grid gap-8 lg:grid-cols-[minmax(0,2.5fr)_minmax(220px,1fr)]">
-            <div className="space-y-12">
-              <Prose className="shadow-xl shadow-black/15 dark:shadow-black/40">
+            <div className="min-w-0 space-y-12">
+              <Prose className="min-w-0">
                 {mdx}
               </Prose>
 

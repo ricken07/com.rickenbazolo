@@ -246,6 +246,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .prose .mermaid-diagram svg {
@@ -363,6 +365,8 @@
   border-radius: 1rem;
   background: color-mix(in srgb, var(--color-card) 88%, transparent);
   box-shadow: 0 14px 32px -24px rgba(6, 147, 227, 0.35);
+  max-width: 100%;
+  min-width: 0;
 }
 
 .prose table {
