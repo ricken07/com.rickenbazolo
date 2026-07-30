@@ -23,8 +23,12 @@ Le système était capable de retrouver de l’information. Mais tant que cette 
 
 Au début, nous avons suivi la chaîne classique que beaucoup mettent en place :
 
-```
-PDF → chunking → embeddings → vector database
+```mermaid
+flowchart LR
+    A[Document PDF] --> B[Extraction du texte]
+    B --> C[Découpage en chunks]
+    C --> D[Génération des embeddings]
+    D --> E[(Base de données vectorielle)]
 ```
 
 Ce pipeline fonctionne. Il permet d’obtenir des premiers résultats assez rapidement. Pour des questions générales, le système paraissait même correct.

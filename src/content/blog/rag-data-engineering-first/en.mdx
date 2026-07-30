@@ -23,8 +23,12 @@ The system could retrieve information. But as long as that information was not p
 
 At the beginning, we followed the classic pipeline many teams start with:
 
-```
-PDF → chunking → embeddings → vector database
+```mermaid
+flowchart LR
+    A[PDF Document] --> B[Text Extraction]
+    B --> C[Chunking]
+    C --> D[Embedding Generation]
+    D --> E[(Vector Database)]
 ```
 
 This pipeline works. It is enough to get first results quickly. For broad questions, the system even looked reasonably effective.
