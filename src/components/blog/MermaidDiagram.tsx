@@ -16,8 +16,16 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
       className="mermaid-diagram"
       mermaidConfig={{
         theme: "neutral",
-        fontFamily: "inherit",
-        flowchart: { useMaxWidth: true },
+        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        fontSize: 15,
+        themeVariables: {
+          primaryTextColor: "#172033",
+          secondaryTextColor: "#172033",
+          tertiaryTextColor: "#172033",
+          lineColor: "#526176",
+          edgeLabelBackground: "#ffffff",
+        },
+        flowchart: { useMaxWidth: true, htmlLabels: true },
         sequence: { useMaxWidth: true },
       }}
       loadingText="Rendering diagram…"
