@@ -29,7 +29,7 @@ const siteDescription =
   "Personal website, bilingual blog, and project hub for Ricken Bazolo. Java, AI, open source, and product delivery insights.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rickenbazolo.dev"),
+  metadataBase: new URL("https://rickenbazolo.com"),
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
