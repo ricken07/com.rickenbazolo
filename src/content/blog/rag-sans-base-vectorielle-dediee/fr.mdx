@@ -9,27 +9,17 @@ excerpt: "Un vector store embarqué peut simplifier un système RAG, à conditio
 status: "published"
 ---
 
-Lorsqu'une application doit enrichir les réponses d'un modèle avec des informations issues de ses propres documents, le chemin d'architecture semble souvent déjà défini.
-
-Les documents sont découpés, transformés en embeddings, puis enregistrés dans une base vectorielle chargée de retrouver les fragments les plus proches de la question de l'utilisateur.
-
-Le raisonnement devient presque automatique :
+Lorsqu'une application doit enrichir les réponses d'un modèle avec des informations issues de ses propres documents, le chemin d'architecture semble souvent déjà défini. Les documents sont découpés, transformés en embeddings, puis enregistrés dans une base vectorielle chargée de retrouver les fragments les plus proches de la question de l'utilisateur. Le raisonnement devient presque automatique :
 
 > RAG, embeddings, base vectorielle.
 
-Qdrant, Weaviate, Pinecone, Elasticsearch ou PostgreSQL avec pgvector rejoignent alors rapidement le diagramme d'architecture.
+Qdrant, Weaviate, Pinecone, Elasticsearch ou PostgreSQL avec pgvector rejoignent alors rapidement le diagramme d'architecture. Ces solutions répondent à de véritables besoins. Mais leur introduction est parfois décidée avant même d'avoir analysé la manière dont le corpus sera produit, mis à jour, partagé et exploité.
 
-Ces solutions répondent à de véritables besoins. Mais leur introduction est parfois décidée avant même d'avoir analysé la manière dont le corpus sera produit, mis à jour, partagé et exploité.
-
-Un corpus propre à une seule application, alimenté par un processus contrôlé et interrogé localement, nécessite-t-il immédiatement un service vectoriel indépendant ?
-
-Deux articles récents permettent d'explorer cette question par l'implémentation.
+Un corpus propre à une seule application, alimenté par un processus contrôlé et interrogé localement, nécessite-t-il immédiatement un service vectoriel indépendant ? Deux articles récents permettent d'explorer cette question par l'implémentation.
 
 Dans <a href="https://thetalkingapp.medium.com/spring-ai-recipe-rag-without-a-separate-vector-database-7c47047ddbb1" target="_blank" rel="noopener noreferrer">Spring AI Recipe: RAG Without a Separate Vector Database</a>, Craig Walls montre comment exécuter un vector store directement dans la JVM avec Spring AI.
 
-Brian Sam-Bodden prolonge cette approche dans <a href="https://medium.com/@bsbodden_68805/in-jvm-rag-that-survives-restarts-4de4e15a4aa1" target="_blank" rel="noopener noreferrer">In-JVM RAG That Survives Restarts</a>, en traitant la persistance des index et leur restauration après un redémarrage.
-
-Ces démonstrations établissent qu'un système RAG peut fonctionner sans serveur vectoriel séparé.
+Brian Sam-Bodden prolonge cette approche dans <a href="https://medium.com/@bsbodden_68805/in-jvm-rag-that-survives-restarts-4de4e15a4aa1" target="_blank" rel="noopener noreferrer">In-JVM RAG That Survives Restarts</a>, en traitant la persistance des index et leur restauration après un redémarrage. Ces démonstrations établissent qu'un système RAG peut fonctionner sans serveur vectoriel séparé.
 
 Mais elles ouvrent surtout une question d'architecture plus importante :
 
@@ -58,18 +48,14 @@ Le choix ne porte donc pas uniquement sur la technologie de recherche. Il porte 
 
 ## B- Ce que le moteur embarqué simplifie réellement
 
-Un vector store embarqué réduit le nombre de composants à déployer et à surveiller. Pour un projet local, un prototype avancé ou une application dont le corpus est maîtrisé, cette réduction peut être significative.
-
-L'équipe peut notamment éviter :
+Un vector store embarqué réduit le nombre de composants à déployer et à surveiller. Pour un projet local, un prototype avancé ou une application dont le corpus est maîtrisé, cette réduction peut être significative. L'équipe peut notamment éviter :
 
 * le déploiement d'un service supplémentaire ;
 * la gestion d'un réseau entre l'application et le moteur de recherche ;
 * la synchronisation de plusieurs environnements ;
 * une partie des coûts et des opérations liés à un service partagé.
 
-Cette simplicité a cependant une limite importante. Retirer une base vectorielle du diagramme ne retire pas les contraintes liées au stockage des vecteurs.
-
-Cela change l'endroit où elles sont prises en charge.
+Cette simplicité a cependant une limite importante. Retirer une base vectorielle du diagramme ne retire pas les contraintes liées au stockage des vecteurs. Cela change l'endroit où elles sont prises en charge.
 
 Avec un moteur embarqué, l'application gagne en autonomie et réduit son empreinte opérationnelle. Elle devient aussi responsable de la persistance, des sauvegardes, des réindexations, des écritures concurrentes et de la restauration des données.
 
@@ -96,9 +82,7 @@ La simplicité visible dans le diagramme peut donc masquer une responsabilité s
 
 Un index construit uniquement en mémoire disparaît lorsque le processus s'arrête. Cette option peut convenir à un environnement de développement ou à un corpus facilement régénérable. Elle est plus difficile à défendre lorsque l'ingestion est longue, coûteuse ou dépend de traitements externes.
 
-La persistance doit alors être pensée explicitement. Il faut déterminer ce qui est sauvegardé, à quel moment, avec quelle version du modèle d'embeddings et selon quelle stratégie de restauration.
-
-Les vecteurs ne sont pas indépendants de leur production. Changer de modèle d'embeddings, de dimension vectorielle, de méthode de découpage ou de métadonnées peut rendre nécessaire une réindexation complète.
+La persistance doit alors être pensée explicitement. Il faut déterminer ce qui est sauvegardé, à quel moment, avec quelle version du modèle d'embeddings et selon quelle stratégie de restauration. Les vecteurs ne sont pas indépendants de leur production. Changer de modèle d'embeddings, de dimension vectorielle, de méthode de découpage ou de métadonnées peut rendre nécessaire une réindexation complète.
 
 Une architecture embarquée doit donc répondre à des questions concrètes :
 
@@ -121,9 +105,7 @@ Le moteur embarqué peut être un choix cohérent lorsque plusieurs conditions s
 * l'index peut être reconstruit ou restauré de manière fiable ;
 * l'équipe accepte de porter les opérations nécessaires.
 
-Dans ce contexte, l'absence de service externe n'est pas une faiblesse. Elle peut réduire la complexité et rapprocher le stockage de la capacité qui l'utilise.
-
-Il faut toutefois éviter de confondre faible volume et faible criticité. Un petit corpus peut alimenter une fonctionnalité importante. La taille de l'index ne suffit donc pas à déterminer l'architecture.
+Dans ce contexte, l'absence de service externe n'est pas une faiblesse. Elle peut réduire la complexité et rapprocher le stockage de la capacité qui l'utilise. Il faut toutefois éviter de confondre faible volume et faible criticité. Un petit corpus peut alimenter une fonctionnalité importante. La taille de l'index ne suffit donc pas à déterminer l'architecture.
 
 ## E- Quand le service externe devient préférable
 
@@ -147,9 +129,7 @@ La mutualisation apporte alors de la souplesse, mais aussi un périmètre de res
 
 ## F- Une décision d'architecture, pas une préférence de technologie
 
-Le sujet n'est donc pas d'opposer une solution légère à une solution industrielle.
-
-Il s'agit de comprendre comment chaque approche répartit les responsabilités du système, puis de choisir celle qui correspond réellement à sa topologie et à sa trajectoire d'évolution.
+Le sujet n'est donc pas d'opposer une solution légère à une solution industrielle. Il s'agit de comprendre comment chaque approche répartit les responsabilités du système, puis de choisir celle qui correspond réellement à sa topologie et à sa trajectoire d'évolution.
 
 ```mermaid
 flowchart TB
@@ -166,10 +146,6 @@ flowchart TB
     C --> E[Embarqué ou externe]
 ```
 
-Le bon choix peut évoluer. Une application peut commencer avec un index embarqué, puis migrer vers un service externe lorsque le corpus, les consommateurs ou les exigences de disponibilité changent. À l'inverse, une architecture peut aussi rester embarquée lorsque la mutualisation n'apporte aucune valeur réelle.
+Le bon choix peut évoluer. Une application peut commencer avec un index embarqué, puis migrer vers un service externe lorsque le corpus, les consommateurs ou les exigences de disponibilité changent. À l'inverse, une architecture peut aussi rester embarquée lorsque la mutualisation n'apporte aucune valeur réelle. La question utile n'est donc pas : « Faut-il toujours une base vectorielle dédiée ? »
 
-La question utile n'est donc pas : « Faut-il toujours une base vectorielle dédiée ? »
-
-La question est plutôt : « Qui doit être responsable de l'index, de sa durée de vie et de sa restauration ? »
-
-Répondre clairement à cette question permet de simplifier l'infrastructure sans déplacer le problème vers un endroit moins visible.
+La question est plutôt : « Qui doit être responsable de l'index, de sa durée de vie et de sa restauration ? » Répondre clairement à cette question permet de simplifier l'infrastructure sans déplacer le problème vers un endroit moins visible.

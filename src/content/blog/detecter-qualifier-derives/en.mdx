@@ -11,15 +11,9 @@ status: "published"
 
 # Detecting and Qualifying Behavioral Drift
 
-An LLM system can change without becoming less capable.
+An LLM system can change without becoming less capable. A new model version can produce different responses. A prompt can be reworded. A tool can change the information available. A security rule can be tightened. A change in temperature, context, or routing strategy can also change observed behavior. The problem, then, is not simply detecting a difference.
 
-A new model version can produce different responses. A prompt can be reworded. A tool can change the information available. A security rule can be tightened. A change in temperature, context, or routing strategy can also change observed behavior.
-
-The problem, then, is not simply detecting a difference.
-
-The real challenge is determining **whether that difference constitutes behavioral drift**, what its nature is, how large it is, and above all what impact it has on the system.
-
-This is a fundamental distinction in industrializing LLM-based systems:
+The real challenge is determining **whether that difference constitutes behavioral drift**, what its nature is, how large it is, and above all what impact it has on the system. This is a fundamental distinction in industrializing LLM-based systems:
 
 > **A behavioral variation is not necessarily a regression.**
 
@@ -29,9 +23,7 @@ Evaluation must make this distinction in a reproducible way.
 
 ## 1. Detecting a Difference Is Not Enough
 
-When a new version of a system is evaluated, we may find that it no longer produces exactly the same results as the previous one.
-
-This can involve:
+When a new version of a system is evaluated, we may find that it no longer produces exactly the same results as the previous one. This can involve:
 
 * the produced response;
 * the decision made;
@@ -44,11 +36,7 @@ This can involve:
 * the structure of the response;
 * the behavior when facing an ambiguous situation.
 
-The first mistake is to treat every difference as an anomaly.
-
-Take, for example, an assistant that must decide whether a request requires a tool call.
-
-Version A produces:
+The first mistake is to treat every difference as an anomaly. Take, for example, an assistant that must decide whether a request requires a tool call. Version A produces:
 
 ```text
 Tool call → data retrieval → response
@@ -60,15 +48,9 @@ Version B produces:
 Direct response
 ```
 
-The difference is obvious.
+The difference is obvious. But it does not yet let us conclude there is a regression. If the necessary information was already present in the context, the direct response can be perfectly valid.
 
-But it does not yet let us conclude there is a regression.
-
-If the necessary information was already present in the context, the direct response can be perfectly valid.
-
-Conversely, if the response absolutely requires external data, the absence of a tool call can be a functional break.
-
-The comparison must therefore evolve:
+Conversely, if the response absolutely requires external data, the absence of a tool call can be a functional break. The comparison must therefore evolve:
 
 ```mermaid
 flowchart LR
@@ -86,9 +68,7 @@ This is where the evaluation work really begins.
 
 ## 2. Drift Is a Difference from a Reference Behavior
 
-To detect drift, we need a reference.
-
-This reference can be made up of:
+To detect drift, we need a reference. This reference can be made up of:
 
 * behavioral invariants;
 * business rules;
@@ -110,23 +90,15 @@ We are instead trying to determine:
 Version B ≠ expected behavior
 ```
 
-This distinction is essential.
+This distinction is essential. The previous version is often a **point of comparison**, but it is not necessarily the truth.
 
-The previous version is often a **point of comparison**, but it is not necessarily the truth.
-
-An older version can itself contain flaws.
-
-The reference, then, must be built from the behaviors we actually want to preserve.
+An older version can itself contain flaws. The reference, then, must be built from the behaviors we actually want to preserve.
 
 ---
 
 ## 3. Invariants Become the Reference Point
 
-Behavioral invariants play a central role here.
-
-An invariant describes a property that must remain true regardless of how the system evolves.
-
-For example:
+Behavioral invariants play a central role here. An invariant describes a property that must remain true regardless of how the system evolves. For example:
 
 > A financial operation must never be executed without explicit user validation.
 
@@ -138,9 +110,7 @@ Or:
 
 > Confidential information must never be returned to an unauthorized user.
 
-These properties are far more robust than comparing wordings.
-
-We can represent the evaluation like this:
+These properties are far more robust than comparing wordings. We can represent the evaluation like this:
 
 ```mermaid
 flowchart TD
@@ -174,9 +144,7 @@ A more useful classification distinguishes several levels.
 
 ### Neutral Variation
 
-Behavior changes, but no important property is affected.
-
-Examples:
+Behavior changes, but no important property is affected. Examples:
 
 * different wording;
 * different order of two non-critical pieces of information;
@@ -187,17 +155,11 @@ The difference can be logged, but it does not necessarily require action.
 
 ### Acceptable Variation
 
-The behavior is different, but stays within the space of allowed behaviors.
-
-Example:
-
-An agent chooses a different search strategy while still producing the same correct decision.
+The behavior is different, but stays within the space of allowed behaviors. Example: An agent chooses a different search strategy while still producing the same correct decision.
 
 ### Concerning Variation
 
-The behavior remains functional but drifts away from a desired behavior.
-
-Examples:
+The behavior remains functional but drifts away from a desired behavior. Examples:
 
 * more tool calls;
 * more refusals;
@@ -209,9 +171,7 @@ This drift may not be blocking, but it deserves investigation.
 
 ### Regression
 
-An important functional property is no longer upheld.
-
-Examples:
+An important functional property is no longer upheld. Examples:
 
 * a wrong decision;
 * a critical tool not called;
@@ -221,9 +181,7 @@ Examples:
 
 ### Critical Regression
 
-The drift compromises a security or compliance property, or a critical function.
-
-Example:
+The drift compromises a security or compliance property, or a critical function. Example:
 
 ```text
 Sensitive data
@@ -239,11 +197,7 @@ This classification lets us focus analysis effort on the changes that actually m
 
 ## 5. Qualifying Drift Along Several Dimensions
 
-Drift should not be described by a single overall score.
-
-Two systems can achieve the same success rate while presenting completely different risk profiles.
-
-A useful qualification can take several dimensions into account.
+Drift should not be described by a single overall score. Two systems can achieve the same success rate while presenting completely different risk profiles. A useful qualification can take several dimensions into account.
 
 ### Direction
 
@@ -277,9 +231,7 @@ Is the behavior reproducible?
 
 ### Context Sensitivity
 
-Does the drift appear only under certain conditions?
-
-For example:
+Does the drift appear only under certain conditions? For example:
 
 ```text
 Language
@@ -297,13 +249,9 @@ These dimensions turn a raw observation into a genuine diagnosis.
 
 ## 6. Measuring Frequency Is Not Enough
 
-An error that appears in 1% of cases may seem negligible.
+An error that appears in 1% of cases may seem negligible. But if that 1% corresponds to the system's most sensitive operations, it can matter far more than a 10% degradation on requests with no consequence.
 
-But if that 1% corresponds to the system's most sensitive operations, it can matter far more than a 10% degradation on requests with no consequence.
-
-The overall rate often hides how errors are distributed.
-
-Take two systems:
+The overall rate often hides how errors are distributed. Take two systems:
 
 | Category | Version A | Version B |
 | --- | ---: | ---: |
@@ -312,19 +260,13 @@ Take two systems:
 | Critical operations | 99% | 96% |
 | Security | 100% | 98% |
 
-An average score may suggest only a slight degradation.
-
-Yet the drop on critical operations can be far more significant than what is observed on general questions.
-
-Evaluation must therefore be **segmented**.
+An average score may suggest only a slight degradation. Yet the drop on critical operations can be far more significant than what is observed on general questions. Evaluation must therefore be **segmented**.
 
 ---
 
 ## 7. Mapping Drift
 
-<a href="/en/blog/construire-jeu-evaluation" target="_blank" rel="noopener noreferrer">The evaluation set built previously</a> can become a map of behaviors.
-
-Each case can be analyzed along several axes:
+<a href="/en/blog/construire-jeu-evaluation" target="_blank" rel="noopener noreferrer">The evaluation set built previously</a> can become a map of behaviors. Each case can be analyzed along several axes:
 
 ```mermaid
 quadrantChart
@@ -337,9 +279,7 @@ quadrantChart
     quadrant-4 Critical
 ```
 
-The goal is not to produce yet another chart for its own sake.
-
-It is to be able to quickly answer four questions:
+The goal is not to produce yet another chart for its own sake. It is to be able to quickly answer four questions:
 
 1. **Where does the system change?**
 2. **How often?**
@@ -352,9 +292,7 @@ This mapping, in particular, helps distinguish localized drift from a systemic c
 
 ## 8. Drift Can Be Multidimensional
 
-An agent's behavior is not limited to the final response.
-
-Drift can appear in the trajectory that leads to that response.
+An agent's behavior is not limited to the final response. Drift can appear in the trajectory that leads to that response.
 
 ```mermaid
 flowchart LR
@@ -367,9 +305,7 @@ flowchart LR
     G --> H[Response]
 ```
 
-Two versions can produce the same final response while following different trajectories.
-
-Version A:
+Two versions can produce the same final response while following different trajectories. Version A:
 
 ```text
 Request
@@ -389,9 +325,7 @@ Request
 → response
 ```
 
-The final response can be correct in both cases.
-
-Yet system B may show:
+The final response can be correct in both cases. Yet system B may show:
 
 * more latency;
 * more cost;
@@ -399,17 +333,13 @@ Yet system B may show:
 * more points of failure;
 * higher context consumption.
 
-There are, therefore, **behavioral drifts invisible in the final result**.
-
-This matters particularly for agentic systems.
+There are, therefore, **behavioral drifts invisible in the final result**. This matters particularly for agentic systems.
 
 ---
 
 ## 9. Distinguishing Local Drift from Systemic Drift
 
-A change can affect a handful of specific cases or an entire category.
-
-This distinction is essential.
+A change can affect a handful of specific cases or an entire category. This distinction is essential.
 
 ### Local Drift
 
@@ -435,9 +365,7 @@ several categories affected
 structural change likely
 ```
 
-The second situation should generally trigger deeper analysis.
-
-It can stem from a change in:
+The second situation should generally trigger deeper analysis. It can stem from a change in:
 
 * the model;
 * the system prompt;
@@ -467,9 +395,7 @@ flowchart TD
     E --> G[Observed drift]
 ```
 
-The evaluation system must therefore retain enough information to allow causal analysis.
-
-For each important execution, it can be useful to keep:
+The evaluation system must therefore retain enough information to allow causal analysis. For each important execution, it can be useful to keep:
 
 * model version;
 * prompt version;
@@ -490,11 +416,7 @@ Without this traceability, a team can detect a regression without being able to 
 
 ## 11. The Behavioral Delta as an Object of Analysis
 
-The goal is no longer just to store a score.
-
-We need to be able to represent the **behavioral delta** between two versions.
-
-For example:
+The goal is no longer just to store a score. We need to be able to represent the **behavioral delta** between two versions. For example:
 
 ```text
 Case #1842
@@ -548,11 +470,7 @@ The second case should not be treated as a regression simply because the system 
 
 ## 12. Introducing the Notion of a Drift Budget
 
-Not every behavior needs to be perfectly stable.
-
-In a real system, some amount of variation is unavoidable.
-
-It can therefore be useful to define **drift budgets**.
+Not every behavior needs to be perfectly stable. In a real system, some amount of variation is unavoidable. It can therefore be useful to define **drift budgets**.
 
 | Dimension | Acceptable budget |
 | --- | ---: |
@@ -575,9 +493,7 @@ A system can be very flexible on wording and extremely conservative on a regulat
 
 ## 13. The Role of Thresholds
 
-Thresholds turn observations into operational rules.
-
-For example:
+Thresholds turn observations into operational rules. For example:
 
 ```text
 Variation < 2%
@@ -593,9 +509,7 @@ Variation ≥ 10%
 → mandatory review
 ```
 
-But these thresholds should never be treated as universal.
-
-They must depend on:
+But these thresholds should never be treated as universal. They must depend on:
 
 * the domain;
 * the risk;
@@ -610,11 +524,7 @@ For a critical function, a single violation can be enough to block a release.
 
 ## 14. Toward Continuous Evaluation
 
-Drift detection should not happen only before a production release.
-
-It must also be observed after deployment.
-
-An industrial architecture can follow this cycle:
+Drift detection should not happen only before a production release. It must also be observed after deployment. An industrial architecture can follow this cycle:
 
 ```mermaid
 flowchart LR
@@ -631,9 +541,7 @@ flowchart LR
     J --> A
 ```
 
-The evaluation system then becomes a control loop.
-
-It no longer serves only to say:
+The evaluation system then becomes a control loop. It no longer serves only to say:
 
 > "This version works."
 
@@ -647,9 +555,7 @@ That is a major shift in how we think about quality assurance for LLM systems.
 
 ## 15. The Goal Is Not to Eliminate Change
 
-An LLM system that never changes is not necessarily a good system.
-
-Evolution can bring:
+An LLM system that never changes is not necessarily a good system. Evolution can bring:
 
 * better decisions;
 * better performance;
@@ -658,9 +564,7 @@ Evolution can bring:
 * lower costs;
 * better robustness.
 
-Trying to reproduce historical outputs exactly can even block some of these improvements.
-
-The goal, then, is not:
+Trying to reproduce historical outputs exactly can even block some of these improvements. The goal, then, is not:
 
 ```text
 Old behavior = New behavior
@@ -684,9 +588,7 @@ Stability should apply to **what matters**, not necessarily to everything that c
 
 ## 16. Drift Is Ultimately a Governance Problem
 
-Technical detection is only the first step.
-
-An organization must also decide:
+Technical detection is only the first step. An organization must also decide:
 
 * which variations are acceptable;
 * which drift requires review;
@@ -695,9 +597,7 @@ An organization must also decide:
 * which metrics must be monitored;
 * which evidence must be retained.
 
-This turns evaluation into a governance mechanism.
-
-We progressively move from:
+This turns evaluation into a governance mechanism. We progressively move from:
 
 ```text
 Evaluating a model
@@ -733,11 +633,7 @@ Drift, then, can be produced by any one of these components.
 
 ## Conclusion of the Series
 
-Detecting a difference is relatively simple.
-
-Determining whether that difference constitutes a genuine regression is far harder.
-
-Evaluating an LLM system must therefore go beyond comparing outputs to analyze:
+Detecting a difference is relatively simple. Determining whether that difference constitutes a genuine regression is far harder. Evaluating an LLM system must therefore go beyond comparing outputs to analyze:
 
 * invariants;
 * decisions;
@@ -756,15 +652,9 @@ but:
 
 > **"Does the new system still behave in line with the properties we decided to protect?"**
 
-This approach lets us accept evolution while keeping regression under control.
+This approach lets us accept evolution while keeping regression under control. It also marks a shift from simply evaluating models to genuinely **governing the behavior of AI systems**. An industrial-grade LLM system must be able to evolve. But that evolution must remain observable, measurable, and governable.
 
-It also marks a shift from simply evaluating models to genuinely **governing the behavior of AI systems**.
-
-An industrial-grade LLM system must be able to evolve. But that evolution must remain observable, measurable, and governable.
-
-Maturity, then, is not about preventing change.
-
-It is about knowing:
+Maturity, then, is not about preventing change. It is about knowing:
 
 * **what can change;**
 * **what must not change;**
@@ -772,9 +662,7 @@ It is about knowing:
 * **what impact a drift can have;**
 * **and what decisions to make once a limit has been crossed.**
 
-This series has followed a single thread: understand the behavior of an LLM system before trying to optimize it, then learn to test it, compare it, and govern its evolution.
-
-A first part made this behavior understandable:
+This series has followed a single thread: understand the behavior of an LLM system before trying to optimize it, then learn to test it, compare it, and govern its evolution. A first part made this behavior understandable:
 
 1. [**Freezing the Behavior of an LLM System Before Evolving It**](/en/blog/figer-comportement-systeme-llm), to establish a baseline;
 2. [**Observe Before Optimizing**](/en/blog/observer-avant-doptimiser), to make visible the elements that produce this behavior;

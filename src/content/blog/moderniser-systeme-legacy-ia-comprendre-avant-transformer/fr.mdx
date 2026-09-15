@@ -13,13 +13,9 @@ status: "published"
 
 > **Explorer un dépôt de code avec un agent est devenu rapide. Comprendre les comportements, les règles et les contraintes qu'il faut préserver avant de transformer le système reste un problème d'ingénierie.**
 
-Demander à un agent de code d'explorer une application existante est devenu relativement simple.
+Demander à un agent de code d'explorer une application existante est devenu relativement simple. En quelques minutes, il peut identifier les principaux modules, parcourir les dépendances, retrouver les points d'entrée, suivre certains appels, repérer des composants fortement couplés ou produire une première représentation de l'architecture.
 
-En quelques minutes, il peut identifier les principaux modules, parcourir les dépendances, retrouver les points d'entrée, suivre certains appels, repérer des composants fortement couplés ou produire une première représentation de l'architecture.
-
-Cette capacité change considérablement la manière d'aborder un système legacy.
-
-Une analyse qui demandait auparavant plusieurs heures de navigation dans le code peut désormais être accélérée. Nous pouvons demander à un agent de retrouver le parcours d'une transaction, d'expliquer le rôle d'un module, d'identifier les dépendances d'une classe ou de cartographier les appels autour d'un cas d'usage.
+Cette capacité change considérablement la manière d'aborder un système legacy. Une analyse qui demandait auparavant plusieurs heures de navigation dans le code peut désormais être accélérée. Nous pouvons demander à un agent de retrouver le parcours d'une transaction, d'expliquer le rôle d'un module, d'identifier les dépendances d'une classe ou de cartographier les appels autour d'un cas d'usage.
 
 Il devient alors tentant de poursuivre immédiatement :
 
@@ -30,19 +26,11 @@ Il devient alors tentant de poursuivre immédiatement :
 - Réécrire un module.
 - Ou demander directement à l'agent de produire la transformation.
 
-Pourtant, quelque chose manque entre ces deux étapes.
+Pourtant, quelque chose manque entre ces deux étapes. Avoir compris comment le code est organisé ne signifie pas nécessairement avoir compris ce que le système doit continuer à faire. Et dans un système qui fonctionne depuis plusieurs années, cette différence est loin d'être anodine.
 
-Avoir compris comment le code est organisé ne signifie pas nécessairement avoir compris ce que le système doit continuer à faire.
+Le code transporte des règles métier, mais aussi des compromis, des exceptions, des comportements implicites, des contraintes d'intégration et parfois des décisions dont la justification n'est plus documentée. Certaines lignes que nous considérons aujourd'hui comme inutiles sont peut-être devenues indispensables au fonctionnement réel du système.
 
-Et dans un système qui fonctionne depuis plusieurs années, cette différence est loin d'être anodine.
-
-Le code transporte des règles métier, mais aussi des compromis, des exceptions, des comportements implicites, des contraintes d'intégration et parfois des décisions dont la justification n'est plus documentée.
-
-Certaines lignes que nous considérons aujourd'hui comme inutiles sont peut-être devenues indispensables au fonctionnement réel du système.
-
-D'autres sont effectivement des vestiges qu'il faudrait supprimer.
-
-Le problème est précisément de savoir les distinguer.
+D'autres sont effectivement des vestiges qu'il faudrait supprimer. Le problème est précisément de savoir les distinguer.
 
 ```mermaid
 flowchart TD
@@ -65,59 +53,35 @@ flowchart TD
     J --> K[Décision de transformation]
 ```
 
-L'enjeu n'est donc probablement plus seulement d'accélérer la lecture du code.
-
-Il est de construire une compréhension suffisamment fiable pour décider ce que nous pouvons transformer, ce que nous devons préserver et ce que nous devons encore vérifier.
+L'enjeu n'est donc probablement plus seulement d'accélérer la lecture du code. Il est de construire une compréhension suffisamment fiable pour décider ce que nous pouvons transformer, ce que nous devons préserver et ce que nous devons encore vérifier.
 
 ---
 
 ## 1. Explorer un dépôt de code n'est plus le problème
 
-Pendant longtemps, l'une des difficultés d'un projet de modernisation consistait simplement à entrer dans le système.
+Pendant longtemps, l'une des difficultés d'un projet de modernisation consistait simplement à entrer dans le système. Il fallait identifier les modules, comprendre les conventions, parcourir les dépendances, retrouver les points d'entrée, suivre les appels entre plusieurs couches et reconstruire progressivement une représentation mentale de l'application.
 
-Il fallait identifier les modules, comprendre les conventions, parcourir les dépendances, retrouver les points d'entrée, suivre les appels entre plusieurs couches et reconstruire progressivement une représentation mentale de l'application.
+Sur un système ancien et volumineux, cette phase pouvait être particulièrement coûteuse. Les agents de code changent une partie de cette équation. Ils permettent d'interroger le dépôt plutôt que de le parcourir uniquement de manière linéaire.
 
-Sur un système ancien et volumineux, cette phase pouvait être particulièrement coûteuse.
+Nous pouvons leur demander où commence un traitement, quelles classes participent à une fonctionnalité, quelles tables sont utilisées, où une règle semble être appliquée ou quelles dépendances seraient touchées par une modification. Cette capacité est importante. Mais elle déplace aussi le problème.
 
-Les agents de code changent une partie de cette équation.
+Lorsque l'exploration devient plus rapide, nous pouvons facilement confondre vitesse d'accès à l'information et compréhension du système. L'agent retrouve une condition dans le code. Il peut expliquer ce qu'elle fait.
 
-Ils permettent d'interroger le dépôt plutôt que de le parcourir uniquement de manière linéaire.
-
-Nous pouvons leur demander où commence un traitement, quelles classes participent à une fonctionnalité, quelles tables sont utilisées, où une règle semble être appliquée ou quelles dépendances seraient touchées par une modification.
-
-Cette capacité est importante.
-
-Mais elle déplace aussi le problème.
-
-Lorsque l'exploration devient plus rapide, nous pouvons facilement confondre vitesse d'accès à l'information et compréhension du système.
-
-L'agent retrouve une condition dans le code.
-
-Il peut expliquer ce qu'elle fait.
-
-Il peut parfois retrouver les méthodes qui l'appellent.
-
-Il peut même proposer une interprétation de son intention.
+Il peut parfois retrouver les méthodes qui l'appellent. Il peut même proposer une interprétation de son intention.
 
 Mais cette interprétation n'établit pas nécessairement pourquoi cette condition existe, si elle correspond toujours à une règle métier ou si d'autres composants reposent implicitement sur son comportement.
 
 > **Lire n'est pas encore comprendre.**
 
-L'agent peut accélérer la lecture d'un système.
-
-La décision de le transformer exige de savoir quels comportements, règles et contraintes cette lecture permet réellement d'établir.
+L'agent peut accélérer la lecture d'un système. La décision de le transformer exige de savoir quels comportements, règles et contraintes cette lecture permet réellement d'établir.
 
 ---
 
 ## 2. L'illusion de compréhension
 
-Prenons un cas volontairement simple.
+Prenons un cas volontairement simple. Un système applique une règle particulière lorsqu'une transaction dépasse un certain montant. L'agent retrouve la condition dans le code, identifie la méthode concernée et constate que la valeur utilisée est définie directement dans le composant.
 
-Un système applique une règle particulière lorsqu'une transaction dépasse un certain montant. L'agent retrouve la condition dans le code, identifie la méthode concernée et constate que la valeur utilisée est définie directement dans le composant.
-
-La conclusion peut sembler évidente : nous avons découvert une règle métier mal implémentée, qu'il faudrait extraire dans une configuration ou dans un composant métier plus propre.
-
-Techniquement, cette analyse peut être correcte.
+La conclusion peut sembler évidente : nous avons découvert une règle métier mal implémentée, qu'il faudrait extraire dans une configuration ou dans un composant métier plus propre. Techniquement, cette analyse peut être correcte.
 
 Mais plusieurs questions restent ouvertes :
 
@@ -127,19 +91,11 @@ Mais plusieurs questions restent ouvertes :
 - Une application consommatrice dépend-elle de ce comportement ?
 - Des transactions existantes seraient-elles interprétées différemment si nous changions cette règle ?
 
-Le code nous donne une observation.
+Le code nous donne une observation. Il ne nous donne pas automatiquement toute l'histoire. Le danger apparaît lorsque nous transformons trop rapidement cette observation en certitude.
 
-Il ne nous donne pas automatiquement toute l'histoire.
+Cette situation devient encore plus délicate avec un agent capable de produire une explication cohérente. Une explication bien formulée peut donner une impression de compréhension supérieure au niveau réel de preuve dont nous disposons. Le problème ne vient donc pas seulement d'une éventuelle erreur du modèle.
 
-Le danger apparaît lorsque nous transformons trop rapidement cette observation en certitude.
-
-Cette situation devient encore plus délicate avec un agent capable de produire une explication cohérente. Une explication bien formulée peut donner une impression de compréhension supérieure au niveau réel de preuve dont nous disposons.
-
-Le problème ne vient donc pas seulement d'une éventuelle erreur du modèle.
-
-Il vient également de notre manière d'utiliser ce qu'il produit.
-
-Une analyse générée à partir du dépôt doit rester ce qu'elle est : une construction issue des éléments accessibles à l'agent.
+Il vient également de notre manière d'utiliser ce qu'il produit. Une analyse générée à partir du dépôt doit rester ce qu'elle est : une construction issue des éléments accessibles à l'agent.
 
 > **Une hypothèse issue du code n'est pas encore une règle métier.**
 
@@ -149,9 +105,7 @@ Elle devient réellement exploitable lorsqu'elle peut être reliée à d'autres 
 
 ## 3. Comprendre le code ou comprendre le système ?
 
-Cette distinction me semble fondamentale pour aborder la modernisation avec des agents.
-
-Comprendre le code consiste à reconstruire sa structure :
+Cette distinction me semble fondamentale pour aborder la modernisation avec des agents. Comprendre le code consiste à reconstruire sa structure :
 
 - Quels sont les modules ?
 - Quels composants s'appellent entre eux ?
@@ -169,29 +123,17 @@ Comprendre le système pose une question différente :
 - Quelles anomalies apparentes sont en réalité devenues des comportements contractuels ?
 - Et quelles parties du système ne comprenons-nous pas encore suffisamment ?
 
-Cette différence explique pourquoi une cartographie technique, même très détaillée, ne suffit pas toujours pour lancer une transformation.
+Cette différence explique pourquoi une cartographie technique, même très détaillée, ne suffit pas toujours pour lancer une transformation. Une application n'est pas uniquement constituée de classes, de modules et de dépendances. Elle produit un comportement observable dans un environnement donné.
 
-Une application n'est pas uniquement constituée de classes, de modules et de dépendances.
-
-Elle produit un comportement observable dans un environnement donné.
-
-C'est ce comportement que la modernisation devra finalement préserver, corriger ou faire évoluer.
-
-La structure nous aide à trouver où intervenir.
-
-La compréhension du système nous aide à décider ce que l'intervention a le droit de changer.
+C'est ce comportement que la modernisation devra finalement préserver, corriger ou faire évoluer. La structure nous aide à trouver où intervenir. La compréhension du système nous aide à décider ce que l'intervention a le droit de changer.
 
 ---
 
 ## 4. Ce qu'un système legacy transporte avec lui
 
-Un système legacy n'est pas simplement un système utilisant une ancienne technologie.
+Un système legacy n'est pas simplement un système utilisant une ancienne technologie. Il peut être techniquement ancien et parfaitement maîtrisé.
 
-Il peut être techniquement ancien et parfaitement maîtrisé.
-
-À l'inverse, une application relativement récente peut déjà être difficile à faire évoluer si ses responsabilités, ses comportements et ses dépendances sont mal compris.
-
-Ce qui rend généralement la modernisation délicate est ce que le système a accumulé avec le temps :
+À l'inverse, une application relativement récente peut déjà être difficile à faire évoluer si ses responsabilités, ses comportements et ses dépendances sont mal compris. Ce qui rend généralement la modernisation délicate est ce que le système a accumulé avec le temps :
 
 - Des règles métier ont été ajoutées.
 - Des exceptions sont apparues.
@@ -201,35 +143,21 @@ Ce qui rend généralement la modernisation délicate est ce que le système a a
 - Certaines contraintes temporaires sont devenues permanentes.
 - Et toutes ces décisions ne sont pas nécessairement présentes dans la documentation.
 
-Prenons un délai particulier avant le déclenchement d'un traitement.
+Prenons un délai particulier avant le déclenchement d'un traitement. Vu depuis le code, il peut sembler arbitraire. Il peut s'agir d'une mauvaise implémentation.
 
-Vu depuis le code, il peut sembler arbitraire.
-
-Il peut s'agir d'une mauvaise implémentation.
-
-Mais il peut également compenser le comportement d'un système externe, respecter une fenêtre de traitement bancaire ou protéger l'application contre une condition de concurrence observée plusieurs années auparavant.
-
-Même chose pour une duplication de données, un mécanisme de retry inhabituel, un format ancien encore supporté ou une séquence d'appels apparemment inutile.
+Mais il peut également compenser le comportement d'un système externe, respecter une fenêtre de traitement bancaire ou protéger l'application contre une condition de concurrence observée plusieurs années auparavant. Même chose pour une duplication de données, un mécanisme de retry inhabituel, un format ancien encore supporté ou une séquence d'appels apparemment inutile.
 
 > **Une anomalie apparente n'est pas nécessairement une erreur à supprimer.**
 
-Cela ne signifie pas qu'il faut conserver toutes les décisions historiques.
+Cela ne signifie pas qu'il faut conserver toutes les décisions historiques. Ce serait l'excès inverse.
 
-Ce serait l'excès inverse.
-
-La modernisation consiste justement à distinguer ce qui reste nécessaire de ce qui ne l'est plus.
-
-Pour y parvenir, nous devons sortir d'une lecture exclusivement structurelle du code.
+La modernisation consiste justement à distinguer ce qui reste nécessaire de ce qui ne l'est plus. Pour y parvenir, nous devons sortir d'une lecture exclusivement structurelle du code.
 
 ---
 
 ## 5. Le dépôt de code n'est qu'une partie de l'histoire
 
-Le dépôt de code constitue naturellement une source essentielle de connaissance.
-
-Il nous montre ce qui a été implémenté.
-
-Mais le comportement réel du système dépend souvent d'un ensemble plus large :
+Le dépôt de code constitue naturellement une source essentielle de connaissance. Il nous montre ce qui a été implémenté. Mais le comportement réel du système dépend souvent d'un ensemble plus large :
 
 - **Les tests** peuvent révéler des cas considérés comme suffisamment importants pour être protégés.
 - **La configuration** peut modifier profondément le comportement d'un même composant selon les environnements.
@@ -254,9 +182,7 @@ flowchart LR
     K --> T[Transformation maîtrisée]
 ```
 
-Cela change la manière d'utiliser un agent.
-
-Au lieu de lui demander uniquement :
+Cela change la manière d'utiliser un agent. Au lieu de lui demander uniquement :
 
 > « Explique-moi comment fonctionne cette application. »
 
@@ -269,23 +195,15 @@ Nous pouvons progressivement lui fournir ou lui faire explorer plusieurs sources
 - Quels consommateurs utilisent encore ce format ?
 - Existe-t-il des éléments contradictoires entre le code et la documentation ?
 
-L'objectif n'est plus simplement de générer une description du système.
-
-Il est de construire une compréhension traçable.
+L'objectif n'est plus simplement de générer une description du système. Il est de construire une compréhension traçable.
 
 ---
 
 ## 6. Passer de l'observation à la connaissance exploitable
 
-C'est ici qu'une discipline supplémentaire devient nécessaire.
+C'est ici qu'une discipline supplémentaire devient nécessaire. Lorsqu'un agent analyse un système, tout ce qu'il produit ne devrait pas avoir le même statut. Une observation directement visible dans le code n'a pas la même valeur qu'une interprétation.
 
-Lorsqu'un agent analyse un système, tout ce qu'il produit ne devrait pas avoir le même statut.
-
-Une observation directement visible dans le code n'a pas la même valeur qu'une interprétation.
-
-Une règle confirmée par plusieurs sources n'a pas le même niveau de confiance qu'une hypothèse issue d'une seule méthode.
-
-Nous pouvons représenter cette progression de manière simple.
+Une règle confirmée par plusieurs sources n'a pas le même niveau de confiance qu'une hypothèse issue d'une seule méthode. Nous pouvons représenter cette progression de manière simple.
 
 ```mermaid
 flowchart LR
@@ -296,9 +214,7 @@ flowchart LR
     E --> F[Connaissance exploitable]
 ```
 
-Supposons que l'agent observe qu'une demande dépassant un montant donné passe systématiquement par une validation supplémentaire.
-
-L'observation peut être formulée ainsi :
+Supposons que l'agent observe qu'une demande dépassant un montant donné passe systématiquement par une validation supplémentaire. L'observation peut être formulée ainsi :
 
 > « Une condition déclenche `manualReview()` lorsque le montant dépasse le seuil configuré. »
 
@@ -315,11 +231,7 @@ Nous pouvons ensuite chercher des éléments qui renforcent ou affaiblissent cet
 - Existe-t-il des cas qui contournent la règle ?
 - Un expert métier peut-il confirmer son intention ?
 
-À mesure que ces éléments convergent, l'hypothèse devient suffisamment fiable pour être utilisée dans la conception de la cible.
-
-Cette progression est importante parce qu'elle introduit une différence entre ce que l'agent **déduit** et ce que le projet considère comme **établi**.
-
-On pourrait par exemple utiliser quelques statuts simples :
+À mesure que ces éléments convergent, l'hypothèse devient suffisamment fiable pour être utilisée dans la conception de la cible. Cette progression est importante parce qu'elle introduit une différence entre ce que l'agent **déduit** et ce que le projet considère comme **établi**. On pourrait par exemple utiliser quelques statuts simples :
 
 | Statut | Signification |
 | --- | --- |
@@ -329,9 +241,7 @@ On pourrait par exemple utiliser quelques statuts simples :
 | Contradictoire | Plusieurs sources donnent des indications incompatibles |
 | Inconnu | Information nécessaire mais non déterminée |
 
-L'intérêt d'un tel mécanisme n'est pas de bureaucratiser l'analyse.
-
-Il est d'éviter qu'une hypothèse bien formulée se transforme silencieusement en spécification.
+L'intérêt d'un tel mécanisme n'est pas de bureaucratiser l'analyse. Il est d'éviter qu'une hypothèse bien formulée se transforme silencieusement en spécification.
 
 ---
 
@@ -357,41 +267,21 @@ Une partie de la qualité de l'analyse consiste précisément à ne pas inventer
 
 > **Ce que nous ne savons pas fait également partie de notre compréhension du système.**
 
-Les incertitudes devraient donc devenir des artefacts du workflow.
+Les incertitudes devraient donc devenir des artefacts du workflow. Elles peuvent être associées à leur contexte, aux sources déjà consultées, à leur impact potentiel et à la personne ou au système susceptible de les résoudre. Une question ouverte sur un ancien écran administratif n'a probablement pas la même priorité qu'une incertitude concernant la manière dont un montant financier est calculé.
 
-Elles peuvent être associées à leur contexte, aux sources déjà consultées, à leur impact potentiel et à la personne ou au système susceptible de les résoudre.
+Nous pouvons alors commencer à raisonner sur le risque. Une transformation qui touche uniquement des comportements bien compris peut avancer rapidement. Une transformation qui traverse plusieurs zones d'incertitude demande davantage de validation.
 
-Une question ouverte sur un ancien écran administratif n'a probablement pas la même priorité qu'une incertitude concernant la manière dont un montant financier est calculé.
-
-Nous pouvons alors commencer à raisonner sur le risque.
-
-Une transformation qui touche uniquement des comportements bien compris peut avancer rapidement.
-
-Une transformation qui traverse plusieurs zones d'incertitude demande davantage de validation.
-
-La confiance dans la transformation ne vient donc pas du nombre de fichiers analysés.
-
-Elle vient du rapport entre ce que nous savons, ce que nous pouvons prouver et ce que nous savons encore devoir vérifier.
+La confiance dans la transformation ne vient donc pas du nombre de fichiers analysés. Elle vient du rapport entre ce que nous savons, ce que nous pouvons prouver et ce que nous savons encore devoir vérifier.
 
 ---
 
 ## 8. Comprendre suffisamment pour transformer
 
-Une autre erreur serait d'en déduire qu'un système doit être entièrement documenté avant toute modification.
+Une autre erreur serait d'en déduire qu'un système doit être entièrement documenté avant toute modification. Sur une application importante, cette ambition serait souvent irréaliste. Nous pouvons toujours découvrir un nouveau cas particulier, une ancienne intégration ou une décision oubliée.
 
-Sur une application importante, cette ambition serait souvent irréaliste.
+L'objectif n'est pas d'atteindre une compréhension exhaustive. Il est d'atteindre une compréhension suffisante pour la transformation envisagée. Si nous voulons remplacer une bibliothèque isolée, le niveau de connaissance nécessaire peut être relativement local.
 
-Nous pouvons toujours découvrir un nouveau cas particulier, une ancienne intégration ou une décision oubliée.
-
-L'objectif n'est pas d'atteindre une compréhension exhaustive.
-
-Il est d'atteindre une compréhension suffisante pour la transformation envisagée.
-
-Si nous voulons remplacer une bibliothèque isolée, le niveau de connaissance nécessaire peut être relativement local.
-
-Si nous voulons extraire un domaine métier d'un monolithe, nous devons comprendre beaucoup plus précisément ses données, ses contrats, ses dépendances et ses invariants.
-
-Si nous voulons remplacer complètement un système, la couverture nécessaire devient encore plus large.
+Si nous voulons extraire un domaine métier d'un monolithe, nous devons comprendre beaucoup plus précisément ses données, ses contrats, ses dépendances et ses invariants. Si nous voulons remplacer complètement un système, la couverture nécessaire devient encore plus large.
 
 ```mermaid
 flowchart TD
@@ -411,15 +301,9 @@ flowchart TD
     I --> G
 ```
 
-Cette notion de compréhension suffisante me semble particulièrement importante lorsqu'on utilise des agents.
+Cette notion de compréhension suffisante me semble particulièrement importante lorsqu'on utilise des agents. Un agent peut toujours continuer à explorer. Il peut produire davantage de diagrammes, davantage de résumés, davantage de descriptions.
 
-Un agent peut toujours continuer à explorer.
-
-Il peut produire davantage de diagrammes, davantage de résumés, davantage de descriptions.
-
-Mais produire davantage d'informations ne signifie pas nécessairement réduire le risque.
-
-La bonne question devient plutôt :
+Mais produire davantage d'informations ne signifie pas nécessairement réduire le risque. La bonne question devient plutôt :
 
 > **Disposons-nous des connaissances nécessaires pour prendre cette décision de transformation ?**
 
@@ -430,52 +314,24 @@ Cela oblige à relier l'analyse à un objectif :
 - Quels contrats seront modifiés ?
 - Quelles zones restent trop incertaines pour avancer ?
 
-À partir de là, l'agent cesse progressivement d'être uniquement un outil d'exploration.
-
-Il devient un moyen d'accélérer un processus d'ingénierie dans lequel les observations, les hypothèses, les preuves et les décisions restent explicitement distinguées.
+À partir de là, l'agent cesse progressivement d'être uniquement un outil d'exploration. Il devient un moyen d'accélérer un processus d'ingénierie dans lequel les observations, les hypothèses, les preuves et les décisions restent explicitement distinguées.
 
 ---
 
 ## Conclusion : transformer commence avant la génération de code
 
-Les agents de code rendent l'exploration des systèmes existants beaucoup plus rapide.
+Les agents de code rendent l'exploration des systèmes existants beaucoup plus rapide. C'est déjà une évolution importante. Mais la modernisation d'un système legacy ne commence pas au moment où l'agent génère le nouveau code.
 
-C'est déjà une évolution importante.
+Elle commence lorsque nous essayons de déterminer ce que l'ancien système fait réellement, pourquoi il le fait et quelles propriétés doivent survivre à sa transformation. Le dépôt de code constitue un point d'entrée. Il ne constitue pas à lui seul la connaissance du système.
 
-Mais la modernisation d'un système legacy ne commence pas au moment où l'agent génère le nouveau code.
+Les tests, la configuration, les données, les traces, la documentation et l'expertise métier permettent de compléter cette représentation. L'agent peut nous aider à parcourir ces sources, à retrouver des relations et à formuler des hypothèses. Mais une hypothèse ne devrait pas devenir silencieusement une vérité.
 
-Elle commence lorsque nous essayons de déterminer ce que l'ancien système fait réellement, pourquoi il le fait et quelles propriétés doivent survivre à sa transformation.
+Elle doit pouvoir être reliée aux éléments qui la soutiennent, à son niveau de confiance et, lorsque cela est nécessaire, à une validation humaine. Il faut également accepter de conserver les incertitudes. Toutes les questions ne seront pas résolues immédiatement.
 
-Le dépôt de code constitue un point d'entrée.
+Toutes n'ont d'ailleurs pas besoin de l'être. L'objectif n'est pas de tout comprendre avant de commencer. Il est de savoir **ce que nous comprenons, sur quelles preuves cette compréhension repose et quelles incertitudes subsistent**.
 
-Il ne constitue pas à lui seul la connaissance du système.
+C'est à partir de cette matière que la modernisation peut réellement commencer. Car une fois le système suffisamment compris, une nouvelle question apparaît immédiatement. Comment transformer toutes ces observations, règles, comportements, contraintes et questions ouvertes en artefacts suffisamment structurés pour guider la suite du travail ?
 
-Les tests, la configuration, les données, les traces, la documentation et l'expertise métier permettent de compléter cette représentation.
-
-L'agent peut nous aider à parcourir ces sources, à retrouver des relations et à formuler des hypothèses.
-
-Mais une hypothèse ne devrait pas devenir silencieusement une vérité.
-
-Elle doit pouvoir être reliée aux éléments qui la soutiennent, à son niveau de confiance et, lorsque cela est nécessaire, à une validation humaine.
-
-Il faut également accepter de conserver les incertitudes.
-
-Toutes les questions ne seront pas résolues immédiatement.
-
-Toutes n'ont d'ailleurs pas besoin de l'être.
-
-L'objectif n'est pas de tout comprendre avant de commencer.
-
-Il est de savoir **ce que nous comprenons, sur quelles preuves cette compréhension repose et quelles incertitudes subsistent**.
-
-C'est à partir de cette matière que la modernisation peut réellement commencer.
-
-Car une fois le système suffisamment compris, une nouvelle question apparaît immédiatement.
-
-Comment transformer toutes ces observations, règles, comportements, contraintes et questions ouvertes en artefacts suffisamment structurés pour guider la suite du travail ?
-
-Autrement dit, comment passer d'une compréhension dispersée du système à des spécifications réellement exploitables par les développeurs, les architectes et les agents qui participeront à sa transformation ?
-
-C'est le sujet du prochain article de cette série :
+Autrement dit, comment passer d'une compréhension dispersée du système à des spécifications réellement exploitables par les développeurs, les architectes et les agents qui participeront à sa transformation ? C'est le sujet du prochain article de cette série :
 
 > **Passer du code aux spécifications exploitables.**
