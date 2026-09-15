@@ -466,11 +466,9 @@ Each step should use common vocabulary, stable identifiers, and understandable s
 
 It is also useful to distinguish multiple information levels.
 
-The first level answers: **what happened?**
-
-The second explains: **why was this decision made?**
-
-The third clarifies: **what effect did this decision have on what followed?**
+- The first level answers: **what happened?**
+- The second explains: **why was this decision made?**
+- The third clarifies: **what effect did this decision have on what followed?**
 
 Take a routing example.
 
@@ -528,11 +526,9 @@ They can ensure that sensitive requests always take a controlled route, that a r
 
 Assertions then become behavioral.
 
-For a refund request, a test can accept multiple response formulations while requiring that the order and applicable policy were consulted.
-
-For a payment request, the test can tolerate different explanations, but reject any trajectory that executes the action without confirmation.
-
-For document search, the test can verify that the response relies on authorized and sufficiently recent sources.
+- For a refund request, a test can accept multiple response formulations while requiring that the order and applicable policy were consulted.
+- For a payment request, the test can tolerate different explanations, but reject any trajectory that executes the action without confirmation.
+- For document search, the test can verify that the response relies on authorized and sufficiently recent sources.
 
 This approach reduces dependence on fragile text comparisons.
 

@@ -71,13 +71,10 @@ Elles indiquent que certaines variations sont acceptables et que d'autres ne le 
 
 Pourtant, elles restent souvent trop implicites pour devenir des critères de vérification.
 
-Que signifie exactement « demander une précision » ?
-
-À quel moment l'identifiant devient-il obligatoire ?
-
-Quelle information constitue une confirmation valide ?
-
-Comment vérifier que la donnée utilisée provient réellement du référentiel attendu ?
+- Que signifie exactement « demander une précision » ?
+- À quel moment l'identifiant devient-il obligatoire ?
+- Quelle information constitue une confirmation valide ?
+- Comment vérifier que la donnée utilisée provient réellement du référentiel attendu ?
 
 À partir du moment où un système repose en partie sur des décisions produites ou influencées par un LLM, cette imprécision devient difficile à conserver.
 
@@ -215,13 +212,10 @@ peut sembler rassurant.
 
 Mais une telle règle devient rapidement difficile à exploiter.
 
-Une confirmation est-elle nécessaire pour consulter une information ?
-
-Pour générer une simulation ?
-
-Pour modifier une préférence utilisateur ?
-
-Pour déclencher une opération irréversible ?
+- Une confirmation est-elle nécessaire pour consulter une information ?
+- Pour générer une simulation ?
+- Pour modifier une préférence utilisateur ?
+- Pour déclencher une opération irréversible ?
 
 Le contexte d'application fait partie de l'invariant.
 
@@ -264,11 +258,9 @@ Le texte de la clarification importe peu.
 
 Ce qui compte est la décision prise.
 
-Le système a-t-il reconnu qu'il ne disposait pas de suffisamment d'informations ?
-
-A-t-il choisi de demander une précision ?
-
-Ou a-t-il construit une hypothèse et poursuivi l'exécution ?
+- Le système a-t-il reconnu qu'il ne disposait pas de suffisamment d'informations ?
+- A-t-il choisi de demander une précision ?
+- Ou a-t-il construit une hypothèse et poursuivi l'exécution ?
 
 L'invariant porte sur cette bifurcation.
 
@@ -564,13 +556,10 @@ Une approche plus pragmatique consiste à commencer par une autre question :
 
 > **Quels comportements refuserions-nous de perdre lors de la prochaine évolution du système ?**
 
-Si nous changeons de modèle, quelle décision doit rester stable ?
-
-Si nous modifions le prompt système, quelle règle doit toujours être appliquée ?
-
-Si nous ajoutons un nouvel outil, quelle action doit rester impossible dans certaines conditions ?
-
-Si nous changeons la construction du contexte, quelles données doivent continuer à provenir de sources maîtrisées ?
+- Si nous changeons de modèle, quelle décision doit rester stable ?
+- Si nous modifions le prompt système, quelle règle doit toujours être appliquée ?
+- Si nous ajoutons un nouvel outil, quelle action doit rester impossible dans certaines conditions ?
+- Si nous changeons la construction du contexte, quelles données doivent continuer à provenir de sources maîtrisées ?
 
 Ces questions permettent de faire émerger progressivement les invariants réellement importants.
 
@@ -602,13 +591,10 @@ C'est cette frontière qui transforme progressivement une application difficile 
 
 La première partie de cette série cherchait à rendre le comportement compréhensible.
 
-Nous avons établi une référence.
-
-Nous avons rendu l'exécution observable.
-
-Nous avons reconstitué la trajectoire de décision.
-
-Nous avons identifié les surfaces sur lesquelles le comportement peut varier.
+- Nous avons établi une référence.
+- Nous avons rendu l'exécution observable.
+- Nous avons reconstitué la trajectoire de décision.
+- Nous avons identifié les surfaces sur lesquelles le comportement peut varier.
 
 Cette deuxième partie commence en définissant ce que nous voulons conserver sur ces surfaces.
 

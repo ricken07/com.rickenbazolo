@@ -50,15 +50,11 @@ It is cautious, understandable, and does not promise an operation the bank may n
 
 But what actually happened?
 
-Did the system consult the status of the transfer in question?
-
-Did it identify that the customer was referring to a specific transaction?
-
-Did it call the banking service that retrieves that transaction?
-
-Did it verify the cancellation conditions specific to that type of transfer?
-
-Or did it simply generate a plausible answer from general knowledge contained in the model?
+- Did the system consult the status of the transfer in question?
+- Did it identify that the customer was referring to a specific transaction?
+- Did it call the banking service that retrieves that transaction?
+- Did it verify the cancellation conditions specific to that type of transfer?
+- Or did it simply generate a plausible answer from general knowledge contained in the model?
 
 The answer can be correct in form while being incorrect from the perspective of the expected system.
 
@@ -343,17 +339,12 @@ If the user still receives an empty or incoherent answer, the problem is no long
 
 The final step is to observe what the behavior actually produced.
 
-Did the user get the information they were looking for?
-
-Did they continue with the proposed flow?
-
-Was the banking action executed?
-
-Did the recommendation lead to playback?
-
-Did an advisor have to take over the conversation?
-
-Did the user immediately rephrase the same request?
+- Did the user get the information they were looking for?
+- Did they continue with the proposed flow?
+- Was the banking action executed?
+- Did the recommendation lead to playback?
+- Did an advisor have to take over the conversation?
+- Did the user immediately rephrase the same request?
 
 An answer can look correct in isolation while still failing to achieve the business goal.
 
@@ -709,17 +700,12 @@ When a result is unsatisfactory, the model is only one possible cause among othe
 
 The real challenge is therefore to make visible the chain that links the user's request to the final result.
 
-Observe the input.
-
-Observe the context.
-
-Observe the decisions.
-
-Observe the tools.
-
-Observe the validations.
-
-Observe the business result.
+- Observe the input.
+- Observe the context.
+- Observe the decisions.
+- Observe the tools.
+- Observe the validations.
+- Observe the business result.
 
 That visibility changes how the system evolves.
 

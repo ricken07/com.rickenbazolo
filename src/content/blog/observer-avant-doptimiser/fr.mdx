@@ -50,15 +50,11 @@ Elle est prudente, compréhensible et ne promet pas une opération que la banque
 
 Mais que s'est-il réellement passé ?
 
-Le système a-t-il consulté le statut du virement concerné ?
-
-A-t-il identifié que le client faisait référence à une transaction précise ?
-
-A-t-il appelé le service bancaire permettant de récupérer cette transaction ?
-
-A-t-il vérifié les conditions d'annulation propres à ce type de virement ?
-
-Ou a-t-il simplement généré une réponse plausible à partir de connaissances générales présentes dans le modèle ?
+- Le système a-t-il consulté le statut du virement concerné ?
+- A-t-il identifié que le client faisait référence à une transaction précise ?
+- A-t-il appelé le service bancaire permettant de récupérer cette transaction ?
+- A-t-il vérifié les conditions d'annulation propres à ce type de virement ?
+- Ou a-t-il simplement généré une réponse plausible à partir de connaissances générales présentes dans le modèle ?
 
 La réponse peut être correcte sur la forme tout en étant incorrecte du point de vue du système attendu.
 
@@ -343,17 +339,12 @@ Si l'utilisateur reçoit malgré tout une réponse vide ou incohérente, le prob
 
 La dernière étape consiste à observer ce que le comportement a réellement produit.
 
-L'utilisateur a-t-il obtenu l'information recherchée ?
-
-A-t-il poursuivi le parcours proposé ?
-
-L'action bancaire a-t-elle été exécutée ?
-
-La recommandation a-t-elle conduit au lancement d'un contenu ?
-
-Un conseiller a-t-il dû reprendre la conversation ?
-
-L'utilisateur a-t-il reformulé immédiatement la même demande ?
+- L'utilisateur a-t-il obtenu l'information recherchée ?
+- A-t-il poursuivi le parcours proposé ?
+- L'action bancaire a-t-elle été exécutée ?
+- La recommandation a-t-elle conduit au lancement d'un contenu ?
+- Un conseiller a-t-il dû reprendre la conversation ?
+- L'utilisateur a-t-il reformulé immédiatement la même demande ?
 
 Une réponse peut sembler correcte lors d'une évaluation isolée tout en échouant à atteindre l'objectif métier.
 
@@ -709,17 +700,12 @@ Lorsqu'un résultat est insatisfaisant, le modèle n'est qu'une cause possible p
 
 Le véritable enjeu consiste donc à rendre visible la chaîne qui relie la demande de l'utilisateur au résultat final.
 
-Observer l'entrée.
-
-Observer le contexte.
-
-Observer les décisions.
-
-Observer les outils.
-
-Observer les validations.
-
-Observer le résultat métier.
+- Observer l'entrée.
+- Observer le contexte.
+- Observer les décisions.
+- Observer les outils.
+- Observer les validations.
+- Observer le résultat métier.
 
 Cette visibilité transforme la manière de faire évoluer le système.
 

@@ -71,13 +71,10 @@ They indicate that some variations are acceptable and others are not.
 
 Yet they often remain too implicit to become verification criteria.
 
-What exactly does « asking for clarification » mean?
-
-At what point does the identifier become mandatory?
-
-What information counts as a valid confirmation?
-
-How do we verify that the data used actually comes from the expected reference system?
+- What exactly does « asking for clarification » mean?
+- At what point does the identifier become mandatory?
+- What information counts as a valid confirmation?
+- How do we verify that the data used actually comes from the expected reference system?
 
 Once a system relies, even partly, on decisions produced or influenced by an LLM, this vagueness becomes hard to sustain.
 
@@ -215,13 +212,10 @@ may sound reassuring.
 
 But such a rule quickly becomes hard to work with.
 
-Is a confirmation needed to look up information?
-
-To generate a simulation?
-
-To change a user preference?
-
-To trigger an irreversible operation?
+- Is a confirmation needed to look up information?
+- To generate a simulation?
+- To change a user preference?
+- To trigger an irreversible operation?
 
 The context of application is part of the invariant.
 
@@ -264,11 +258,9 @@ The wording of the clarification matters little.
 
 What matters is the decision made.
 
-Did the system recognize that it lacked sufficient information?
-
-Did it choose to ask for a precision?
-
-Or did it build an assumption and continue execution?
+- Did the system recognize that it lacked sufficient information?
+- Did it choose to ask for a precision?
+- Or did it build an assumption and continue execution?
 
 The invariant concerns this fork in the road.
 
@@ -564,13 +556,10 @@ A more pragmatic approach starts with a different question:
 
 > **Which behaviors would we refuse to lose in the system's next evolution?**
 
-If we change models, which decision must remain stable?
-
-If we modify the system prompt, which rule must always be applied?
-
-If we add a new tool, which action must remain impossible under certain conditions?
-
-If we change how context is built, which data must keep coming from controlled sources?
+- If we change models, which decision must remain stable?
+- If we modify the system prompt, which rule must always be applied?
+- If we add a new tool, which action must remain impossible under certain conditions?
+- If we change how context is built, which data must keep coming from controlled sources?
 
 These questions progressively surface the invariants that truly matter.
 
@@ -602,13 +591,10 @@ This is the boundary that progressively turns an application that is hard to com
 
 The first part of this series aimed to make behavior understandable.
 
-We established a reference point.
-
-We made execution observable.
-
-We reconstructed the decision trajectory.
-
-We identified the surfaces on which behavior can vary.
+- We established a reference point.
+- We made execution observable.
+- We reconstructed the decision trajectory.
+- We identified the surfaces on which behavior can vary.
 
 This second part begins by defining what we want to preserve on those surfaces.
 

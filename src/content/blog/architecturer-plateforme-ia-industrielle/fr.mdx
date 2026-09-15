@@ -85,13 +85,10 @@ C'est généralement à ce moment-là que le véritable sujet d'architecture com
 
 Lorsqu'une nouvelle technologie apparaît dans l'écosystème IA, il peut être tentant de structurer l'architecture autour d'elle.
 
-Un nouveau framework propose une meilleure orchestration.
-
-Un fournisseur expose un modèle plus performant.
-
-Un protocole simplifie la communication avec les outils.
-
-Une nouvelle solution de recherche améliore l'accès à la connaissance.
+- Un nouveau framework propose une meilleure orchestration.
+- Un fournisseur expose un modèle plus performant.
+- Un protocole simplifie la communication avec les outils.
+- Une nouvelle solution de recherche améliore l'accès à la connaissance.
 
 Ces évolutions sont importantes, mais elles appartiennent précisément à la partie du système qui change rapidement.
 
@@ -162,13 +159,10 @@ flowchart LR
     KA --> DS[Search / RAG / Enterprise Data]
 ```
 
-Un `Model Adapter` peut isoler les différences entre plusieurs fournisseurs.
-
-Un `Agent Runtime Adapter` permet d'exécuter certaines capacités agentiques sans faire du framework utilisé le centre de l'architecture.
-
-Un `Tool Adapter` fournit une frontière avec les services et outils de l'entreprise.
-
-Un `Knowledge Adapter` découple l'exécution des mécanismes utilisés pour rechercher ou préparer le contexte.
+- Un `Model Adapter` peut isoler les différences entre plusieurs fournisseurs.
+- Un `Agent Runtime Adapter` permet d'exécuter certaines capacités agentiques sans faire du framework utilisé le centre de l'architecture.
+- Un `Tool Adapter` fournit une frontière avec les services et outils de l'entreprise.
+- Un `Knowledge Adapter` découple l'exécution des mécanismes utilisés pour rechercher ou préparer le contexte.
 
 Le cœur du système peut alors raisonner avec ses propres concepts :
 
@@ -208,17 +202,12 @@ Mais toutes les décisions nécessaires à cette exécution ne devraient pas lui
 
 Prenons quelques questions simples.
 
-Ce tenant peut-il utiliser ce modèle ?
-
-Cette information peut-elle quitter l'infrastructure interne ?
-
-Cet utilisateur est-il autorisé à appeler cet outil ?
-
-Quelle limite de consommation doit s'appliquer ?
-
-Quelle stratégie de fallback est acceptable ?
-
-Quel fournisseur est autorisé pour cette classification de données ?
+- Ce tenant peut-il utiliser ce modèle ?
+- Cette information peut-elle quitter l'infrastructure interne ?
+- Cet utilisateur est-il autorisé à appeler cet outil ?
+- Quelle limite de consommation doit s'appliquer ?
+- Quelle stratégie de fallback est acceptable ?
+- Quel fournisseur est autorisé pour cette classification de données ?
 
 Ce sont des décisions qui relèvent davantage de la gouvernance de la plateforme que de l'implémentation d'un workflow particulier.
 
@@ -411,11 +400,9 @@ D'un point de vue purement technique, cette stratégie semble raisonnable.
 
 Mais le modèle B peut avoir un comportement différent.
 
-Son coût peut être plus élevé.
-
-Son infrastructure d'hébergement peut être située ailleurs.
-
-Ses politiques de conservation peuvent différer.
+- Son coût peut être plus élevé.
+- Son infrastructure d'hébergement peut être située ailleurs.
+- Ses politiques de conservation peuvent différer.
 
 Le fallback n'est donc plus uniquement un mécanisme de disponibilité.
 
@@ -445,15 +432,11 @@ La résilience ne doit pas devenir une porte permettant de contourner la gouvern
 
 Une plateforme distribuée doit naturellement être observable.
 
-Latence.
-
-Disponibilité.
-
-Erreurs.
-
-Consommation.
-
-Saturation.
+- Latence.
+- Disponibilité.
+- Erreurs.
+- Consommation.
+- Saturation.
 
 Ces métriques permettent de comprendre la santé technique du système.
 
@@ -480,15 +463,11 @@ Cette trajectoire peut ensuite être enrichie avec le modèle réellement utilis
 
 Il devient alors utile de distinguer plusieurs niveaux d'observation.
 
-Les **métriques** décrivent la santé globale.
-
-Les **logs** décrivent les événements techniques.
-
-Les **traces distribuées** reconstruisent le chemin emprunté par une requête entre plusieurs composants.
-
-Les **traces d'exécution IA** apportent le contexte nécessaire pour comprendre comment les capacités ont été utilisées.
-
-Enfin, l'**audit** répond à une autre question : qui a utilisé quelle capacité, dans quel contexte et sous quelle politique ?
+- Les **métriques** décrivent la santé globale.
+- Les **logs** décrivent les événements techniques.
+- Les **traces distribuées** reconstruisent le chemin emprunté par une requête entre plusieurs composants.
+- Les **traces d'exécution IA** apportent le contexte nécessaire pour comprendre comment les capacités ont été utilisées.
+- Enfin, l'**audit** répond à une autre question : qui a utilisé quelle capacité, dans quel contexte et sous quelle politique ?
 
 Cette dernière dimension prend encore plus d'importance lorsque l'on introduit des comportements agentiques.
 
@@ -627,17 +606,12 @@ Une plateforme IA ne devrait probablement pas chercher en priorité à protéger
 
 Elle devrait protéger certaines propriétés du système.
 
-Le **découplage**, pour permettre aux implémentations d'évoluer sans transformer l'ensemble de l'architecture.
-
-L'**isolation**, pour empêcher un tenant, une donnée ou une exécution de sortir de son périmètre autorisé.
-
-Le **contrôle**, pour que les décisions structurantes restent portées par la plateforme et non dispersées dans chaque intégration.
-
-La **résilience**, pour continuer à fonctionner sans contourner les règles définies.
-
-L'**observabilité**, pour comprendre la santé technique et opérationnelle du système.
-
-La **traçabilité**, pour reconstruire pourquoi une route, un modèle, un outil ou une donnée ont été utilisés.
+- Le **découplage**, pour permettre aux implémentations d'évoluer sans transformer l'ensemble de l'architecture.
+- L'**isolation**, pour empêcher un tenant, une donnée ou une exécution de sortir de son périmètre autorisé.
+- Le **contrôle**, pour que les décisions structurantes restent portées par la plateforme et non dispersées dans chaque intégration.
+- La **résilience**, pour continuer à fonctionner sans contourner les règles définies.
+- L'**observabilité**, pour comprendre la santé technique et opérationnelle du système.
+- La **traçabilité**, pour reconstruire pourquoi une route, un modèle, un outil ou une donnée ont été utilisés.
 
 Ces propriétés sont finalement beaucoup plus durables que les technologies utilisées pour les implémenter.
 

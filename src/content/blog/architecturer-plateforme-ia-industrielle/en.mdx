@@ -85,13 +85,10 @@ This is usually when the real architecture topic begins.
 
 When a new technology appears in the AI ecosystem, it can be tempting to structure the architecture around it.
 
-A new framework offers better orchestration.
-
-A provider exposes a more capable model.
-
-A protocol simplifies communication with tools.
-
-A new search solution improves access to knowledge.
+- A new framework offers better orchestration.
+- A provider exposes a more capable model.
+- A protocol simplifies communication with tools.
+- A new search solution improves access to knowledge.
 
 These developments matter, but they belong precisely to the part of the system that changes quickly.
 
@@ -162,13 +159,10 @@ flowchart LR
     KA --> DS[Search / RAG / Enterprise Data]
 ```
 
-A `Model Adapter` can isolate the differences between several providers.
-
-An `Agent Runtime Adapter` makes it possible to run certain agentic capabilities without making the chosen framework the center of the architecture.
-
-A `Tool Adapter` provides a boundary with the company's services and tools.
-
-A `Knowledge Adapter` decouples execution from the mechanisms used to retrieve or prepare context.
+- A `Model Adapter` can isolate the differences between several providers.
+- An `Agent Runtime Adapter` makes it possible to run certain agentic capabilities without making the chosen framework the center of the architecture.
+- A `Tool Adapter` provides a boundary with the company's services and tools.
+- A `Knowledge Adapter` decouples execution from the mechanisms used to retrieve or prepare context.
 
 The core of the system can then reason with its own concepts:
 
@@ -208,17 +202,12 @@ But not all the decisions required for this execution should belong to it.
 
 Let's take a few simple questions.
 
-Can this tenant use this model?
-
-Can this information leave the internal infrastructure?
-
-Is this user allowed to call this tool?
-
-Which consumption limit should apply?
-
-Which fallback strategy is acceptable?
-
-Which provider is authorized for this data classification?
+- Can this tenant use this model?
+- Can this information leave the internal infrastructure?
+- Is this user allowed to call this tool?
+- Which consumption limit should apply?
+- Which fallback strategy is acceptable?
+- Which provider is authorized for this data classification?
 
 These decisions belong more to platform governance than to the implementation of a particular workflow.
 
@@ -411,11 +400,9 @@ From a purely technical standpoint, this strategy seems reasonable.
 
 But model B may behave differently.
 
-Its cost may be higher.
-
-Its hosting infrastructure may be located elsewhere.
-
-Its retention policies may differ.
+- Its cost may be higher.
+- Its hosting infrastructure may be located elsewhere.
+- Its retention policies may differ.
 
 The fallback is therefore no longer only an availability mechanism.
 
@@ -445,15 +432,11 @@ Resilience must not become a door for bypassing governance when the system encou
 
 A distributed platform must naturally be observable.
 
-Latency.
-
-Availability.
-
-Errors.
-
-Consumption.
-
-Saturation.
+- Latency.
+- Availability.
+- Errors.
+- Consumption.
+- Saturation.
 
 These metrics help us understand the technical health of the system.
 
@@ -480,15 +463,11 @@ This trajectory can then be enriched with the model actually used, its version, 
 
 It then becomes useful to distinguish several levels of observation.
 
-**Metrics** describe overall health.
-
-**Logs** describe technical events.
-
-**Distributed traces** reconstruct the path a request took across several components.
-
-**AI execution traces** provide the context needed to understand how the capabilities were used.
-
-Finally, **audit** answers another question: who used which capability, in what context, and under which policy?
+- **Metrics** describe overall health.
+- **Logs** describe technical events.
+- **Distributed traces** reconstruct the path a request took across several components.
+- **AI execution traces** provide the context needed to understand how the capabilities were used.
+- Finally, **audit** answers another question: who used which capability, in what context, and under which policy?
 
 This last dimension becomes even more important once agentic behaviors are introduced.
 
@@ -627,17 +606,12 @@ An AI platform should probably not seek first and foremost to protect a technolo
 
 It should protect certain properties of the system.
 
-**Decoupling**, so that implementations can evolve without transforming the entire architecture.
-
-**Isolation**, to prevent a tenant, a piece of data, or an execution from leaving its authorized perimeter.
-
-**Control**, so that structuring decisions remain carried by the platform rather than scattered across every integration.
-
-**Resilience**, to keep operating without bypassing the defined rules.
-
-**Observability**, to understand the technical and operational health of the system.
-
-**Traceability**, to reconstruct why a route, a model, a tool, or a piece of data was used.
+- **Decoupling**, so that implementations can evolve without transforming the entire architecture.
+- **Isolation**, to prevent a tenant, a piece of data, or an execution from leaving its authorized perimeter.
+- **Control**, so that structuring decisions remain carried by the platform rather than scattered across every integration.
+- **Resilience**, to keep operating without bypassing the defined rules.
+- **Observability**, to understand the technical and operational health of the system.
+- **Traceability**, to reconstruct why a route, a model, a tool, or a piece of data was used.
 
 These properties are ultimately far more durable than the technologies used to implement them.
 
