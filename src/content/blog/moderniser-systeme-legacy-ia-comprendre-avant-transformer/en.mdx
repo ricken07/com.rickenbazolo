@@ -21,19 +21,14 @@ This capability considerably changes how we approach a legacy system.
 
 An analysis that used to require hours of navigating through the code can now be accelerated. We can ask an agent to trace the path of a transaction, explain the role of a module, identify the dependencies of a class, or map the calls around a use case.
 
-It then becomes tempting to move on immediately.
+It then becomes tempting to move on immediately:
 
-Propose a new architecture.
-
-Migrate a framework.
-
-Extract a microservice.
-
-Replace an obsolete dependency.
-
-Rewrite a module.
-
-Or ask the agent directly to produce the transformation.
+- Propose a new architecture.
+- Migrate a framework.
+- Extract a microservice.
+- Replace an obsolete dependency.
+- Rewrite a module.
+- Or ask the agent directly to produce the transformation.
 
 Yet something is missing between these two steps.
 
@@ -124,17 +119,13 @@ The conclusion may seem obvious: we have discovered a poorly implemented busines
 
 Technically, this analysis may be correct.
 
-But several questions remain open.
+But several questions remain open:
 
-Does this value still match the current rule?
-
-Is it specific to a product, a country, or an old contract?
-
-Is there a batch process that applies a different rule?
-
-Does a consuming application depend on this behavior?
-
-Would existing transactions be interpreted differently if we changed this rule?
+- Does this value still match the current rule?
+- Is it specific to a product, a country, or an old contract?
+- Is there a batch process that applies a different rule?
+- Does a consuming application depend on this behavior?
+- Would existing transactions be interpreted differently if we changed this rule?
 
 The code gives us an observation.
 
@@ -160,33 +151,23 @@ It becomes truly actionable when it can be connected to other elements that conf
 
 This distinction seems fundamental to me when approaching modernization with agents.
 
-Understanding the code means rebuilding its structure.
+Understanding the code means rebuilding its structure:
 
-What are the modules?
+- What are the modules?
+- Which components call each other?
+- Where is the data transformed?
+- Which dependencies are used?
+- Which execution paths can we identify?
 
-Which components call each other?
+Understanding the system asks a different question:
 
-Where is the data transformed?
-
-Which dependencies are used?
-
-Which execution paths can we identify?
-
-Understanding the system asks a different question.
-
-Why do these paths exist?
-
-Which behaviors are expected?
-
-Which properties must remain true after the transformation?
-
-Which consumers depend on the system?
-
-Which operational constraints have shaped its architecture?
-
-Which apparent anomalies have in fact become contractual behaviors?
-
-And which parts of the system do we still not understand well enough?
+- Why do these paths exist?
+- Which behaviors are expected?
+- Which properties must remain true after the transformation?
+- Which consumers depend on the system?
+- Which operational constraints have shaped its architecture?
+- Which apparent anomalies have in fact become contractual behaviors?
+- And which parts of the system do we still not understand well enough?
 
 This difference explains why a technical map, even a very detailed one, is not always enough to launch a transformation.
 
@@ -210,21 +191,15 @@ It can be technically old and perfectly well mastered.
 
 Conversely, a relatively recent application can already be hard to evolve if its responsibilities, behaviors, and dependencies are poorly understood.
 
-What generally makes modernization delicate is what the system has accumulated over time.
+What generally makes modernization delicate is what the system has accumulated over time:
 
-Business rules have been added.
-
-Exceptions have appeared.
-
-Partners have imposed certain contracts.
-
-Data migrations have left compatibility layers behind that must be maintained.
-
-Incidents have led to the addition of protection mechanisms.
-
-Some temporary constraints have become permanent.
-
-And not all of these decisions are necessarily present in the documentation.
+- Business rules have been added.
+- Exceptions have appeared.
+- Partners have imposed certain contracts.
+- Data migrations have left compatibility layers behind that must be maintained.
+- Incidents have led to the addition of protection mechanisms.
+- Some temporary constraints have become permanent.
+- And not all of these decisions are necessarily present in the documentation.
 
 Take a specific delay before a process is triggered.
 
@@ -254,23 +229,16 @@ The code repository is naturally an essential source of knowledge.
 
 It shows us what has been implemented.
 
-But the actual behavior of the system often depends on a broader set of elements.
+But the actual behavior of the system often depends on a broader set of elements:
 
-Tests can reveal cases considered important enough to be protected.
-
-Configuration can profoundly change the behavior of the same component from one environment to another.
-
-Data helps us understand which cases actually exist and how often.
-
-Logs and traces show the paths that are actually executed.
-
-Operations scripts sometimes reveal procedures that do not appear in the application itself.
-
-Documentation contains intentions that are no longer necessarily visible in the implementation.
-
-Change history can help trace the origin of certain decisions.
-
-And business expertise can sometimes explain in a few minutes a rule that no static analysis could establish with certainty.
+- **Tests** can reveal cases considered important enough to be protected.
+- **Configuration** can profoundly change the behavior of the same component from one environment to another.
+- **Data** helps us understand which cases actually exist and how often.
+- **Logs and traces** show the paths that are actually executed.
+- **Operations scripts** sometimes reveal procedures that do not appear in the application itself.
+- **Documentation** contains intentions that are no longer necessarily visible in the implementation.
+- **Change history** can help trace the origin of certain decisions.
+- **Business expertise** can sometimes explain in a few minutes a rule that no static analysis could establish with certainty.
 
 ```mermaid
 flowchart LR
@@ -292,19 +260,14 @@ Instead of only asking it:
 
 > "Explain to me how this application works."
 
-We can progressively provide it with, or have it explore, several sources to answer more precise questions.
+We can progressively provide it with, or have it explore, several sources to answer more precise questions:
 
-Where does this rule appear?
-
-Is there a test that protects it?
-
-Which configurations can change its behavior?
-
-Do we actually observe this path in the logs?
-
-Which consumers still use this format?
-
-Are there contradictions between the code and the documentation?
+- Where does this rule appear?
+- Is there a test that protects it?
+- Which configurations can change its behavior?
+- Do we actually observe this path in the logs?
+- Which consumers still use this format?
+- Are there contradictions between the code and the documentation?
 
 The goal is no longer simply to generate a description of the system.
 
@@ -343,19 +306,14 @@ The hypothesis becomes:
 
 > "Operations above this threshold require human validation."
 
-We can then look for elements that strengthen or weaken this interpretation.
+We can then look for elements that strengthen or weaken this interpretation:
 
-Does an integration test cover this scenario?
-
-Does the functional documentation mention this validation?
-
-Is the threshold identical in every environment?
-
-Do the traces actually show this step being executed?
-
-Are there cases that bypass the rule?
-
-Can a business expert confirm its intent?
+- Does an integration test cover this scenario?
+- Does the functional documentation mention this validation?
+- Is the threshold identical in every environment?
+- Do the traces actually show this step being executed?
+- Are there cases that bypass the rule?
+- Can a business expert confirm its intent?
 
 As these elements converge, the hypothesis becomes reliable enough to be used in the design of the target.
 
@@ -379,29 +337,21 @@ It is to prevent a well-worded hypothesis from silently turning into a specifica
 
 ## 7. Also Making Visible What We Do Not Know
 
-When we document a system, we naturally tend to keep the answers.
+When we document a system, we naturally tend to keep the answers:
 
-The modules identified.
+- The modules identified.
+- The flows understood.
+- The rules recovered.
+- The dependencies discovered.
 
-The flows understood.
+Yet, in a modernization project, the open questions can be just as important:
 
-The rules recovered.
-
-The dependencies discovered.
-
-Yet, in a modernization project, the open questions can be just as important.
-
-Why do two apparently equivalent processes use different rules?
-
-Is this table still being populated?
-
-Must this format still be accepted?
-
-Is this batch still used in production?
-
-Is this behavior a business rule or a historical workaround?
-
-What actually happens when this external service does not respond?
+- Why do two apparently equivalent processes use different rules?
+- Is this table still being populated?
+- Must this format still be accepted?
+- Is this batch still used in production?
+- Is this behavior a business rule or a historical workaround?
+- What actually happens when this external service does not respond?
 
 Part of the quality of the analysis lies precisely in not inventing an answer when the available elements do not allow a conclusion.
 
@@ -473,15 +423,12 @@ The right question becomes instead:
 
 > **Do we have the knowledge needed to make this transformation decision?**
 
-This forces us to connect the analysis to a goal.
+This forces us to connect the analysis to a goal:
 
-Which behaviors will potentially be affected?
-
-Which rules must we protect?
-
-Which contracts will be changed?
-
-Which areas remain too uncertain to move forward?
+- Which behaviors will potentially be affected?
+- Which rules must we protect?
+- Which contracts will be changed?
+- Which areas remain too uncertain to move forward?
 
 From there, the agent progressively stops being only an exploration tool.
 

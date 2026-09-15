@@ -21,19 +21,14 @@ Cette capacité change considérablement la manière d'aborder un système legac
 
 Une analyse qui demandait auparavant plusieurs heures de navigation dans le code peut désormais être accélérée. Nous pouvons demander à un agent de retrouver le parcours d'une transaction, d'expliquer le rôle d'un module, d'identifier les dépendances d'une classe ou de cartographier les appels autour d'un cas d'usage.
 
-Il devient alors tentant de poursuivre immédiatement.
+Il devient alors tentant de poursuivre immédiatement :
 
-Proposer une nouvelle architecture.
-
-Migrer un framework.
-
-Extraire un microservice.
-
-Remplacer une dépendance obsolète.
-
-Réécrire un module.
-
-Ou demander directement à l'agent de produire la transformation.
+- Proposer une nouvelle architecture.
+- Migrer un framework.
+- Extraire un microservice.
+- Remplacer une dépendance obsolète.
+- Réécrire un module.
+- Ou demander directement à l'agent de produire la transformation.
 
 Pourtant, quelque chose manque entre ces deux étapes.
 
@@ -124,17 +119,13 @@ La conclusion peut sembler évidente : nous avons découvert une règle métier 
 
 Techniquement, cette analyse peut être correcte.
 
-Mais plusieurs questions restent ouvertes.
+Mais plusieurs questions restent ouvertes :
 
-Cette valeur correspond-elle encore à la règle actuelle ?
-
-Est-elle spécifique à un produit, à un pays ou à un ancien contrat ?
-
-Existe-t-il un traitement batch qui applique une règle différente ?
-
-Une application consommatrice dépend-elle de ce comportement ?
-
-Des transactions existantes seraient-elles interprétées différemment si nous changions cette règle ?
+- Cette valeur correspond-elle encore à la règle actuelle ?
+- Est-elle spécifique à un produit, à un pays ou à un ancien contrat ?
+- Existe-t-il un traitement batch qui applique une règle différente ?
+- Une application consommatrice dépend-elle de ce comportement ?
+- Des transactions existantes seraient-elles interprétées différemment si nous changions cette règle ?
 
 Le code nous donne une observation.
 
@@ -160,33 +151,23 @@ Elle devient réellement exploitable lorsqu'elle peut être reliée à d'autres 
 
 Cette distinction me semble fondamentale pour aborder la modernisation avec des agents.
 
-Comprendre le code consiste à reconstruire sa structure.
+Comprendre le code consiste à reconstruire sa structure :
 
-Quels sont les modules ?
+- Quels sont les modules ?
+- Quels composants s'appellent entre eux ?
+- Où les données sont-elles transformées ?
+- Quelles dépendances sont utilisées ?
+- Quels chemins d'exécution pouvons-nous identifier ?
 
-Quels composants s'appellent entre eux ?
+Comprendre le système pose une question différente :
 
-Où les données sont-elles transformées ?
-
-Quelles dépendances sont utilisées ?
-
-Quels chemins d'exécution pouvons-nous identifier ?
-
-Comprendre le système pose une question différente.
-
-Pourquoi ces chemins existent-ils ?
-
-Quels comportements sont attendus ?
-
-Quelles propriétés doivent rester vraies après la transformation ?
-
-Quels consommateurs dépendent du système ?
-
-Quelles contraintes opérationnelles ont influencé son architecture ?
-
-Quelles anomalies apparentes sont en réalité devenues des comportements contractuels ?
-
-Et quelles parties du système ne comprenons-nous pas encore suffisamment ?
+- Pourquoi ces chemins existent-ils ?
+- Quels comportements sont attendus ?
+- Quelles propriétés doivent rester vraies après la transformation ?
+- Quels consommateurs dépendent du système ?
+- Quelles contraintes opérationnelles ont influencé son architecture ?
+- Quelles anomalies apparentes sont en réalité devenues des comportements contractuels ?
+- Et quelles parties du système ne comprenons-nous pas encore suffisamment ?
 
 Cette différence explique pourquoi une cartographie technique, même très détaillée, ne suffit pas toujours pour lancer une transformation.
 
@@ -210,21 +191,15 @@ Il peut être techniquement ancien et parfaitement maîtrisé.
 
 À l'inverse, une application relativement récente peut déjà être difficile à faire évoluer si ses responsabilités, ses comportements et ses dépendances sont mal compris.
 
-Ce qui rend généralement la modernisation délicate est ce que le système a accumulé avec le temps.
+Ce qui rend généralement la modernisation délicate est ce que le système a accumulé avec le temps :
 
-Des règles métier ont été ajoutées.
-
-Des exceptions sont apparues.
-
-Des partenaires ont imposé certains contrats.
-
-Des migrations de données ont laissé derrière elles des compatibilités à maintenir.
-
-Des incidents ont conduit à ajouter des mécanismes de protection.
-
-Certaines contraintes temporaires sont devenues permanentes.
-
-Et toutes ces décisions ne sont pas nécessairement présentes dans la documentation.
+- Des règles métier ont été ajoutées.
+- Des exceptions sont apparues.
+- Des partenaires ont imposé certains contrats.
+- Des migrations de données ont laissé derrière elles des compatibilités à maintenir.
+- Des incidents ont conduit à ajouter des mécanismes de protection.
+- Certaines contraintes temporaires sont devenues permanentes.
+- Et toutes ces décisions ne sont pas nécessairement présentes dans la documentation.
 
 Prenons un délai particulier avant le déclenchement d'un traitement.
 
@@ -254,23 +229,16 @@ Le dépôt de code constitue naturellement une source essentielle de connaissanc
 
 Il nous montre ce qui a été implémenté.
 
-Mais le comportement réel du système dépend souvent d'un ensemble plus large.
+Mais le comportement réel du système dépend souvent d'un ensemble plus large :
 
-Les tests peuvent révéler des cas considérés comme suffisamment importants pour être protégés.
-
-La configuration peut modifier profondément le comportement d'un même composant selon les environnements.
-
-Les données permettent de comprendre quels cas existent réellement et avec quelle fréquence.
-
-Les logs et les traces montrent les chemins effectivement exécutés.
-
-Les scripts d'exploitation révèlent parfois des procédures qui n'apparaissent pas dans l'application elle-même.
-
-La documentation contient des intentions qui ne sont plus nécessairement visibles dans l'implémentation.
-
-L'historique des modifications peut aider à retrouver l'origine de certaines décisions.
-
-Et l'expertise métier permet parfois d'expliquer en quelques minutes une règle qu'aucune analyse statique ne pourrait établir avec certitude.
+- **Les tests** peuvent révéler des cas considérés comme suffisamment importants pour être protégés.
+- **La configuration** peut modifier profondément le comportement d'un même composant selon les environnements.
+- **Les données** permettent de comprendre quels cas existent réellement et avec quelle fréquence.
+- **Les logs et les traces** montrent les chemins effectivement exécutés.
+- **Les scripts d'exploitation** révèlent parfois des procédures qui n'apparaissent pas dans l'application elle-même.
+- **La documentation** contient des intentions qui ne sont plus nécessairement visibles dans l'implémentation.
+- **L'historique des modifications** peut aider à retrouver l'origine de certaines décisions.
+- **L'expertise métier** permet parfois d'expliquer en quelques minutes une règle qu'aucune analyse statique ne pourrait établir avec certitude.
 
 ```mermaid
 flowchart LR
@@ -292,19 +260,14 @@ Au lieu de lui demander uniquement :
 
 > « Explique-moi comment fonctionne cette application. »
 
-Nous pouvons progressivement lui fournir ou lui faire explorer plusieurs sources pour répondre à des questions plus précises.
+Nous pouvons progressivement lui fournir ou lui faire explorer plusieurs sources pour répondre à des questions plus précises :
 
-Où cette règle apparaît-elle ?
-
-Existe-t-il un test qui la protège ?
-
-Quelles configurations peuvent modifier son comportement ?
-
-Observe-t-on réellement ce chemin dans les logs ?
-
-Quels consommateurs utilisent encore ce format ?
-
-Existe-t-il des éléments contradictoires entre le code et la documentation ?
+- Où cette règle apparaît-elle ?
+- Existe-t-il un test qui la protège ?
+- Quelles configurations peuvent modifier son comportement ?
+- Observe-t-on réellement ce chemin dans les logs ?
+- Quels consommateurs utilisent encore ce format ?
+- Existe-t-il des éléments contradictoires entre le code et la documentation ?
 
 L'objectif n'est plus simplement de générer une description du système.
 
@@ -343,19 +306,14 @@ L'hypothèse devient :
 
 > « Les opérations supérieures à ce seuil nécessitent une validation humaine. »
 
-Nous pouvons ensuite chercher des éléments qui renforcent ou affaiblissent cette interprétation.
+Nous pouvons ensuite chercher des éléments qui renforcent ou affaiblissent cette interprétation :
 
-Un test d'intégration couvre-t-il ce scénario ?
-
-La documentation fonctionnelle mentionne-t-elle cette validation ?
-
-Le seuil est-il identique dans tous les environnements ?
-
-Les traces montrent-elles réellement le passage par cette étape ?
-
-Existe-t-il des cas qui contournent la règle ?
-
-Un expert métier peut-il confirmer son intention ?
+- Un test d'intégration couvre-t-il ce scénario ?
+- La documentation fonctionnelle mentionne-t-elle cette validation ?
+- Le seuil est-il identique dans tous les environnements ?
+- Les traces montrent-elles réellement le passage par cette étape ?
+- Existe-t-il des cas qui contournent la règle ?
+- Un expert métier peut-il confirmer son intention ?
 
 À mesure que ces éléments convergent, l'hypothèse devient suffisamment fiable pour être utilisée dans la conception de la cible.
 
@@ -379,29 +337,21 @@ Il est d'éviter qu'une hypothèse bien formulée se transforme silencieusement 
 
 ## 7. Rendre également visible ce que nous ne savons pas
 
-Lorsque nous documentons un système, nous avons naturellement tendance à conserver les réponses.
+Lorsque nous documentons un système, nous avons naturellement tendance à conserver les réponses :
 
-Les modules identifiés.
+- Les modules identifiés.
+- Les flux compris.
+- Les règles retrouvées.
+- Les dépendances découvertes.
 
-Les flux compris.
+Pourtant, dans un projet de modernisation, les questions ouvertes peuvent être tout aussi importantes :
 
-Les règles retrouvées.
-
-Les dépendances découvertes.
-
-Pourtant, dans un projet de modernisation, les questions ouvertes peuvent être tout aussi importantes.
-
-Pourquoi deux traitements apparemment équivalents utilisent-ils des règles différentes ?
-
-Cette table est-elle encore alimentée ?
-
-Ce format doit-il toujours être accepté ?
-
-Ce batch est-il encore utilisé en production ?
-
-Ce comportement constitue-t-il une règle métier ou un contournement historique ?
-
-Que se passe-t-il réellement lorsque ce service externe ne répond pas ?
+- Pourquoi deux traitements apparemment équivalents utilisent-ils des règles différentes ?
+- Cette table est-elle encore alimentée ?
+- Ce format doit-il toujours être accepté ?
+- Ce batch est-il encore utilisé en production ?
+- Ce comportement constitue-t-il une règle métier ou un contournement historique ?
+- Que se passe-t-il réellement lorsque ce service externe ne répond pas ?
 
 Une partie de la qualité de l'analyse consiste précisément à ne pas inventer une réponse lorsque les éléments disponibles ne permettent pas de conclure.
 
@@ -473,15 +423,12 @@ La bonne question devient plutôt :
 
 > **Disposons-nous des connaissances nécessaires pour prendre cette décision de transformation ?**
 
-Cela oblige à relier l'analyse à un objectif.
+Cela oblige à relier l'analyse à un objectif :
 
-Quels comportements seront potentiellement affectés ?
-
-Quelles règles devons-nous protéger ?
-
-Quels contrats seront modifiés ?
-
-Quelles zones restent trop incertaines pour avancer ?
+- Quels comportements seront potentiellement affectés ?
+- Quelles règles devons-nous protéger ?
+- Quels contrats seront modifiés ?
+- Quelles zones restent trop incertaines pour avancer ?
 
 À partir de là, l'agent cesse progressivement d'être uniquement un outil d'exploration.
 
