@@ -7,6 +7,8 @@ export interface Talk {
   title: Record<string, string>;
   host: string;
   date?: string;
+  time?: string;
+  eventUrl?: string;
   summary?: Record<string, string>;
   tags?: string[];
   slidesUrl?: string;

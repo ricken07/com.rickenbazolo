@@ -1,5 +1,22 @@
 [
   {
+    "slug": "spring-ai-en-action-marseille-jug",
+    "status": "upcoming",
+    "date": "2026-11-03",
+    "time": "19:00",
+    "eventUrl": "https://marsjug.org/reunions/spring-ai-en-action-int-grer-les-capacit-s-des-llm-dans-vos-applications-java/",
+    "title": {
+      "fr": "Spring AI en action : intégrer les capacités des LLM dans vos applications Java",
+      "en": "Spring AI in Action: Integrating LLM Capabilities into Your Java Applications"
+    },
+    "host": "Marseille JUG",
+    "summary": {
+      "fr": "Intégration des LLM dans des applications Java avec Spring AI : RAG pour enrichir le contexte, Function Calling pour invoquer des fonctions Java typées, patterns d'agents et MCP pour structurer les interactions avec les outils IA.",
+      "en": "Integrating LLMs into Java applications with Spring AI: RAG for context enrichment, Function Calling for typed Java function invocation, agent patterns, and MCP for structured AI tool interactions."
+    },
+    "tags": ["Java", "Spring AI", "LLM", "RAG", "MCP"]
+  },
+  {
     "slug": "llm-java-bordeaux-jug",
     "status": "past",
     "title": {

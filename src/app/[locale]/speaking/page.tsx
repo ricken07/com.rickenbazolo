@@ -55,9 +55,24 @@ export default async function SpeakingPage({ params }: { params: Promise<{ local
                 <tbody>
                   {upcomingTalks.map((talk) => (
                     <tr key={talk.slug} className="border-t border-border/60">
-                      <td className="px-5 py-4 font-medium text-foreground">{talk.localizedTitle}</td>
+                      <td className="px-5 py-4 font-medium text-foreground">
+                        {talk.eventUrl ? (
+                          <a
+                            href={talk.eventUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline-offset-4 transition hover:text-accent hover:underline"
+                          >
+                            {talk.localizedTitle}
+                          </a>
+                        ) : (
+                          talk.localizedTitle
+                        )}
+                      </td>
                       <td className="px-5 py-4 text-muted-foreground">{talk.host}</td>
-                      <td className="px-5 py-4 text-muted-foreground">{formatDate(talk.date!, locale)}</td>
+                      <td className="px-5 py-4 text-muted-foreground">{formatDate(talk.date!, locale)}
+                        {talk.time ? ` · ${talk.time}` : ""}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

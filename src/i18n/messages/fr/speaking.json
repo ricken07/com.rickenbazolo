@@ -11,7 +11,7 @@
     "description": "Les prochaines sessions et conférences prévues.",
     "empty": "Pas d'événements pour le moment",
     "table": {
-      "title": "Titre de l'événement",
+      "title": "Événement",
       "host": "Hôte",
       "date": "Date"
     }
