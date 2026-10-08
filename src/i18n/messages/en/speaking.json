@@ -11,7 +11,7 @@
     "description": "The next planned sessions and conferences.",
     "empty": "No events at the moment",
     "table": {
-      "title": "Event title",
+      "title": "Event",
       "host": "Host",
       "date": "Date"
     }
