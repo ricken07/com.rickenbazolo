@@ -7,6 +7,9 @@ export function TalkCard({ talk }: { talk: LocalizedTalk }) {
       <div className="flex flex-col gap-2">
         <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{talk.host}</p>
         <h3 className="text-xl font-semibold">{talk.localizedTitle}</h3>
+        {talk.localizedDate ? (
+          <time dateTime={talk.date} className="text-sm text-muted-foreground">{talk.localizedDate}</time>
+        ) : null}
         {talk.localizedSummary ? (
           <p className="text-sm leading-relaxed text-muted-foreground">{talk.localizedSummary}</p>
         ) : null}

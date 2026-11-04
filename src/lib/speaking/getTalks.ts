@@ -9,6 +9,7 @@ const TALKS_PATH = path.join(process.cwd(), "src", "content", "speaking", "talks
 export interface LocalizedTalk extends Omit<Talk, "title" | "summary"> {
   localizedTitle: string;
   localizedSummary?: string;
+  localizedDate?: string;
 }
 
 export async function getTalks(locale: string) {
@@ -19,5 +20,8 @@ export async function getTalks(locale: string) {
     ...talk,
     localizedTitle: talk.title?.[locale] ?? talk.title.en,
     localizedSummary: talk.summary?.[locale] ?? talk.summary?.en,
+    localizedDate: talk.date
+      ? new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${talk.date}T12:00:00Z`))
+      : undefined,
   }));
 }
